@@ -231,7 +231,7 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           setTimeout(() => initOrders(retries - 1), 2000);
         } else {
           import('sonner').then(({ toast }) => {
-            toast.error('Backend connection failed. Please ensure the server is running on port 5000.');
+            toast.error('Backend connection failed. Please ensure the backend is reachable.');
           });
           setIsLoading(false);
         }

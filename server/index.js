@@ -36,7 +36,12 @@ require('./models/SiteData');
 // Database Connection (Background)
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/inkopia', {
+    const mongoUri = process.env.MONGODB_URI;
+    if (!mongoUri) {
+      console.log('ℹ️ MONGODB_URI not found. Working in Local JSON Storage mode.');
+      return;
+    }
+    await mongoose.connect(mongoUri, {
       serverSelectionTimeoutMS: 5000
     });
     console.log('✅ Connected to MongoDB Atlas');
@@ -49,8 +54,14 @@ const connectDB = async () => {
 connectDB();
 
 // Keep alive timer
-setInterval(() => {}, 1000 * 60 * 60);
+if (process.env.NODE_ENV !== 'production') {
+  setInterval(() => {}, 1000 * 60 * 60);
+}
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Server is running on port ${PORT}`);
-});
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Server is running on port ${PORT}`);
+  });
+}
+
+module.exports = app;
