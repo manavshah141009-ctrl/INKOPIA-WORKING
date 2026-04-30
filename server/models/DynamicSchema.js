@@ -19,4 +19,4 @@ const dynamicSchemaSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('DynamicSchema', dynamicSchemaSchema);
+module.exports = mongoose.models.DynamicSchema || mongoose.model('DynamicSchema', dynamicSchemaSchema);

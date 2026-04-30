@@ -14,4 +14,4 @@ const siteDataSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('SiteData', siteDataSchema);
+module.exports = mongoose.models.SiteData || mongoose.model('SiteData', siteDataSchema);

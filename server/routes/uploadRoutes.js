@@ -4,10 +4,14 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-// Ensure uploads directory exists
+// Ensure uploads directory exists (Safe for Serverless)
 const uploadDir = path.join(__dirname, '../uploads');
-if (!fs.existsSync(uploadDir)){
-    fs.mkdirSync(uploadDir);
+try {
+    if (!fs.existsSync(uploadDir) && !process.env.VERCEL) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+    }
+} catch (err) {
+    console.warn('⚠️ Could not create uploads directory:', err.message);
 }
 
 const storage = multer.diskStorage({
