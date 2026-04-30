@@ -84,6 +84,7 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
               fields: [
                 { name: 'id', label: 'Order ID', type: 'text' },
                 { name: 'clientName', label: 'Client Name', type: 'text' },
+                { name: 'clientPhone', label: 'Phone', type: 'text' },
                 { name: 'location', label: 'Location', type: 'text' },
                 { name: 'date', label: 'Date', type: 'date' },
                 { name: 'service', label: 'Service', type: 'text' },

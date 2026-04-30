@@ -30,9 +30,13 @@ const uploadRoutes = require('./routes/uploadRoutes');
 const authRoutes = require('./routes/authRoutes');
 
 app.use('/api/schemas', schemaRoutes);
+app.use('/schemas', schemaRoutes);
 app.use('/api/data', dataRoutes);
+app.use('/data', dataRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/upload', uploadRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/auth', authRoutes);
 
 // Basic Route
 app.get('/', (req, res) => {
