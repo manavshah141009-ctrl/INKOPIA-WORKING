@@ -69,10 +69,13 @@ class Storage {
           return await Model.findByIdAndUpdate(id, data, { new: true });
         } else {
           const instance = new Model(data);
-          return await instance.save();
+          const saved = await instance.save();
+          console.log(`✅ [STORAGE] Saved ${modelName} to MongoDB`);
+          return saved;
         }
       } catch (err) {
-        console.error(`MongoDB save error for ${modelName}:`, err.message);
+        console.error(`❌ [STORAGE] MongoDB save error for ${modelName}:`, err.message);
+        throw err; // Re-throw to be caught by route and sent to client
       }
     }
 
