@@ -1,0 +1,190 @@
+[
+  {
+    "_id": "69f05af0111796663e7c6722",
+    "collectionName": "orders",
+    "displayName": "Service Orders",
+    "fields": [
+      {
+        "name": "clientName",
+        "label": "Client Name",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "location",
+        "label": "Location",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "date",
+        "label": "Date",
+        "type": "date",
+        "required": true
+      },
+      {
+        "name": "service",
+        "label": "Service",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "instrument",
+        "label": "Instrument",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "paymentMethod",
+        "label": "Payment Method",
+        "type": "text"
+      },
+      {
+        "name": "bookingTime",
+        "label": "Booking Time",
+        "type": "text"
+      },
+      {
+        "name": "amount",
+        "label": "Amount",
+        "type": "number"
+      },
+      {
+        "name": "id",
+        "label": "Order ID",
+        "type": "text"
+      },
+      {
+        "name": "status",
+        "label": "Status",
+        "type": "text"
+      }
+    ],
+    "createdAt": "2026-04-28T10:00:00.000Z",
+    "updatedAt": "2026-04-28T10:00:00.000Z"
+  },
+  {
+    "_id": "69f05af0111796663e7c6723",
+    "collectionName": "users",
+    "displayName": "Registered Users",
+    "fields": [
+      {
+        "name": "name",
+        "label": "Name",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "email",
+        "label": "Email",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "address",
+        "label": "Address",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "phone",
+        "label": "Phone",
+        "type": "text"
+      },
+      {
+        "name": "company",
+        "label": "Company",
+        "type": "text"
+      },
+      {
+        "name": "designation",
+        "label": "Designation",
+        "type": "text"
+      }
+    ],
+    "createdAt": "2026-04-28T10:00:00.000Z",
+    "updatedAt": "2026-04-28T10:00:00.000Z"
+  },
+  {
+    "collectionName": "vault",
+    "displayName": "Customer Vault",
+    "fields": [
+      {
+        "name": "brand",
+        "label": "Brand",
+        "type": "text"
+      },
+      {
+        "name": "model",
+        "label": "Model",
+        "type": "text"
+      },
+      {
+        "name": "nib",
+        "label": "Nib",
+        "type": "text"
+      },
+      {
+        "name": "silhouette",
+        "label": "Silhouette",
+        "type": "text"
+      },
+      {
+        "name": "imageUrl",
+        "label": "Image URL",
+        "type": "text"
+      },
+      {
+        "name": "ownerName",
+        "label": "Owner Name",
+        "type": "text"
+      }
+    ],
+    "_id": "lkh5hrvm1",
+    "createdAt": "2026-04-28T11:47:59.587Z",
+    "updatedAt": "2026-04-28T11:47:59.587Z"
+  },
+  {
+    "collectionName": "site_config",
+    "displayName": "Site Configuration",
+    "fields": [
+      {
+        "name": "content",
+        "label": "Site Content",
+        "type": "rich-text"
+      },
+      {
+        "name": "theme",
+        "label": "Site Theme",
+        "type": "rich-text"
+      },
+      {
+        "name": "servicePrice",
+        "label": "Service Price",
+        "type": "number"
+      }
+    ],
+    "_id": "xdanlycax",
+    "createdAt": "2026-04-28T11:47:59.592Z",
+    "updatedAt": "2026-04-28T11:47:59.592Z"
+  },
+  {
+    "collectionName": "inks",
+    "displayName": "Available Inks",
+    "fields": [
+      {
+        "name": "name",
+        "label": "Ink Name",
+        "type": "text"
+      },
+      {
+        "name": "hex",
+        "label": "Hex Code",
+        "type": "text"
+      }
+    ],
+    "_id": "pkaprylx4",
+    "createdAt": "2026-04-28T11:47:59.615Z",
+    "updatedAt": "2026-04-28T11:47:59.615Z"
+  }
+]

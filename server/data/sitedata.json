@@ -1,0 +1,838 @@
+[
+  {
+    "schemaId": "pkaprylx4",
+    "data": {
+      "name": "Onyx Black",
+      "hex": "#0f0f0f"
+    },
+    "_id": "257xjkn6i",
+    "createdAt": "2026-04-28T11:47:59.647Z",
+    "updatedAt": "2026-04-28T11:47:59.647Z"
+  },
+  {
+    "schemaId": "pkaprylx4",
+    "data": {
+      "name": "Midnight Blue",
+      "hex": "#191970"
+    },
+    "_id": "1oheqz1dg",
+    "createdAt": "2026-04-28T11:47:59.708Z",
+    "updatedAt": "2026-04-28T11:47:59.708Z"
+  },
+  {
+    "schemaId": "pkaprylx4",
+    "data": {
+      "name": "Oxblood Red",
+      "hex": "#4a0404"
+    },
+    "_id": "hoa9rr4uw",
+    "createdAt": "2026-04-28T11:47:59.777Z",
+    "updatedAt": "2026-04-28T11:47:59.777Z"
+  },
+  {
+    "schemaId": "pkaprylx4",
+    "data": {
+      "name": "Emerald Green",
+      "hex": "#2e8b57"
+    },
+    "_id": "z4askpo7i",
+    "createdAt": "2026-04-28T11:47:59.826Z",
+    "updatedAt": "2026-04-28T11:47:59.826Z"
+  },
+  {
+    "schemaId": "pkaprylx4",
+    "data": {
+      "name": "Imperial Purple",
+      "hex": "#4b0082"
+    },
+    "_id": "kyfqsnecz",
+    "createdAt": "2026-04-28T11:47:59.885Z",
+    "updatedAt": "2026-04-28T11:47:59.885Z"
+  },
+  {
+    "schemaId": "pkaprylx4",
+    "data": {
+      "name": "Toffee Brown",
+      "hex": "#603311"
+    },
+    "_id": "brkz0fh7f",
+    "createdAt": "2026-04-28T11:47:59.948Z",
+    "updatedAt": "2026-04-28T11:47:59.948Z"
+  },
+  {
+    "schemaId": "lkh5hrvm1",
+    "data": {
+      "brand": "Montblanc",
+      "model": "Meisterstück 149",
+      "nib": "Fine - 18k Gold",
+      "silhouette": "cigar",
+      "ownerName": "Manav"
+    },
+    "_id": "rdnumk8ya",
+    "createdAt": "2026-04-28T11:52:20.148Z",
+    "updatedAt": "2026-04-28T11:52:20.148Z"
+  },
+  {
+    "schemaId": "69f05af0111796663e7c6722",
+    "data": {
+      "clientName": "Manav",
+      "location": "1102, devikrupa blg",
+      "date": "2026-04-30",
+      "service": "Aficionado Maintenance Ritual",
+      "instrument": "Montblanc Meisterstück 149",
+      "ink": "Midnight Blue",
+      "id": "ORD2665",
+      "status": "Completed",
+      "createdAt": "2026-04-28T11:53:18.494Z",
+      "backendId": "p5lfq5z8y"
+    },
+    "_id": "p5lfq5z8y",
+    "createdAt": "2026-04-28T11:53:18.558Z",
+    "updatedAt": "2026-04-29T11:28:44.846Z"
+  },
+  {
+    "schemaId": "69f05af0111796663e7c6722",
+    "data": {
+      "clientName": "Manav",
+      "location": "1293 dec",
+      "date": "2026-05-01",
+      "service": "Aficionado Maintenance Ritual",
+      "instrument": "Montblanc Meisterstück 149",
+      "ink": "Midnight Blue",
+      "id": "ORD2248",
+      "status": "Completed",
+      "createdAt": "2026-04-28T11:58:51.787Z",
+      "backendId": "5t8vdpox5"
+    },
+    "_id": "5t8vdpox5",
+    "createdAt": "2026-04-28T11:58:51.835Z",
+    "updatedAt": "2026-04-29T11:28:43.275Z"
+  },
+  {
+    "schemaId": "69f05af0111796663e7c6722",
+    "data": {
+      "clientName": "Manav",
+      "location": "12344677",
+      "date": "2026-04-23",
+      "service": "Aficionado Maintenance Ritual",
+      "instrument": "Montblanc Meisterstück 149",
+      "ink": "Oxblood Red",
+      "id": "ORD1281",
+      "status": "Pending",
+      "createdAt": "2026-04-29T11:29:43.808Z"
+    },
+    "_id": "jnc8vw781",
+    "createdAt": "2026-04-29T11:29:43.836Z",
+    "updatedAt": "2026-04-29T11:29:43.836Z"
+  },
+  {
+    "schemaId": "69f05af0111796663e7c6722",
+    "data": {
+      "clientName": "Manav",
+      "location": "1234567ifdjasdfghjukilo;p'",
+      "date": "2026-04-09",
+      "service": "Aficionado Maintenance Ritual",
+      "instrument": "Montblanc Meisterstück 149",
+      "ink": "Oxblood Red",
+      "id": "ORD6030",
+      "status": "Pending",
+      "createdAt": "2026-04-29T11:34:44.455Z"
+    },
+    "_id": "86w6od86x",
+    "createdAt": "2026-04-29T11:34:44.474Z",
+    "updatedAt": "2026-04-29T11:34:44.474Z"
+  },
+  {
+    "schemaId": "lkh5hrvm1",
+    "data": {
+      "brand": "Visconti",
+      "model": "Homo Sapiens Bronze Age",
+      "nib": "Fine - 23k Palladium",
+      "silhouette": "flat-top",
+      "ownerName": "Manav"
+    },
+    "_id": "68n1q84r2",
+    "createdAt": "2026-04-29T11:40:31.557Z",
+    "updatedAt": "2026-04-29T11:40:31.557Z"
+  },
+  {
+    "schemaId": "69f05af0111796663e7c6722",
+    "data": {
+      "clientName": "Manav",
+      "location": "asdfhjkl;lkbvcxcgbgjklvcxz",
+      "date": "2026-04-09",
+      "service": "Aficionado Maintenance Ritual",
+      "instrument": "Visconti Homo Sapiens Bronze Age",
+      "ink": "Toffee Brown",
+      "id": "ORD2593",
+      "status": "Pending",
+      "createdAt": "2026-04-29T11:40:48.999Z"
+    },
+    "_id": "4ty19ehr7",
+    "createdAt": "2026-04-29T11:40:49.021Z",
+    "updatedAt": "2026-04-29T11:40:49.021Z"
+  },
+  {
+    "schemaId": "pkaprylx4",
+    "data": {
+      "name": "White ",
+      "hex": "#000000"
+    },
+    "_id": "c9966rdwd",
+    "createdAt": "2026-04-29T11:41:29.924Z",
+    "updatedAt": "2026-04-29T11:41:29.924Z"
+  },
+  {
+    "schemaId": "69f05af0111796663e7c6722",
+    "data": {
+      "clientName": "Manav",
+      "location": "wqertyuiop[asdfghjkl;",
+      "date": "2026-05-08",
+      "service": "Aficionado Maintenance Ritual",
+      "instrument": "Visconti Homo Sapiens Bronze Age",
+      "ink": "Toffee Brown",
+      "id": "ORD6753",
+      "status": "Pending",
+      "createdAt": "2026-04-29T12:01:39.993Z"
+    },
+    "_id": "9z4xrchj5",
+    "createdAt": "2026-04-29T12:01:40.009Z",
+    "updatedAt": "2026-04-29T12:01:40.009Z"
+  },
+  {
+    "schemaId": "xdanlycax",
+    "data": {
+      "content": {
+        "heroSubheading": "Luxury in Every Stroke",
+        "conciergeTitle": "The Concierge",
+        "conciergeHeading": "Mastery in Person.",
+        "conciergeText": "No shipping. No waiting. Commission one of our master specialists to visit your private residence or office. We handle your most prized writing instruments with the reverence they deserve.",
+        "ritualTitle": "The White-Glove Ritual",
+        "ritualHeading": "The Refilling Ceremony.",
+        "ritualItems": [
+          {
+            "title": "The Purge",
+            "desc": "Pharmaceutical-grade feed flush."
+          },
+          {
+            "title": "The Curation",
+            "desc": "Private vault ink selection."
+          },
+          {
+            "title": "The Prime",
+            "desc": "Flawless fill and nib polish."
+          }
+        ],
+        "commissionTitle": "Commission",
+        "commissionHeading": "Reserve Your Aficionado.",
+        "commissionText": "Experience the ultimate care for your collection.",
+        "commissionPenBrand": "",
+        "commissionPenName": "",
+        "penImage": "/uploaded1-pen.png",
+        "pages": [],
+        "stripePublicKey": "",
+        "firebaseApiKey": "",
+        "firebaseProjectId": "",
+        "servicePrice": 1500
+      },
+      "theme": {
+        "backgroundColor": "#F5F5F5",
+        "textColor": "#004225",
+        "accentColor": "#D4AF37",
+        "borderRadius": "8px",
+        "borderWidth": "2px",
+        "borderStyle": "solid",
+        "fontFamilyPrimary": "'Playfair Display', Georgia, serif",
+        "fontFamilySecondary": "'Inter', system-ui, sans-serif"
+      }
+    },
+    "_id": "m49g7o1d0",
+    "createdAt": "2026-04-29T12:05:26.583Z",
+    "updatedAt": "2026-04-29T12:28:37.133Z"
+  },
+  {
+    "schemaId": "xdanlycax",
+    "data": {
+      "content": {
+        "heroSubheading": "Luxury in Every Stroke",
+        "conciergeTitle": "The Concierge",
+        "conciergeHeading": "Mastery in Person.",
+        "conciergeText": "No shipping. No waiting. Commission one of our master specialists to visit your private residence or office. We handle your most prized writing instruments with the reverence they deserve.",
+        "ritualTitle": "The White-Glove Ritual",
+        "ritualHeading": "The Refilling Ceremony.",
+        "ritualItems": [
+          {
+            "title": "The Purge",
+            "desc": "Pharmaceutical-grade feed flush."
+          },
+          {
+            "title": "The Curation",
+            "desc": "Private vault ink selection."
+          },
+          {
+            "title": "The Prime",
+            "desc": "Flawless fill and nib polish."
+          }
+        ],
+        "commissionTitle": "Commission",
+        "commissionHeading": "Reserve Your Aficionado.",
+        "commissionText": "Experience the ultimate care for your collection.",
+        "commissionPenBrand": "Visconti",
+        "commissionPenName": "Homo Sapiens",
+        "penImage": "/uploaded1-pen.png",
+        "pages": [],
+        "stripePublicKey": "",
+        "firebaseApiKey": "",
+        "firebaseProjectId": "",
+        "servicePrice": 15
+      },
+      "theme": {
+        "backgroundColor": "#F5F5F5",
+        "textColor": "#004225",
+        "accentColor": "#D4AF37",
+        "borderRadius": "8px",
+        "borderWidth": "2px",
+        "borderStyle": "solid",
+        "fontFamilyPrimary": "'Playfair Display', Georgia, serif",
+        "fontFamilySecondary": "'Inter', system-ui, sans-serif"
+      }
+    },
+    "_id": "v87u5c4v0",
+    "createdAt": "2026-04-29T12:05:27.492Z",
+    "updatedAt": "2026-04-29T12:05:27.492Z"
+  },
+  {
+    "schemaId": "xdanlycax",
+    "data": {
+      "content": {
+        "heroSubheading": "Luxury in Every Stroke",
+        "conciergeTitle": "The Concierge",
+        "conciergeHeading": "Mastery in Person.",
+        "conciergeText": "No shipping. No waiting. Commission one of our master specialists to visit your private residence or office. We handle your most prized writing instruments with the reverence they deserve.",
+        "ritualTitle": "The White-Glove Ritual",
+        "ritualHeading": "The Refilling Ceremony.",
+        "ritualItems": [
+          {
+            "title": "The Purge",
+            "desc": "Pharmaceutical-grade feed flush."
+          },
+          {
+            "title": "The Curation",
+            "desc": "Private vault ink selection."
+          },
+          {
+            "title": "The Prime",
+            "desc": "Flawless fill and nib polish."
+          }
+        ],
+        "commissionTitle": "Commission",
+        "commissionHeading": "Reserve Your Aficionado.",
+        "commissionText": "Experience the ultimate care for your collection.",
+        "commissionPenBrand": "Visconti",
+        "commissionPenName": "Homo Sapiens",
+        "penImage": "/uploaded1-pen.png",
+        "pages": [],
+        "stripePublicKey": "",
+        "firebaseApiKey": "",
+        "firebaseProjectId": "",
+        "servicePrice": 150
+      },
+      "theme": {
+        "backgroundColor": "#F5F5F5",
+        "textColor": "#004225",
+        "accentColor": "#D4AF37",
+        "borderRadius": "8px",
+        "borderWidth": "2px",
+        "borderStyle": "solid",
+        "fontFamilyPrimary": "'Playfair Display', Georgia, serif",
+        "fontFamilySecondary": "'Inter', system-ui, sans-serif"
+      }
+    },
+    "_id": "2gqb2oun1",
+    "createdAt": "2026-04-29T12:05:28.523Z",
+    "updatedAt": "2026-04-29T12:05:28.523Z"
+  },
+  {
+    "schemaId": "xdanlycax",
+    "data": {
+      "content": {
+        "heroSubheading": "Luxury in Every Stroke",
+        "conciergeTitle": "The Concierge",
+        "conciergeHeading": "Mastery in Person.",
+        "conciergeText": "No shipping. No waiting. Commission one of our master specialists to visit your private residence or office. We handle your most prized writing instruments with the reverence they deserve.",
+        "ritualTitle": "The White-Glove Ritual",
+        "ritualHeading": "The Refilling Ceremony.",
+        "ritualItems": [
+          {
+            "title": "The Purge",
+            "desc": "Pharmaceutical-grade feed flush."
+          },
+          {
+            "title": "The Curation",
+            "desc": "Private vault ink selection."
+          },
+          {
+            "title": "The Prime",
+            "desc": "Flawless fill and nib polish."
+          }
+        ],
+        "commissionTitle": "Commission",
+        "commissionHeading": "Reserve Your Aficionado.",
+        "commissionText": "Experience the ultimate care for your collection.",
+        "commissionPenBrand": "Visconti",
+        "commissionPenName": "Homo Sapiens",
+        "penImage": "/uploaded1-pen.png",
+        "pages": [],
+        "stripePublicKey": "",
+        "firebaseApiKey": "",
+        "firebaseProjectId": "",
+        "servicePrice": 0
+      },
+      "theme": {
+        "backgroundColor": "#F5F5F5",
+        "textColor": "#004225",
+        "accentColor": "#D4AF37",
+        "borderRadius": "8px",
+        "borderWidth": "2px",
+        "borderStyle": "solid",
+        "fontFamilyPrimary": "'Playfair Display', Georgia, serif",
+        "fontFamilySecondary": "'Inter', system-ui, sans-serif"
+      }
+    },
+    "_id": "p8903qvfi",
+    "createdAt": "2026-04-29T12:05:29.456Z",
+    "updatedAt": "2026-04-29T12:05:29.456Z"
+  },
+  {
+    "schemaId": "xdanlycax",
+    "data": {
+      "content": {
+        "heroSubheading": "Luxury in Every Stroke",
+        "conciergeTitle": "The Concierge",
+        "conciergeHeading": "Mastery in Person.",
+        "conciergeText": "No shipping. No waiting. Commission one of our master specialists to visit your private residence or office. We handle your most prized writing instruments with the reverence they deserve.",
+        "ritualTitle": "The White-Glove Ritual",
+        "ritualHeading": "The Refilling Ceremony.",
+        "ritualItems": [
+          {
+            "title": "The Purge",
+            "desc": "Pharmaceutical-grade feed flush."
+          },
+          {
+            "title": "The Curation",
+            "desc": "Private vault ink selection."
+          },
+          {
+            "title": "The Prime",
+            "desc": "Flawless fill and nib polish."
+          }
+        ],
+        "commissionTitle": "Commission",
+        "commissionHeading": "Reserve Your Aficionado.",
+        "commissionText": "Experience the ultimate care for your collection.",
+        "commissionPenBrand": "Visconti",
+        "commissionPenName": "Homo Sapiens",
+        "penImage": "/uploaded1-pen.png",
+        "pages": [],
+        "stripePublicKey": "",
+        "firebaseApiKey": "",
+        "firebaseProjectId": "",
+        "servicePrice": 0
+      },
+      "theme": {
+        "backgroundColor": "#F5F5F5",
+        "textColor": "#004225",
+        "accentColor": "#D4AF37",
+        "borderRadius": "8px",
+        "borderWidth": "2px",
+        "borderStyle": "solid",
+        "fontFamilyPrimary": "'Playfair Display', Georgia, serif",
+        "fontFamilySecondary": "'Inter', system-ui, sans-serif"
+      }
+    },
+    "_id": "gwglpqenv",
+    "createdAt": "2026-04-29T12:05:29.476Z",
+    "updatedAt": "2026-04-29T12:05:29.476Z"
+  },
+  {
+    "schemaId": "xdanlycax",
+    "data": {
+      "content": {
+        "heroSubheading": "Luxury in Every Stroke",
+        "conciergeTitle": "The Concierge",
+        "conciergeHeading": "Mastery in Person.",
+        "conciergeText": "No shipping. No waiting. Commission one of our master specialists to visit your private residence or office. We handle your most prized writing instruments with the reverence they deserve.",
+        "ritualTitle": "The White-Glove Ritual",
+        "ritualHeading": "The Refilling Ceremony.",
+        "ritualItems": [
+          {
+            "title": "The Purge",
+            "desc": "Pharmaceutical-grade feed flush."
+          },
+          {
+            "title": "The Curation",
+            "desc": "Private vault ink selection."
+          },
+          {
+            "title": "The Prime",
+            "desc": "Flawless fill and nib polish."
+          }
+        ],
+        "commissionTitle": "Commission",
+        "commissionHeading": "Reserve Your Aficionado.",
+        "commissionText": "Experience the ultimate care for your collection.",
+        "commissionPenBrand": "Visconti",
+        "commissionPenName": "Homo Sapiens",
+        "penImage": "/uploaded1-pen.png",
+        "pages": [],
+        "stripePublicKey": "",
+        "firebaseApiKey": "",
+        "firebaseProjectId": "",
+        "servicePrice": 0
+      },
+      "theme": {
+        "backgroundColor": "#F5F5F5",
+        "textColor": "#004225",
+        "accentColor": "#D4AF37",
+        "borderRadius": "8px",
+        "borderWidth": "2px",
+        "borderStyle": "solid",
+        "fontFamilyPrimary": "'Playfair Display', Georgia, serif",
+        "fontFamilySecondary": "'Inter', system-ui, sans-serif"
+      }
+    },
+    "_id": "61awm40qv",
+    "createdAt": "2026-04-29T12:05:29.501Z",
+    "updatedAt": "2026-04-29T12:05:29.501Z"
+  },
+  {
+    "schemaId": "xdanlycax",
+    "data": {
+      "content": {
+        "heroSubheading": "Luxury in Every Stroke",
+        "conciergeTitle": "The Concierge",
+        "conciergeHeading": "Mastery in Person.",
+        "conciergeText": "No shipping. No waiting. Commission one of our master specialists to visit your private residence or office. We handle your most prized writing instruments with the reverence they deserve.",
+        "ritualTitle": "The White-Glove Ritual",
+        "ritualHeading": "The Refilling Ceremony.",
+        "ritualItems": [
+          {
+            "title": "The Purge",
+            "desc": "Pharmaceutical-grade feed flush."
+          },
+          {
+            "title": "The Curation",
+            "desc": "Private vault ink selection."
+          },
+          {
+            "title": "The Prime",
+            "desc": "Flawless fill and nib polish."
+          }
+        ],
+        "commissionTitle": "Commission",
+        "commissionHeading": "Reserve Your Aficionado.",
+        "commissionText": "Experience the ultimate care for your collection.",
+        "commissionPenBrand": "Visconti",
+        "commissionPenName": "Homo Sapiens",
+        "penImage": "/uploaded1-pen.png",
+        "pages": [],
+        "stripePublicKey": "",
+        "firebaseApiKey": "",
+        "firebaseProjectId": "",
+        "servicePrice": 1
+      },
+      "theme": {
+        "backgroundColor": "#F5F5F5",
+        "textColor": "#004225",
+        "accentColor": "#D4AF37",
+        "borderRadius": "8px",
+        "borderWidth": "2px",
+        "borderStyle": "solid",
+        "fontFamilyPrimary": "'Playfair Display', Georgia, serif",
+        "fontFamilySecondary": "'Inter', system-ui, sans-serif"
+      }
+    },
+    "_id": "5jqya0wuf",
+    "createdAt": "2026-04-29T12:05:30.455Z",
+    "updatedAt": "2026-04-29T12:05:30.455Z"
+  },
+  {
+    "schemaId": "xdanlycax",
+    "data": {
+      "content": {
+        "heroSubheading": "Luxury in Every Stroke",
+        "conciergeTitle": "The Concierge",
+        "conciergeHeading": "Mastery in Person.",
+        "conciergeText": "No shipping. No waiting. Commission one of our master specialists to visit your private residence or office. We handle your most prized writing instruments with the reverence they deserve.",
+        "ritualTitle": "The White-Glove Ritual",
+        "ritualHeading": "The Refilling Ceremony.",
+        "ritualItems": [
+          {
+            "title": "The Purge",
+            "desc": "Pharmaceutical-grade feed flush."
+          },
+          {
+            "title": "The Curation",
+            "desc": "Private vault ink selection."
+          },
+          {
+            "title": "The Prime",
+            "desc": "Flawless fill and nib polish."
+          }
+        ],
+        "commissionTitle": "Commission",
+        "commissionHeading": "Reserve Your Aficionado.",
+        "commissionText": "Experience the ultimate care for your collection.",
+        "commissionPenBrand": "Visconti",
+        "commissionPenName": "Homo Sapiens",
+        "penImage": "/uploaded1-pen.png",
+        "pages": [],
+        "stripePublicKey": "",
+        "firebaseApiKey": "",
+        "firebaseProjectId": "",
+        "servicePrice": 14
+      },
+      "theme": {
+        "backgroundColor": "#F5F5F5",
+        "textColor": "#004225",
+        "accentColor": "#D4AF37",
+        "borderRadius": "8px",
+        "borderWidth": "2px",
+        "borderStyle": "solid",
+        "fontFamilyPrimary": "'Playfair Display', Georgia, serif",
+        "fontFamilySecondary": "'Inter', system-ui, sans-serif"
+      }
+    },
+    "_id": "m8b62uhil",
+    "createdAt": "2026-04-29T12:05:31.594Z",
+    "updatedAt": "2026-04-29T12:05:31.594Z"
+  },
+  {
+    "schemaId": "xdanlycax",
+    "data": {
+      "content": {
+        "heroSubheading": "Luxury in Every Stroke",
+        "conciergeTitle": "The Concierge",
+        "conciergeHeading": "Mastery in Person.",
+        "conciergeText": "No shipping. No waiting. Commission one of our master specialists to visit your private residence or office. We handle your most prized writing instruments with the reverence they deserve.",
+        "ritualTitle": "The White-Glove Ritual",
+        "ritualHeading": "The Refilling Ceremony.",
+        "ritualItems": [
+          {
+            "title": "The Purge",
+            "desc": "Pharmaceutical-grade feed flush."
+          },
+          {
+            "title": "The Curation",
+            "desc": "Private vault ink selection."
+          },
+          {
+            "title": "The Prime",
+            "desc": "Flawless fill and nib polish."
+          }
+        ],
+        "commissionTitle": "Commission",
+        "commissionHeading": "Reserve Your Aficionado.",
+        "commissionText": "Experience the ultimate care for your collection.",
+        "commissionPenBrand": "Visconti",
+        "commissionPenName": "Homo Sapiens",
+        "penImage": "/uploaded1-pen.png",
+        "pages": [],
+        "stripePublicKey": "",
+        "firebaseApiKey": "",
+        "firebaseProjectId": "",
+        "servicePrice": 145
+      },
+      "theme": {
+        "backgroundColor": "#F5F5F5",
+        "textColor": "#004225",
+        "accentColor": "#D4AF37",
+        "borderRadius": "8px",
+        "borderWidth": "2px",
+        "borderStyle": "solid",
+        "fontFamilyPrimary": "'Playfair Display', Georgia, serif",
+        "fontFamilySecondary": "'Inter', system-ui, sans-serif"
+      }
+    },
+    "_id": "vgoktd71w",
+    "createdAt": "2026-04-29T12:05:31.619Z",
+    "updatedAt": "2026-04-29T12:05:31.620Z"
+  },
+  {
+    "schemaId": "xdanlycax",
+    "data": {
+      "content": {
+        "heroSubheading": "Luxury in Every Stroke",
+        "conciergeTitle": "The Concierge",
+        "conciergeHeading": "Mastery in Person.",
+        "conciergeText": "No shipping. No waiting. Commission one of our master specialists to visit your private residence or office. We handle your most prized writing instruments with the reverence they deserve.",
+        "ritualTitle": "The White-Glove Ritual",
+        "ritualHeading": "The Refilling Ceremony.",
+        "ritualItems": [
+          {
+            "title": "The Purge",
+            "desc": "Pharmaceutical-grade feed flush."
+          },
+          {
+            "title": "The Curation",
+            "desc": "Private vault ink selection."
+          },
+          {
+            "title": "The Prime",
+            "desc": "Flawless fill and nib polish."
+          }
+        ],
+        "commissionTitle": "Commission",
+        "commissionHeading": "Reserve Your Aficionado.",
+        "commissionText": "Experience the ultimate care for your collection.",
+        "commissionPenBrand": "Visconti",
+        "commissionPenName": "Homo Sapiens",
+        "penImage": "/uploaded1-pen.png",
+        "pages": [],
+        "stripePublicKey": "",
+        "firebaseApiKey": "",
+        "firebaseProjectId": "",
+        "servicePrice": 14
+      },
+      "theme": {
+        "backgroundColor": "#F5F5F5",
+        "textColor": "#004225",
+        "accentColor": "#D4AF37",
+        "borderRadius": "8px",
+        "borderWidth": "2px",
+        "borderStyle": "solid",
+        "fontFamilyPrimary": "'Playfair Display', Georgia, serif",
+        "fontFamilySecondary": "'Inter', system-ui, sans-serif"
+      }
+    },
+    "_id": "uoqfg5yjs",
+    "createdAt": "2026-04-29T12:05:32.644Z",
+    "updatedAt": "2026-04-29T12:05:32.644Z"
+  },
+  {
+    "schemaId": "xdanlycax",
+    "data": {
+      "content": {
+        "heroSubheading": "Luxury in Every Stroke",
+        "conciergeTitle": "The Concierge",
+        "conciergeHeading": "Mastery in Person.",
+        "conciergeText": "No shipping. No waiting. Commission one of our master specialists to visit your private residence or office. We handle your most prized writing instruments with the reverence they deserve.",
+        "ritualTitle": "The White-Glove Ritual",
+        "ritualHeading": "The Refilling Ceremony.",
+        "ritualItems": [
+          {
+            "title": "The Purge",
+            "desc": "Pharmaceutical-grade feed flush."
+          },
+          {
+            "title": "The Curation",
+            "desc": "Private vault ink selection."
+          },
+          {
+            "title": "The Prime",
+            "desc": "Flawless fill and nib polish."
+          }
+        ],
+        "commissionTitle": "Commission",
+        "commissionHeading": "Reserve Your Aficionado.",
+        "commissionText": "Experience the ultimate care for your collection.",
+        "commissionPenBrand": "Visconti",
+        "commissionPenName": "Homo Sapiens",
+        "penImage": "/uploaded1-pen.png",
+        "pages": [],
+        "stripePublicKey": "",
+        "firebaseApiKey": "",
+        "firebaseProjectId": "",
+        "servicePrice": 15
+      },
+      "theme": {
+        "backgroundColor": "#F5F5F5",
+        "textColor": "#004225",
+        "accentColor": "#D4AF37",
+        "borderRadius": "8px",
+        "borderWidth": "2px",
+        "borderStyle": "solid",
+        "fontFamilyPrimary": "'Playfair Display', Georgia, serif",
+        "fontFamilySecondary": "'Inter', system-ui, sans-serif"
+      }
+    },
+    "_id": "du6brbxra",
+    "createdAt": "2026-04-29T12:05:33.936Z",
+    "updatedAt": "2026-04-29T12:05:33.936Z"
+  },
+  {
+    "schemaId": "69f05af0111796663e7c6722",
+    "data": {
+      "clientName": "Manav",
+      "location": "asdfgjl;asdfghjklazxsn",
+      "date": "2026-04-18",
+      "bookingTime": "20:38",
+      "service": "Aficionado Maintenance Ritual",
+      "instrument": "Montblanc Meisterstück 149",
+      "ink": "Imperial Purple",
+      "paymentMethod": "Cash on Service",
+      "amount": 2500,
+      "id": "ORD5648",
+      "status": "Pending",
+      "createdAt": "2026-04-29T12:06:00.509Z"
+    },
+    "_id": "02m9xw1hz",
+    "createdAt": "2026-04-29T12:06:00.535Z",
+    "updatedAt": "2026-04-29T12:06:00.535Z"
+  },
+  {
+    "schemaId": "69f05af0111796663e7c6722",
+    "data": {
+      "clientName": "Manav",
+      "location": "asdfghjkl;zxcvbnm,",
+      "date": "2026-05-07",
+      "bookingTime": "20:46",
+      "service": "Aficionado Maintenance Ritual",
+      "instrument": "Montblanc Meisterstück 149",
+      "ink": "Midnight Blue",
+      "paymentMethod": "Cash on Service",
+      "amount": 2500,
+      "id": "ORD7114",
+      "status": "Pending",
+      "createdAt": "2026-04-29T12:13:48.683Z"
+    },
+    "_id": "gffplw2fe",
+    "createdAt": "2026-04-29T12:13:48.697Z",
+    "updatedAt": "2026-04-29T12:13:48.697Z"
+  },
+  {
+    "schemaId": "69f05af0111796663e7c6722",
+    "data": {
+      "clientName": "Google Collector",
+      "location": "asdfghj,.",
+      "date": "2026-04-02",
+      "bookingTime": "21:56",
+      "service": "Aficionado Maintenance Ritual",
+      "instrument": "Visconti Homo Sapiens Bronze Age",
+      "ink": "Midnight Blue",
+      "paymentMethod": "Cash on Service",
+      "amount": 150,
+      "id": "ORD4491",
+      "status": "Completed",
+      "createdAt": "2026-04-29T12:26:25.853Z",
+      "backendId": "yt7k6gcyf"
+    },
+    "_id": "yt7k6gcyf",
+    "createdAt": "2026-04-29T12:26:25.868Z",
+    "updatedAt": "2026-04-29T12:27:12.987Z"
+  },
+  {
+    "schemaId": "69f05af0111796663e7c6723",
+    "data": {
+      "name": "Manav",
+      "email": "manavp0989@gmail.com",
+      "address": "Google Authenticated",
+      "phone": "",
+      "company": "N/A",
+      "designation": "Collector"
+    },
+    "_id": "5eg7vzz5n",
+    "createdAt": "2026-04-29T13:06:20.450Z",
+    "updatedAt": "2026-04-29T13:06:20.450Z"
+  }
+]

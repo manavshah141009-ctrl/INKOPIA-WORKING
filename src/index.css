@@ -1,0 +1,226 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700&family=Inter:wght@300;400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* British Modern Heritage Theme */
+    --background: 0 0% 96%; /* #F5F5F5 — Off-white */
+    --foreground: 154 100% 13%; /* #004225 — British Royal Green */
+
+    --parchment: 38 43% 71%; /* #D4BE98 — Heritage Beige */
+
+    --card: 38 43% 71%; /* Heritage Beige */
+    --card-foreground: 154 100% 13%;
+
+    --popover: 0 0% 96%;
+    --popover-foreground: 154 100% 13%;
+
+    --primary: 154 100% 13%; /* British Royal Green */
+    --primary-foreground: 38 43% 71%; /* Heritage Beige text */
+
+    --secondary: 38 43% 71%;
+    --secondary-foreground: 154 100% 13%;
+
+    --muted: 38 43% 71%;
+    --muted-foreground: 43 72% 52%; /* Changed from 154 100% 30% (green) to Gold */
+
+    --accent: 43 72% 52%; /* Keep gold for subtle accent if needed */
+    --accent-foreground: 154 100% 13%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 38 43% 71%; /* Heritage Beige border */
+    --input: 38 43% 71%;
+    --ring: 154 100% 13%; /* British Royal Green ring */
+
+    --radius: 0.5rem; /* 8px rounded corners */
+
+    --font-serif: 'Playfair Display', Georgia, serif;
+    --font-sans: 'Inter', system-ui, sans-serif;
+
+    --gold: 43 72% 52%;
+    --ink-green: 154 100% 13%; /* #004225 British Royal Green */
+
+    --vault-bg: 0 0% 8%; /* Darker vault background */
+    --vault-foreground: 0 0% 98%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    overflow-x: hidden;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-serif);
+  }
+}
+
+/* Decorative border frame overlay — matches uploaded image */
+.page-frame {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+}
+
+.page-frame::before {
+  content: '';
+  position: absolute;
+  inset: 18px;
+  border: var(--border-width, 2px) var(--border-style, solid) hsl(var(--foreground) / 0.7);
+  border-radius: var(--radius);
+}
+
+.page-frame::after {
+  content: '';
+  position: absolute;
+  inset: 22px;
+  border: calc(var(--border-width, 2px) / 2) var(--border-style, solid) hsl(var(--foreground) / 0.35);
+  border-radius: calc(var(--radius) - 2px);
+}
+
+/* Decorative inner frame with scalloped corners */
+.page-frame-inner {
+  position: fixed;
+  inset: 15px;
+  z-index: 40;
+  pointer-events: none;
+}
+
+.page-frame-inner::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border: calc(var(--border-width, 2px) + 0.5px) var(--border-style, solid) hsl(var(--foreground) / 0.6);
+  /* Scalloped/notched corners using clip-path */
+  border-radius: var(--radius);
+}
+
+/* Corner star decorations */
+.corner-star {
+  position: fixed;
+  z-index: 41;
+  pointer-events: none;
+  width: 28px;
+  height: 28px;
+  color: hsl(var(--foreground) / 0.85);
+}
+
+.corner-star--tl { top: 6px; left: 6px; }
+.corner-star--tr { top: 6px; right: 6px; }
+.corner-star--bl { bottom: 6px; left: 6px; }
+.corner-star--br { bottom: 6px; right: 6px; }
+
+/* Smooth section transitions */
+.section-fade {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.section-fade.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Gold divider line animation */
+.gold-divider {
+  width: 0;
+  height: 1px;
+  background: hsl(var(--gold));
+  transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.gold-divider.visible {
+  width: 48px;
+}
+
+/* Smooth button hover */
+.btn-inkopia {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  background: hsl(var(--ink-green));
+  color: hsl(var(--parchment));
+  border-radius: var(--radius);
+  box-shadow: 0 4px 12px hsl(var(--ink-green) / 0.15);
+}
+
+.btn-inkopia:hover {
+  background: hsl(154 100% 10%); /* Deepened green */
+  color: hsl(var(--parchment));
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px hsl(var(--ink-green) / 0.25);
+}
+
+/* Scroll indicator pulse */
+@keyframes gentle-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
+}
+
+.scroll-indicator {
+  animation: gentle-bounce 2.5s ease-in-out infinite;
+}
+
+/* Text shimmer for headings */
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.text-shimmer {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--ink-green)) 0%,
+    hsl(154 100% 20%) 40%,
+    hsl(43 72% 52%) 50%,
+    hsl(154 100% 20%) 60%,
+    hsl(var(--ink-green)) 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 6s ease-in-out infinite;
+}
+
+@layer utilities {
+  .font-serif {
+    font-family: var(--font-serif);
+  }
+  .font-sans {
+    font-family: var(--font-sans);
+  }
+  .text-gold {
+    color: hsl(var(--gold));
+  }
+  .border-gold {
+    border-color: hsl(var(--gold));
+  }
+  .bg-gold {
+    background-color: hsl(var(--gold));
+  }
+  .text-ink-green {
+    color: hsl(var(--ink-green));
+  }
+  .bg-parchment {
+    background-color: hsl(var(--parchment));
+  }
+  .text-parchment {
+    color: hsl(var(--parchment));
+  }
+}
