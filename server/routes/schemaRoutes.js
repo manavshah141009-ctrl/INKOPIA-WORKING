@@ -4,6 +4,7 @@ const storage = require('../services/storage');
 
 // Get all schemas
 router.get('/', async (req, res) => {
+  console.log('📬 [API] GET /api/schemas hit');
   try {
     const schemas = await storage.find('DynamicSchema');
     res.json(schemas);

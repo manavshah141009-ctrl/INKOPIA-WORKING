@@ -34,7 +34,7 @@ class Storage {
     if (this.isMongoConnected) {
       try {
         const Model = mongoose.model(modelName);
-        return await Model.find(query).timeout(5000);
+        return await Model.find(query).maxTimeMS(5000);
       } catch (err) {
         console.error(`📡 [STORAGE] MongoDB find error for ${modelName}:`, err.message);
         // Do not throw, fall back to local
