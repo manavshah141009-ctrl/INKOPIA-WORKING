@@ -3,8 +3,12 @@ const path = require('path');
 const mongoose = require('mongoose');
 
 const DATA_DIR = path.join(__dirname, '..', 'data');
-if (!fs.existsSync(DATA_DIR)) {
-  fs.mkdirSync(DATA_DIR);
+try {
+  if (!fs.existsSync(DATA_DIR) && !process.env.VERCEL) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+  }
+} catch (err) {
+  console.warn('⚠️ Could not create data directory:', err.message);
 }
 
 class Storage {
