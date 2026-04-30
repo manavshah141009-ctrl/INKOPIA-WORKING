@@ -14,6 +14,7 @@ router.get('/:schemaId', async (req, res) => {
 
 // Create or update data
 router.post('/', async (req, res) => {
+  console.log(`📡 [DATA] POST /api/data | Mode: ${storage.isMongoConnected ? 'CLOUD' : 'LOCAL'}`);
   try {
     const { schemaId, uniqueId, data } = req.body;
     
@@ -26,7 +27,12 @@ router.post('/', async (req, res) => {
     
     res.status(201).json(result);
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    console.error(`❌ [DATA] Save error:`, err);
+    res.status(400).json({ 
+      error: 'Database rejection', 
+      message: err.message,
+      details: err.errors // Mongoose validation errors
+    });
   }
 });
 

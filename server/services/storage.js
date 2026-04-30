@@ -95,12 +95,12 @@ class Storage {
           // Continue to local storage logic below
         } else {
           console.error(`❌ [STORAGE] MongoDB save error for ${modelName}:`, err.message);
-          throw err;
+          // Fall back to local storage instead of throwing
         }
       }
     }
 
-    // Local Fallback
+    // Local Fallback Logic
     const localItems = this.getLocalData(modelName);
     if (id) {
       const index = localItems.findIndex(item => item._id === id);

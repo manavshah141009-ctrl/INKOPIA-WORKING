@@ -295,8 +295,8 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         }
       });
       setPens([...pens, { ...penData, id: savedData._id }]);
-    } catch (err) {
-      console.error('Failed to save pen to vault:', err);
+    } catch (err: any) {
+      console.error('Failed to save pen to vault:', err.response?.data || err.message);
     }
   };
 
