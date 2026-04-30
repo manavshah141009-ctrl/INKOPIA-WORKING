@@ -65,8 +65,25 @@ class Storage {
     if (this.isMongoConnected) {
       try {
         const Model = mongoose.model(modelName);
+        
+        // Validation: If this is SiteData, ensure schemaId is a valid ObjectId
+        if (modelName === 'SiteData' && data.schemaId) {
+          if (!mongoose.Types.ObjectId.isValid(data.schemaId)) {
+            console.warn(`⚠️ [STORAGE] Invalid ObjectId for schemaId: ${data.schemaId}. Falling back to local.`);
+            throw new Error('FallbackToLocal');
+          }
+        }
+        
+        // Validation: If updating by ID, ensure ID is valid
+        if (id && !mongoose.Types.ObjectId.isValid(id)) {
+           console.warn(`⚠️ [STORAGE] Invalid ObjectId for update: ${id}. Falling back to local.`);
+           throw new Error('FallbackToLocal');
+        }
+
         if (id) {
-          return await Model.findByIdAndUpdate(id, data, { new: true });
+          const result = await Model.findByIdAndUpdate(id, data, { new: true });
+          if (!result) throw new Error('FallbackToLocal');
+          return result;
         } else {
           const instance = new Model(data);
           const saved = await instance.save();
@@ -74,8 +91,12 @@ class Storage {
           return saved;
         }
       } catch (err) {
-        console.error(`❌ [STORAGE] MongoDB save error for ${modelName}:`, err.message);
-        throw err; // Re-throw to be caught by route and sent to client
+        if (err.message === 'FallbackToLocal') {
+          // Continue to local storage logic below
+        } else {
+          console.error(`❌ [STORAGE] MongoDB save error for ${modelName}:`, err.message);
+          throw err;
+        }
       }
     }
 
