@@ -1,16 +1,11 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": { "distDir": "dist" }
-    },
-    {
-      "src": "server/index.js",
-      "use": "@vercel/node"
+  "functions": {
+    "server/index.js": {
+      "runtime": "nodejs20.x",
+      "includeFiles": "server/**"
     }
-  ],
+  },
   "rewrites": [
     {
       "source": "/api/(.*)",
