@@ -6,13 +6,21 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
 import SignUp from "./pages/SignUp.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
+import AdminLogin from "./pages/AdminLogin.tsx";
 import { AdminDashboard } from "./dashboard/AdminDashboard.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import DynamicPage from "./pages/DynamicPage.tsx";
 import { SiteProvider } from "./context/SiteContext";
 import { OrderProvider } from "./context/OrderContext";
+import { Navigate } from "react-router-dom";
 
 const queryClient = new QueryClient();
+
+const ProtectedAdminRoute = ({ children }: { children: React.ReactNode }) => {
+  const token = localStorage.getItem('inkopia_admin_token');
+  if (!token) return <Navigate to="/admin-login" replace />;
+  return <>{children}</>;
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -26,7 +34,12 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/signup" element={<SignUp />} />
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin-login" element={<AdminLogin />} />
+              <Route path="/admin" element={
+                <ProtectedAdminRoute>
+                  <AdminDashboard />
+                </ProtectedAdminRoute>
+              } />
               <Route path="/p/:slug" element={<DynamicPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

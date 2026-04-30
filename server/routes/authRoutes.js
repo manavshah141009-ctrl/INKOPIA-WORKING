@@ -82,4 +82,24 @@ router.post('/verify-otp', (req, res) => {
   }
 });
 
+// Admin Login
+router.post('/admin-login', async (req, res) => {
+  const { username, password } = req.body;
+  const jwt = require('jsonwebtoken');
+
+  const adminUser = process.env.ADMIN_USERNAME || 'admin';
+  const adminPass = process.env.ADMIN_PASSWORD || 'inkopia2026';
+
+  if (username === adminUser && password === adminPass) {
+    const token = jwt.sign(
+      { role: 'admin', username: adminUser },
+      process.env.JWT_SECRET || 'inkopia_secret_key',
+      { expiresIn: '24h' }
+    );
+    res.json({ success: true, token });
+  } else {
+    res.status(401).json({ error: 'Invalid admin credentials' });
+  }
+});
+
 module.exports = router;
