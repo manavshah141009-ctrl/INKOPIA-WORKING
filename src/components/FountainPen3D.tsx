@@ -1,11 +1,13 @@
 import { useEffect, useState, useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 import { useSite } from '@/context/SiteContext';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export default function FountainPen3D() {
   const { content } = useSite();
   const [isAtTop, setIsAtTop] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
 
   const { scrollYProgress } = useScroll();
   
@@ -38,13 +40,17 @@ export default function FountainPen3D() {
   const translateX = useTransform(
     smoothProgress,
     [0, 0.1, 0.3, 0.5, 0.7, 1],
-    ["0vw", "15vw", "-25vw", "25vw", "-25vw", "0vw"]
+    isMobile 
+      ? ["0vw", "-40vw", "45vw", "-45vw", "45vw", "0vw"] // Aggressive push for mobile to clear text
+      : ["0vw", "15vw", "30vw", "-30vw", "30vw", "0vw"]
   );
 
   const translateY = useTransform(
     smoothProgress,
     [0, 0.1, 0.3, 0.5, 0.7, 1],
-    ["30vh", "10vh", "-5vh", "10vh", "-5vh", "0vh"]
+    isMobile
+      ? ["25vh", "5vh", "-2vh", "5vh", "-2vh", "0vh"] // More compact vertical movement
+      : ["30vh", "10vh", "-5vh", "10vh", "-5vh", "0vh"]
   );
 
   const rotate = useTransform(
@@ -56,7 +62,9 @@ export default function FountainPen3D() {
   const scale = useTransform(
     smoothProgress,
     [0, 1],
-    [0.85, 0.85] // Keeps the size completely neutral and consistent everywhere
+    isMobile 
+      ? [0.55 * (content.penScale || 1), 0.55 * (content.penScale || 1)] 
+      : [0.85 * (content.penScale || 1), 0.85 * (content.penScale || 1)]
   );
 
   return (

@@ -5,6 +5,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { InkopiaPenSVG } from '../components/InkopiaPenSVG';
 import { useOrders } from '../context/OrderContext';
 import { useSite } from '../context/SiteContext';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { toast } from 'sonner';
 
 /* Corner star SVG component from the theme */
@@ -66,6 +67,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { addOrder, orders: backendOrders, pens, addPen, updateOrderStatus, inks } = useOrders();
   const { content } = useSite();
+  const isMobile = useIsMobile();
   const userName = localStorage.getItem('inkopia_user_name') || 'Collector';
   const userOrders = backendOrders.filter(order => order.clientName === userName);
   
@@ -127,13 +129,13 @@ export default function Dashboard() {
       <CornerStar className="corner-star corner-star--br" />
 
       {/* Top Navigation */}
-      <nav className="relative z-20 border-b border-ink-green/20 px-6 md:px-12 py-6 flex justify-between items-center bg-[#D3C2A3]/60 backdrop-blur-md sticky top-0">
+      <nav className={`relative z-20 border-b border-ink-green/20 ${isMobile ? 'px-8 py-4' : 'px-12 py-6'} flex justify-between items-center bg-[#D3C2A3]/60 backdrop-blur-md sticky top-0`}>
         <div className="flex items-center gap-2">
           <Link to="/" className="flex items-center -ml-2">
             <img 
               src="/logo.jpg" 
               alt="Inkopia" 
-              className="h-[40px] md:h-[50px] w-auto opacity-95 transition-opacity" 
+              className={`${isMobile ? 'h-[36px]' : 'h-[50px]'} w-auto opacity-95 transition-all`} 
               style={{ clipPath: 'inset(15% 10% 18% 10%)' }} 
             />
           </Link>
@@ -153,9 +155,9 @@ export default function Dashboard() {
 
       <main className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 py-24 md:py-32">
         
-        <header className="mb-16">
+        <header className={`${isMobile ? 'mb-10' : 'mb-16'}`}>
           <p className="text-[10px] tracking-[0.4em] uppercase text-ink-green/70 mb-4">Welcome back, {userName}</p>
-          <h1 className="text-4xl md:text-6xl font-serif text-ink-green leading-tight font-bold">
+          <h1 className={`${isMobile ? 'text-3xl' : 'text-6xl'} font-serif text-ink-green leading-tight font-bold`}>
             Your Personal<br />Instrument Vault.
           </h1>
         </header>

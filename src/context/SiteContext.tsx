@@ -31,6 +31,7 @@ export interface SiteContent {
   firebaseApiKey: string;
   firebaseProjectId: string;
   servicePrice: number;
+  penScale: number;
 }
 
 export interface SiteTheme {
@@ -79,6 +80,7 @@ const DEFAULT_CONTENT: SiteContent = {
   firebaseApiKey: "",
   firebaseProjectId: "",
   servicePrice: 2500,
+  penScale: 1.0,
 };
 
 const DEFAULT_THEME: SiteTheme = {

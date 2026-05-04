@@ -212,14 +212,14 @@ const SignUp = () => {
 
 
       {/* Main Content Card */}
-      <div className="relative z-10 w-full max-w-3xl border border-ink-green/10 bg-background/60 backdrop-blur-md p-8 md:p-14 shadow-xl rounded-xl">
+      <div className="relative z-10 w-full max-w-3xl border border-ink-green/10 bg-background/60 backdrop-blur-md p-6 md:p-14 shadow-xl rounded-xl mt-12 mb-12">
 
         {/* Logo — merged with background */}
         <div className="text-center mb-8 flex flex-col items-center">
           <img
             src="/logo.png"
             alt="Inkopia"
-            className="w-[200px] md:w-[260px] h-auto mb-2"
+            className="w-[160px] md:w-[260px] h-auto mb-2"
           />
           <p className="font-serif italic text-ink-green/70 text-sm md:text-base tracking-wide mt-1">
             "The Pen is The Mightiest Sword"

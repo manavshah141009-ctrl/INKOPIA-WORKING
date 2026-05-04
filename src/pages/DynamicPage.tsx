@@ -30,15 +30,15 @@ export default function DynamicPage() {
       <CornerStar className="corner-star corner-star--br" />
 
       {/* Navigation */}
-      <div className="fixed top-10 left-10 z-50">
-        <Link to="/" className="text-[10px] tracking-[0.3em] font-sans uppercase text-ink-green hover:opacity-70 transition-opacity">
+      <div className="fixed top-6 left-6 md:top-10 md:left-10 z-50">
+        <Link to="/" className="text-[10px] tracking-[0.3em] font-sans uppercase text-ink-green hover:opacity-70 transition-opacity bg-white/40 backdrop-blur-md px-4 py-2 rounded-full border border-ink-green/10 shadow-sm md:bg-transparent md:backdrop-blur-none md:p-0 md:border-none md:shadow-none">
           &larr; Return
         </Link>
       </div>
 
       <div className="max-w-3xl w-full relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
         <div className="gold-divider mb-8 w-12" />
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-foreground leading-[1.1] mb-12">
+        <h1 className="text-3xl md:text-5xl lg:text-6xl font-serif font-bold text-foreground leading-[1.1] mb-12">
           {page.title}
         </h1>
         <div 

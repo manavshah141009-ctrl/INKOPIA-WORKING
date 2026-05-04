@@ -4,6 +4,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
+import { Slider } from '@/components/ui/slider';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Loader2, Save } from 'lucide-react';
 import { toast } from 'sonner';
@@ -58,6 +59,21 @@ export const ContentEditor = () => {
                 placeholder="/uploaded1-pen.png"
               />
               <p className="text-[9px] text-ink-green/40 uppercase tracking-widest">Supports local paths or external URLs</p>
+            </div>
+            <div className="space-y-4 pt-2">
+              <div className="flex justify-between items-center">
+                <Label className="text-[10px] uppercase tracking-widest font-bold opacity-60">Global Pen Ratio (Scale)</Label>
+                <span className="text-[10px] font-mono font-bold bg-ink-green/5 px-2 py-0.5 rounded">{localContent.penScale?.toFixed(2) || '1.00'}x</span>
+              </div>
+              <Slider 
+                value={[localContent.penScale || 1]} 
+                min={0.1} 
+                max={2.5} 
+                step={0.05}
+                onValueChange={(val) => handleChange('penScale', val[0])}
+                className="py-4"
+              />
+              <p className="text-[9px] text-ink-green/40 uppercase tracking-widest">Adjust the relative size of the 3D background pen</p>
             </div>
           </AccordionContent>
         </AccordionItem>
