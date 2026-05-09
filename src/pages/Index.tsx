@@ -55,6 +55,14 @@ const Index = () => {
   const ritual = useInView();
   const commission = useInView();
 
+  // Preload large assets for smooth 3D experience
+  useEffect(() => {
+    if (content.penImage) {
+      const img = new Image();
+      img.src = content.penImage;
+    }
+  }, [content.penImage]);
+
   return (
     <div className="relative w-full min-h-screen text-foreground selection:bg-gold selection:text-black">
       {/* Decorative borders — matching logo theme */}
@@ -136,132 +144,122 @@ const Index = () => {
           )}
         </section>
 
-        {/* The Master Rituals - Contained Infographic Panels */}
-        <section className="relative py-8">
-          {/* Frosted backdrop so the 3D pen shows through blurred */}
-          <div className="absolute inset-0 backdrop-blur-[2px] bg-white/50 pointer-events-none" />
+        {/* The White-Glove Concierge Service — Text Only Statement Layout */}
+        <section className="relative py-24 md:py-40 overflow-hidden">
+          {/* Subtle frosted backdrop so the 3D pen shows through clearly */}
+          <div className="absolute inset-0 backdrop-blur-[2px] bg-white/10 pointer-events-none" />
 
-          <div ref={ritual.ref} className={`relative z-10 section-fade ${ritual.isVisible ? 'visible' : ''}`}>
-            {/* Section Header */}
-            <div className="flex flex-col items-center text-center py-16 px-6">
-              <div className="gold-divider mb-8" style={{ width: ritual.isVisible ? '80px' : '0' }} />
-              <p className="text-[11px] tracking-[0.7em] uppercase text-accent font-sans font-bold">
-                {content.ritualTitle}
+          <div ref={ritual.ref} className={`relative z-10 section-fade max-w-6xl mx-auto px-6 ${ritual.isVisible ? 'visible' : ''}`}>
+            
+            {/* Main Statement Header */}
+            <div className="flex flex-col items-center text-center mb-40 md:mb-64">
+              <div className="gold-divider mb-16" style={{ width: ritual.isVisible ? '160px' : '0' }} />
+              <h2 className="text-4xl md:text-8xl font-serif text-accent mb-20 italic leading-[1.1] max-w-5xl">
+                "Focus entirely on the writing. <br className="hidden md:block" /> Let us handle the mess."
+              </h2>
+              <div className="flex items-center gap-6 md:gap-10 mb-10">
+                <div className="w-10 md:w-16 h-[1px] bg-gold/40" />
+                <p className="text-[12px] md:text-[20px] tracking-[0.8em] md:tracking-[1.2em] uppercase text-gold font-sans font-extrabold whitespace-nowrap">
+                  The White-Glove Concierge
+                </p>
+                <div className="w-10 md:w-16 h-[1px] bg-gold/40" />
+              </div>
+              <p className="text-lg md:text-3xl text-foreground/50 font-sans max-w-4xl leading-relaxed italic font-medium">
+                We bring the world's finest pen care and ink library directly to your home or office. 
+                Zero mess, zero downtime, and endless colour possibilities.
               </p>
             </div>
 
-            {/* Panel 1 — The Cleansing Protocol */}
-            <div className="group px-4 md:px-12 lg:px-20 mb-12 md:mb-0">
-              {/* Contained image card */}
-              <div className="mx-auto max-w-5xl rounded-2xl overflow-hidden border border-gold/20 shadow-[0_20px_60px_rgba(0,0,0,0.12)] relative bg-white/10 backdrop-blur-[4px]">
-                <img
-                  src="/infographic1.png"
-                  alt="The Cleansing Protocol"
-                  className="w-full h-auto object-contain block grayscale-[0.05] group-hover:grayscale-0 transition-all duration-1000 scale-[1.01]"
-                />
-                {/* Soft inner vignette to blend edges */}
-                <div className="absolute inset-0 shadow-[inset_0_0_80px_rgba(245,245,245,0.4)] pointer-events-none rounded-2xl" />
+            {/* Pillar 1 — The Mobile Atelier */}
+            <div className="mb-40 md:mb-64 group">
+              <div className="flex flex-col md:flex-row items-baseline gap-6 md:gap-20 mb-10 md:mb-16">
+                <span className="text-6xl md:text-9xl font-serif text-gold/25 font-light italic leading-none">01</span>
+                <h3 className="text-4xl md:text-7xl font-serif text-accent uppercase tracking-tight leading-tight">
+                  The Mobile <br className="hidden md:block" /> Atelier
+                </h3>
               </div>
-              
-              {/* Premium Caption Card */}
-              <div className="mx-auto max-w-5xl mt-[-1px] relative z-20">
-                <div className="flex flex-col md:flex-row items-center justify-between px-6 py-8 md:py-5 border border-gold/20 rounded-b-2xl bg-white/70 backdrop-blur-xl shadow-xl">
-                  <div className="flex flex-col items-center md:items-start mb-5 md:mb-0">
-                    <span className="text-[7px] md:text-[9px] uppercase tracking-[0.7em] text-gold font-bold mb-2">Protocol I – III</span>
-                    <span className="text-[12px] md:text-[11px] uppercase tracking-[0.5em] text-accent font-semibold md:hidden">Cleansing</span>
-                  </div>
-                  
-                  <p className="text-[12px] md:text-xs text-foreground/80 font-sans font-medium leading-relaxed max-w-sm text-center md:text-center px-6 md:px-0">
-                    A pharmaceutical-grade purge of the reservoir and feed, restoring absolute clarity of flow.
-                  </p>
-                  
-                  <span className="text-[9px] uppercase tracking-[0.5em] text-gold/50 font-bold hidden md:block">Cleansing</span>
+              <div className="md:ml-40 max-w-4xl border-l-2 border-gold/20 pl-8 md:pl-20 py-6">
+                <p className="text-xl md:text-4xl text-foreground/80 font-sans leading-relaxed font-medium italic">
+                  No mailing your precious pens. No dropping them off. Our trained artisans come directly to your residence or workplace at a time that suits you.
+                </p>
+                <div className="mt-12 flex items-center gap-6">
+                  <span className="text-[12px] md:text-[15px] uppercase tracking-[0.6em] text-gold font-bold">Convenience redefined</span>
+                  <div className="flex-1 h-[1px] bg-gradient-to-r from-gold/40 to-transparent" />
                 </div>
               </div>
             </div>
 
-            {/* Elegant Star Divider */}
-            <div className="flex items-center gap-4 md:gap-6 px-12 md:px-32 py-12 md:py-16">
-              <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-gold/30 to-transparent md:to-gold/25" />
-              <div className="relative flex items-center justify-center w-8 h-8">
-                <div className="absolute inset-0 bg-gold/15 rounded-full blur-md animate-pulse" />
-                <svg viewBox="0 0 24 24" className="w-3.5 md:w-4 h-3.5 md:h-4 text-gold/60 relative z-10" fill="currentColor">
+            {/* Star Motif Divider */}
+            <div className="flex justify-center mb-32 md:mb-56">
+               <div className="relative flex items-center justify-center w-12 h-12">
+                <div className="absolute inset-0 bg-gold/20 rounded-full blur-xl animate-pulse" />
+                <svg viewBox="0 0 24 24" className="w-6 h-6 text-gold/60 relative z-10" fill="currentColor">
                   <polygon points="12,0 13.5,9 24,12 13.5,15 12,24 10.5,15 0,12 10.5,9" />
                 </svg>
               </div>
-              <div className="flex-1 h-[1px] bg-gradient-to-l from-transparent via-gold/30 to-transparent md:to-gold/25" />
             </div>
 
-            {/* Panel 2 — The Ink Replenishment Ritual */}
-            <div className="group px-4 md:px-12 lg:px-20 mb-12 md:mb-0">
-              <div className="mx-auto max-w-5xl rounded-2xl overflow-hidden border border-gold/20 shadow-[0_20px_60px_rgba(0,0,0,0.12)] relative bg-white/10 backdrop-blur-[4px]">
-                <img
-                  src="/infographic2.png"
-                  alt="The Ink Replenishment Ritual"
-                  className="w-full h-auto object-contain block grayscale-[0.05] group-hover:grayscale-0 transition-all duration-1000 scale-[1.01]"
-                />
-                <div className="absolute inset-0 shadow-[inset_0_0_80px_rgba(245,245,245,0.4)] pointer-events-none rounded-2xl" />
+            {/* Pillar 2 — Sacred Preservation */}
+            <div className="mb-40 md:mb-64 group text-right flex flex-col items-end">
+              <div className="flex flex-col md:flex-row-reverse items-baseline gap-6 md:gap-20 mb-10 md:mb-16">
+                <span className="text-6xl md:text-9xl font-serif text-gold/25 font-light italic leading-none">02</span>
+                <h3 className="text-4xl md:text-7xl font-serif text-accent uppercase tracking-tight leading-tight">
+                  Sacred <br className="hidden md:block" /> Preservation
+                </h3>
               </div>
-              
-              <div className="mx-auto max-w-5xl mt-[-1px] relative z-20">
-                <div className="flex flex-col md:flex-row items-center justify-between px-6 py-8 md:py-5 border border-gold/20 rounded-b-2xl bg-white/70 backdrop-blur-xl shadow-xl">
-                  <div className="flex flex-col items-center md:items-start mb-5 md:mb-0">
-                    <span className="text-[7px] md:text-[9px] uppercase tracking-[0.7em] text-gold font-bold mb-2">Protocol IV – VI</span>
-                    <span className="text-[12px] md:text-[11px] uppercase tracking-[0.5em] text-accent font-semibold md:hidden">Replenishment</span>
-                  </div>
-                  
-                  <p className="text-[12px] md:text-xs text-foreground/80 font-sans font-medium leading-relaxed max-w-sm text-center md:text-center px-6 md:px-0">
-                    Surgical precision in loading the curated ink selection for a consistently flawless flow.
-                  </p>
-                  
-                  <span className="text-[9px] uppercase tracking-[0.5em] text-gold/50 font-bold hidden md:block">Replenishment</span>
+              <div className="md:mr-40 max-w-4xl border-r-2 border-gold/20 pr-8 md:pr-20 py-6">
+                <p className="text-xl md:text-4xl text-foreground/80 font-sans leading-relaxed font-medium italic">
+                  We treat your instruments with the utmost respect. We meticulously flush, clean, and inspect your pens by hand, strictly avoiding harsh ultrasonic machines.
+                </p>
+                <div className="mt-12 flex items-center gap-6 flex-row-reverse">
+                  <span className="text-[12px] md:text-[15px] uppercase tracking-[0.6em] text-gold font-bold">Artisanal hand-care</span>
+                  <div className="flex-1 h-[1px] bg-gradient-to-l from-gold/40 to-transparent" />
                 </div>
               </div>
             </div>
 
-            {/* Elegant Star Divider */}
-            <div className="flex items-center gap-4 md:gap-6 px-12 md:px-32 py-12 md:py-16">
-              <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-gold/30 to-transparent md:to-gold/25" />
-              <div className="relative flex items-center justify-center w-8 h-8">
-                <div className="absolute inset-0 bg-gold/15 rounded-full blur-md animate-pulse" />
-                <svg viewBox="0 0 24 24" className="w-3.5 md:w-4 h-3.5 md:h-4 text-gold/60 relative z-10" fill="currentColor">
+             {/* Star Motif Divider */}
+             <div className="flex justify-center mb-40 md:mb-64">
+               <div className="relative flex items-center justify-center w-16 h-16">
+                <div className="absolute inset-0 bg-gold/25 rounded-full blur-2xl animate-pulse" />
+                <svg viewBox="0 0 24 24" className="w-8 h-8 text-gold/70 relative z-10" fill="currentColor">
                   <polygon points="12,0 13.5,9 24,12 13.5,15 12,24 10.5,15 0,12 10.5,9" />
                 </svg>
               </div>
-              <div className="flex-1 h-[1px] bg-gradient-to-l from-transparent via-gold/30 to-transparent md:to-gold/25" />
             </div>
 
-            {/* Panel 3 — The Writing Mastery Ritual */}
-            <div className="group px-4 md:px-12 lg:px-20 mb-12 md:mb-0">
-              <div className="mx-auto max-w-5xl rounded-2xl overflow-hidden border border-gold/20 shadow-[0_20px_60px_rgba(0,0,0,0.12)] relative bg-white/10 backdrop-blur-[4px]">
-                <img
-                  src="/infographic3.png"
-                  alt="The Writing Mastery Ritual"
-                  className="w-full h-auto object-contain block grayscale-[0.05] group-hover:grayscale-0 transition-all duration-1000 scale-[1.01]"
-                />
-                <div className="absolute inset-0 shadow-[inset_0_0_80px_rgba(245,245,245,0.4)] pointer-events-none rounded-2xl" />
+            {/* Pillar 3 — The Infinite Palette */}
+            <div className="mb-40 md:mb-64 group">
+              <div className="flex flex-col md:flex-row items-baseline gap-6 md:gap-20 mb-10 md:mb-16">
+                <span className="text-6xl md:text-9xl font-serif text-gold/25 font-light italic leading-none">03</span>
+                <h3 className="text-4xl md:text-7xl font-serif text-accent uppercase tracking-tight leading-tight">
+                  The Infinite <br className="hidden md:block" /> Palette
+                </h3>
               </div>
-              
-              <div className="mx-auto max-w-5xl mt-[-1px] relative z-20">
-                <div className="flex flex-col md:flex-row items-center justify-between px-6 py-8 md:py-5 border border-gold/20 rounded-b-2xl bg-white/70 backdrop-blur-xl shadow-xl">
-                  <div className="flex flex-col items-center md:items-start mb-5 md:mb-0">
-                    <span className="text-[7px] md:text-[9px] uppercase tracking-[0.7em] text-gold font-bold mb-2">Protocol VII – IX</span>
-                    <span className="text-[12px] md:text-[11px] uppercase tracking-[0.5em] text-accent font-semibold md:hidden">Mastery</span>
-                  </div>
-                  
-                  <p className="text-[12px] md:text-xs text-foreground/80 font-sans font-medium leading-relaxed max-w-sm text-center md:text-center px-6 md:px-0">
-                    Nib tuning, angle calibration and hand-polishing for the ultimate sensory writing experience.
-                  </p>
-                  
-                  <span className="text-[9px] uppercase tracking-[0.5em] text-gold/50 font-bold hidden md:block">Mastery</span>
+              <div className="md:ml-40 max-w-4xl border-l-2 border-gold/20 pl-8 md:pl-20 py-6">
+                <p className="text-xl md:text-4xl text-foreground/80 font-sans leading-relaxed font-medium italic">
+                  Refill on the spot from our library of 500+ premium inks. Choose your exact colour today, without the commitment of buying the bottle.
+                </p>
+                <div className="mt-12 flex items-center gap-6">
+                  <span className="text-[12px] md:text-[15px] uppercase tracking-[0.6em] text-gold font-bold">Endless possibilities</span>
+                  <div className="flex-1 h-[1px] bg-gradient-to-r from-gold/40 to-transparent" />
                 </div>
               </div>
             </div>
 
-            {/* Bottom spacer */}
-            <div className="py-16" />
+            {/* Final Call to Action */}
+            <div className="flex flex-col items-center py-40">
+              <div className="gold-divider mb-16 w-32" />
+              <p className="text-3xl md:text-5xl text-accent font-serif mb-20 italic text-center leading-tight">
+                Ready for a fresh start <br className="hidden md:block" /> and a fresh colour?
+              </p>
+              <button className="gold-button scale-150 transform hover:scale-[1.6] transition-all duration-700 shadow-[0_0_50px_rgba(212,175,55,0.2)]">
+                Book Your Concierge Session
+              </button>
+            </div>
           </div>
         </section>
+
 
 
         {/* Commission */}

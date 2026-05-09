@@ -5,32 +5,43 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Loader2, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
+import { useDebounce } from '@/hooks/use-debounce';
 
 export const ThemeController = () => {
   const { theme, updateTheme, resetToDefault } = useSite();
   const [isSaving, setIsSaving] = React.useState(false);
   const [localTheme, setLocalTheme] = React.useState(theme);
+  const debouncedTheme = useDebounce(localTheme, 500);
 
   React.useEffect(() => {
     setLocalTheme(theme);
   }, [theme]);
 
-  const handleColorChange = async (key: string, value: string) => {
-    setLocalTheme({ ...localTheme, [key]: value });
-    if (/^#[0-9A-F]{6}$/i.test(value)) {
-      setIsSaving(true);
-      await updateTheme({ [key]: value });
-      setIsSaving(false);
-    }
+  // Sync with backend when debounced value changes
+  React.useEffect(() => {
+    const syncTheme = async () => {
+      // Only sync if it's different from the current theme in context
+      const hasChanged = Object.keys(debouncedTheme).some(
+        key => debouncedTheme[key as keyof typeof theme] !== theme[key as keyof typeof theme]
+      );
+      
+      if (hasChanged) {
+        setIsSaving(true);
+        await updateTheme(debouncedTheme);
+        setIsSaving(false);
+        toast.success('Visual profile synchronized');
+      }
+    };
+    
+    syncTheme();
+  }, [debouncedTheme, theme, updateTheme]);
+
+  const handleColorChange = (key: string, value: string) => {
+    setLocalTheme(prev => ({ ...prev, [key]: value }));
   };
 
-  const handleBlur = async (key: string, value: string) => {
-    if (/^#[0-9A-F]{6}$/i.test(value)) {
-      setIsSaving(true);
-      await updateTheme({ [key]: value });
-      setIsSaving(false);
-      toast.success('Theme updated');
-    } else {
+  const handleBlur = (key: string, value: string) => {
+    if (!/^#[0-9A-F]{6}$/i.test(value)) {
       toast.error('Invalid hex color');
       setLocalTheme(theme); // Revert
     }

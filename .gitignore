@@ -33,3 +33,8 @@ playwright-report/
 test-results/
 server/uploads/*
 !server/uploads/.gitkeep
+
+# Temporary files
+scratch/
+timepas.txt
+stress_test_report.md

@@ -5,6 +5,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 
 export default function FountainPen3D() {
   const { content } = useSite();
+  const [isLoaded, setIsLoaded] = useState(false);
   const [isAtTop, setIsAtTop] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
@@ -17,6 +18,13 @@ export default function FountainPen3D() {
     damping: 30,
     restDelta: 0.001
   });
+
+  // Preload the image
+  useEffect(() => {
+    const img = new Image();
+    img.src = content.penImage;
+    img.onload = () => setIsLoaded(true);
+  }, [content.penImage]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -41,16 +49,16 @@ export default function FountainPen3D() {
     smoothProgress,
     [0, 0.1, 0.3, 0.5, 0.7, 1],
     isMobile 
-      ? ["0vw", "-40vw", "45vw", "-45vw", "45vw", "0vw"] // Aggressive push for mobile to clear text
-      : ["0vw", "15vw", "30vw", "-30vw", "30vw", "0vw"]
+      ? ["0vw", "-35vw", "35vw", "-35vw", "35vw", "0vw"] // Reduced from 45vw to stay in borders
+      : ["0vw", "12vw", "25vw", "-25vw", "25vw", "0vw"] // Reduced for desktop
   );
 
   const translateY = useTransform(
     smoothProgress,
     [0, 0.1, 0.3, 0.5, 0.7, 1],
     isMobile
-      ? ["25vh", "5vh", "-2vh", "5vh", "-2vh", "0vh"] // More compact vertical movement
-      : ["30vh", "10vh", "-5vh", "10vh", "-5vh", "0vh"]
+      ? ["20vh", "5vh", "-2vh", "5vh", "-2vh", "0vh"] 
+      : ["25vh", "10vh", "-5vh", "10vh", "-5vh", "0vh"]
   );
 
   const rotate = useTransform(
@@ -79,7 +87,7 @@ export default function FountainPen3D() {
           background: 'radial-gradient(circle, hsla(43, 72%, 52%, 0.08) 0%, transparent 70%)',
           x: translateX,
           y: translateY,
-          opacity: opacity,
+          opacity: isLoaded ? opacity : 0,
           willChange: 'transform, opacity'
         }}
       />
@@ -89,13 +97,13 @@ export default function FountainPen3D() {
         src={content.penImage}
         alt="INKOPIA Fountain Pen"
         draggable={false}
-        className="max-w-[65%] max-h-[70%] object-contain select-none mix-blend-multiply"
+        className="max-w-[65%] max-h-[70%] object-contain select-none"
         style={{
           x: translateX,
           y: translateY,
           rotate: rotate,
           scale: scale,
-          opacity: opacity,
+          opacity: isLoaded ? opacity : 0,
           filter: 'drop-shadow(0 20px 40px rgba(27, 61, 47, 0.15))',
           willChange: 'transform, opacity'
         }}

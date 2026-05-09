@@ -18,6 +18,7 @@ import {
 } from "firebase/auth";
 import axios from "axios";
 import { useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 /* Corner star SVG component matching the uploaded design */
 function CornerStar({ className }: { className: string }) {
@@ -241,10 +242,21 @@ const SignUp = () => {
                   value={form.name}
                   onChange={set('name')}
                   placeholder="Your full name"
-                  className={`${inputClass} ${errors.name ? 'border-red-400' : 'border-ink-green/30 focus:border-gold'}`}
+                  className={`${inputClass} ${errors.name ? 'border-[hsl(var(--error))] shake-error' : 'border-ink-green/30 focus:border-gold'}`}
                   required
                 />
-                {errors.name && <p className="text-[9px] text-red-500 mt-1">{errors.name}</p>}
+                <AnimatePresence>
+                  {errors.name && (
+                    <motion.p 
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -4 }}
+                      className="error-message"
+                    >
+                      {errors.name}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
               </div>
 
               {/* Email */}
@@ -258,10 +270,21 @@ const SignUp = () => {
                   value={form.email}
                   onChange={set('email')}
                   placeholder="you@example.com"
-                  className={`${inputClass} ${errors.email ? 'border-red-400' : 'border-ink-green/30 focus:border-gold'}`}
+                  className={`${inputClass} ${errors.email ? 'border-[hsl(var(--error))] shake-error' : 'border-ink-green/30 focus:border-gold'}`}
                   required
                 />
-                {errors.email && <p className="text-[9px] text-red-500 mt-1">{errors.email}</p>}
+                <AnimatePresence>
+                  {errors.email && (
+                    <motion.p 
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -4 }}
+                      className="error-message"
+                    >
+                      {errors.email}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
               </div>
 
               {/* Company Info */}
@@ -305,10 +328,21 @@ const SignUp = () => {
                   value={form.address}
                   onChange={set('address')}
                   placeholder="Your residence or office"
-                  className={`${inputClass} mb-3 ${errors.address ? 'border-red-400' : 'border-ink-green/30 focus:border-gold'}`}
+                  className={`${inputClass} mb-3 ${errors.address ? 'border-[hsl(var(--error))] shake-error' : 'border-ink-green/30 focus:border-gold'}`}
                   required
                 />
-                {errors.address && <p className="text-[9px] text-red-500 -mt-2 mb-1">{errors.address}</p>}
+                <AnimatePresence>
+                  {errors.address && (
+                    <motion.p 
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -4 }}
+                      className="error-message -mt-2 mb-2"
+                    >
+                      {errors.address}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
                 <div className="flex gap-4">
                   {(['home', 'work'] as const).map(type => (
                     <label key={type} className="flex items-center gap-1.5 cursor-pointer group">
@@ -338,10 +372,21 @@ const SignUp = () => {
                   value={form.phone}
                   onChange={set('phone')}
                   placeholder="+91 00000 00000"
-                  className={`${inputClass} ${errors.phone ? 'border-red-400' : 'border-ink-green/30 focus:border-gold'}`}
+                  className={`${inputClass} ${errors.phone ? 'border-[hsl(var(--error))] shake-error' : 'border-ink-green/30 focus:border-gold'}`}
                   required
                 />
-                {errors.phone && <p className="text-[9px] text-red-500 mt-1">{errors.phone}</p>}
+                <AnimatePresence>
+                  {errors.phone && (
+                    <motion.p 
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -4 }}
+                      className="error-message"
+                    >
+                      {errors.phone}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
               </div>
 
               <div id="recaptcha-container"></div>

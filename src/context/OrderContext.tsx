@@ -305,12 +305,29 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       import('sonner').then(({ toast }) => toast.error('Backend disconnected. Please refresh the page and try again.'));
       return;
     }
+    
+    // Check if user already exists by email
+    const existingUser = users.find(u => u.email.toLowerCase() === userData.email.toLowerCase());
+    
     try {
-      const { data: savedData } = await dataApi.upsert({
-        schemaId: userSchemaId,
-        data: userData
-      });
-      setUsers(prev => [...prev, { ...userData, backendId: savedData._id }]);
+      if (existingUser && existingUser.backendId) {
+        // Update existing user instead of creating a new one
+        await dataApi.upsert({
+          schemaId: userSchemaId,
+          uniqueId: existingUser.backendId,
+          data: userData
+        });
+        setUsers(prev => prev.map(u => u.backendId === existingUser.backendId ? { ...userData, backendId: existingUser.backendId } : u));
+        console.log(`[AUTH] Updated existing user: ${userData.email}`);
+      } else {
+        // Create new user
+        const { data: savedData } = await dataApi.upsert({
+          schemaId: userSchemaId,
+          data: userData
+        });
+        setUsers(prev => [...prev, { ...userData, backendId: savedData._id }]);
+        console.log(`[AUTH] Created new user: ${userData.email}`);
+      }
     } catch (err) {
       console.error('Failed to save user:', err);
       import('sonner').then(({ toast }) => toast.error('Failed to save user data.'));

@@ -30,7 +30,9 @@
     --accent: 43 72% 52%; /* Keep gold for subtle accent if needed */
     --accent-foreground: 154 100% 13%;
 
-    --destructive: 0 84.2% 60.2%;
+    --error: 350 70% 35%; /* Sophisticated Deep Claret/Burgundy for Errors */
+
+    --destructive: var(--error);
     --destructive-foreground: 0 0% 98%;
 
     --border: 38 43% 71%; /* Heritage Beige border */
@@ -286,5 +288,28 @@
   
   .group:hover .image-glow::before {
     opacity: 1;
+  }
+
+  /* Luxury Error Feedback */
+  .error-message {
+    @apply text-[10px] md:text-[11px] font-sans font-medium uppercase tracking-[0.05em] mt-1.5 flex items-center gap-1.5;
+    color: hsl(var(--error));
+    animation: slide-down-fade 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes slide-down-fade {
+    0% { opacity: 0; transform: translateY(-4px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  .shake-error {
+    animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+  }
+
+  @keyframes shake {
+    10%, 90% { transform: translate3d(-1px, 0, 0); }
+    20%, 80% { transform: translate3d(2px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+    40%, 60% { transform: translate3d(4px, 0, 0); }
   }
 }
