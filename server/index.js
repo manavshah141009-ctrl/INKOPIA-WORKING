@@ -1,22 +1,27 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
+const db = require('./db');
+const remoteLogger = require('./services/remoteLogger');
 
-dotenv.config();
+dotenv.config({ path: path.join(__dirname, '.env') });
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
+
+// Initialize MySQL
+db.initDB();
 
 // Better Error Logging for Serverless
 process.on('uncaughtException', (err) => {
   console.error('🔥 Uncaught Exception:', err.message);
-  console.error(err.stack);
+  remoteLogger.error('Uncaught Exception', { message: err.message, stack: err.stack });
 });
 
 process.on('unhandledRejection', (reason, promise) => {
   console.error('🔥 Unhandled Rejection at:', promise, 'reason:', reason);
+  remoteLogger.error('Unhandled Rejection', { reason: reason?.toString() });
 });
 
 app.use(cors());
@@ -38,36 +43,46 @@ app.use('/upload', uploadRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/auth', authRoutes);
 
-// Basic Route
-app.get('/', (req, res) => {
-  res.send('INKOPIA API is running...');
+// Basic API Check
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', time: new Date() });
 });
 
-// Pre-register models for Storage service
-require('./models/DynamicSchema');
-require('./models/SiteData');
-
-// Database Connection (Background)
-const connectDB = async () => {
-  try {
-    const mongoUri = process.env.MONGODB_URI;
-    if (!mongoUri) {
-      console.log('ℹ️ MONGODB_URI not found. Working in Local JSON Storage mode.');
-      return;
+// Serve static files from the React app (dist folder)
+app.use(express.static(path.join(__dirname, '../dist'), {
+  setHeaders: (res, path) => {
+    if (path.endsWith('.js') || path.endsWith('.mjs')) {
+      res.setHeader('Content-Type', 'application/javascript');
     }
-    
-    console.log('📡 Attempting to connect to MongoDB...');
-    await mongoose.connect(mongoUri, {
-      serverSelectionTimeoutMS: 5000
-    });
-    console.log('✅ Connected to MongoDB Atlas');
-  } catch (err) {
-    console.error('❌ MongoDB connection error:', err.message);
-    console.log('ℹ️  Working in Local JSON Storage mode.');
   }
-};
+}));
 
-connectDB();
+// The "catchall" handler: for any request that doesn't
+// match an API route or a static file, send back React's index.html file.
+app.use((req, res) => {
+  // If the request looks like a file (has an extension) but wasn't caught by express.static
+  if (path.extname(req.path)) {
+    return res.status(404).send('File not found');
+  }
+
+  // If it's an API route that wasn't found, don't send index.html
+  if (req.path.startsWith('/api/') || req.path.startsWith('/data/') || req.path.startsWith('/auth/')) {
+    return res.status(404).json({ error: 'API route not found' });
+  }
+  
+  const distIndex = path.join(__dirname, '../dist/index.html');
+  const rootIndex = path.join(__dirname, '../index.html');
+  
+  res.sendFile(distIndex, (err) => {
+    if (err) {
+      res.sendFile(rootIndex);
+    }
+  });
+});
+
+// Storage service initialization is automatic
+
+// Database initialized via MySQL pool
 
 // Keep alive timer
 if (process.env.NODE_ENV !== 'production') {
@@ -75,8 +90,8 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 Server is running on port ${PORT}`);
+  app.listen(PORT, () => {
+    console.log(`✅ Server is actively listening on port ${PORT}`);
   });
 }
 

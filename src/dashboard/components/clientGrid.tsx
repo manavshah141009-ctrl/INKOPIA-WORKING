@@ -24,8 +24,11 @@ export const ClientGrid = () => {
   };
 
   const clients = users.map(user => {
-    // Count how many pens this user has
-    const userPens = pens.filter(p => p.ownerName === user.name).length;
+    // Count how many pens this user has (matching by email or name)
+    const userPens = pens.filter(p => 
+      (user.email && p.ownerEmail === user.email) || 
+      (user.name && p.ownerName === user.name)
+    ).length;
     return {
       ...user,
       pensCount: userPens,

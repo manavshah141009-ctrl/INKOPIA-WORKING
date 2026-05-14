@@ -3,40 +3,32 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Plus, Bot, User, Trash2, Globe, ShieldCheck } from "lucide-react";
+import { useOrders } from "@/context/OrderContext";
 import { toast } from "sonner";
 
-interface Agent {
-  id: string;
-  name: string;
-  role: string;
-  type: 'ai' | 'human';
-  status: 'active' | 'inactive';
-}
-
 export const AgentManager = () => {
-  const [agents, setAgents] = useState<Agent[]>([]);
-
+  const { agents, addAgent, deleteAgent } = useOrders();
   const [newAgent, setNewAgent] = useState({ name: "", role: "" });
 
-  const addAgent = () => {
+  const handleAddAgent = async () => {
     if (!newAgent.name || !newAgent.role) {
       toast.error("Please fill in both name and role");
       return;
     }
-    const agent: Agent = {
-      id: Math.random().toString(36).substr(2, 9),
+    
+    await addAgent({
       name: newAgent.name,
       role: newAgent.role,
       type: "ai",
       status: "active",
-    };
-    setAgents([...agents, agent]);
+    });
+    
     setNewAgent({ name: "", role: "" });
     toast.success(`${newAgent.name} has been implemented on the site!`);
   };
 
-  const removeAgent = (id: string) => {
-    setAgents(agents.filter(a => a.id !== id));
+  const removeAgent = async (id: string) => {
+    await deleteAgent(id);
     toast.info("Agent decommissioned");
   };
 
@@ -72,7 +64,7 @@ export const AgentManager = () => {
               />
             </div>
             <Button 
-              onClick={addAgent}
+              onClick={handleAddAgent}
               className="w-full bg-ink-green text-parchment hover:bg-ink-green/90 transition-all gap-2 mt-4"
             >
               <Plus className="w-4 h-4" /> Implement Agent
@@ -83,7 +75,7 @@ export const AgentManager = () => {
         {/* List of Implemented Agents */}
         <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
           {agents.map((agent) => (
-            <Card key={agent.id} className="border-ink-green/10 bg-white/30 backdrop-blur-sm group hover:border-gold/30 transition-all">
+            <Card key={agent.backendId} className="border-ink-green/10 bg-white/30 backdrop-blur-sm group hover:border-gold/30 transition-all">
               <CardContent className="p-6">
                 <div className="flex justify-between items-start">
                   <div className="flex gap-4">
@@ -95,7 +87,7 @@ export const AgentManager = () => {
                       <p className="text-xs text-ink-green/60 italic">{agent.role}</p>
                     </div>
                   </div>
-                  <button onClick={() => removeAgent(agent.id)} className="text-destructive/40 hover:text-destructive transition-colors">
+                  <button onClick={() => removeAgent(agent.backendId)} className="text-destructive/40 hover:text-destructive transition-colors">
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>

@@ -8,15 +8,7 @@ import { useSite } from '../context/SiteContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { toast } from 'sonner';
 
-/* Corner star SVG component from the theme */
-function CornerStar({ className }: { className: string }) {
-  return (
-    <svg className={className} viewBox="0 0 32 32" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-      <polygon points="16,0 18,12 32,16 18,20 16,32 14,20 0,16 14,12" />
-      <polygon points="16,4 17.5,14 28,16 17.5,18 16,28 14.5,18 4,16 14.5,14" opacity="0.6" />
-    </svg>
-  );
-}
+
 
 interface Pen {
   id: string;
@@ -69,7 +61,8 @@ export default function Dashboard() {
   const { content } = useSite();
   const isMobile = useIsMobile();
   const userName = localStorage.getItem('inkopia_user_name') || 'Collector';
-  const userOrders = backendOrders.filter(order => order.clientName === userName);
+  const userEmail = localStorage.getItem('inkopia_user_email');
+  const userOrders = backendOrders.filter(order => order.clientEmail === userEmail || order.clientName === userName);
   
   // Modals state
   const [isAddingPen, setIsAddingPen] = useState(false);
@@ -80,7 +73,15 @@ export default function Dashboard() {
   const [newPen, setNewPen] = useState<{brand: string, model: string, nib: string, silhouette: Pen['silhouette'], imageUrl?: string}>({ brand: '', model: '', nib: '', silhouette: 'cigar' });
 
   // Booking form state
-  const [booking, setBooking] = useState({ date: '', location: '', time: '', inkName: '', paymentMethod: 'cos', onlinePaymentType: 'upi' });
+  const [booking, setBooking] = useState({ 
+    date: '', 
+    time: '', 
+    inkName: '', 
+    postalCode: '', 
+    streetAddress: '', 
+    city: '', 
+    paymentMethod: 'cos' 
+  });
 
   const handleAddPen = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -95,16 +96,39 @@ export default function Dashboard() {
     
     const pen = pens.find(p => p.id === isBookingService);
     
+    // Time collision check (1.5 hours = 90 minutes)
+    const selectedDateTime = new Date(`${booking.date}T${booking.time}`);
+    const collision = backendOrders.find(order => {
+      // Basic check for exact date match first to save computation
+      if (order.date !== booking.date) return false;
+      if (!order.bookingTime) return false;
+      
+      try {
+        const orderDateTime = new Date(`${order.date}T${order.bookingTime}`);
+        const diffMs = Math.abs(selectedDateTime.getTime() - orderDateTime.getTime());
+        const diffMins = diffMs / (1000 * 60);
+        return diffMins < 90; // 1.5 hours
+      } catch (e) {
+        return false;
+      }
+    });
+
+    if (collision) {
+      toast.error(`Travel Buffer Alert: Please select a time at least 1.5 hours away from existing appointments on this date.`);
+      return;
+    }
+
     const orderData = {
       clientName: userName,
+      clientEmail: localStorage.getItem('inkopia_user_email') || '',
       clientPhone: localStorage.getItem('inkopia_user_phone') || 'N/A',
-      location: booking.location,
+      location: `${booking.streetAddress}, ${booking.city} - ${booking.postalCode}`,
       date: booking.date,
       bookingTime: booking.time,
-      service: 'Aficionado Maintenance Ritual',
+      service: 'Concierge Maintenance Ritual',
       instrument: pen ? `${pen.brand} ${pen.model}` : 'Fountain Pen',
       ink: booking.inkName,
-      paymentMethod: booking.paymentMethod === 'cos' ? 'Cash on Service' : `Online (${booking.onlinePaymentType.toUpperCase()})`,
+      paymentMethod: 'Cash on Service',
       amount: content.servicePrice || 2500
     };
 
@@ -112,8 +136,8 @@ export default function Dashboard() {
       await addOrder(orderData);
       setIsOrderSuccess(orderData);
       setIsBookingService(null);
-      setBooking({ date: '', location: '', time: '', inkName: '', paymentMethod: 'cos', onlinePaymentType: 'upi' });
-      toast.success('Your Aficionado commission has been dispatched.');
+      setBooking({ date: '', time: '', inkName: '', postalCode: '', streetAddress: '', city: '', paymentMethod: 'cos' });
+      toast.success('Your Concierge commission has been dispatched.');
     } catch (err) {
       toast.error('Failed to place order. Please try again.');
     }
@@ -123,10 +147,6 @@ export default function Dashboard() {
     <div className="relative min-h-screen w-full font-sans text-ink-green selection:bg-ink-green selection:text-white">
       {/* Decorative page frame matching theme */}
       <div className="page-frame" />
-      <CornerStar className="corner-star corner-star--tl" />
-      <CornerStar className="corner-star corner-star--tr" />
-      <CornerStar className="corner-star corner-star--bl" />
-      <CornerStar className="corner-star corner-star--br" />
 
       {/* Top Navigation */}
       <nav className={`relative z-20 border-b border-ink-green/20 ${isMobile ? 'px-8 py-4' : 'px-12 py-6'} flex justify-between items-center bg-[#D3C2A3]/60 backdrop-blur-md sticky top-0`}>
@@ -202,7 +222,7 @@ export default function Dashboard() {
                     onClick={() => setIsBookingService(pen.id)}
                     className="mt-auto w-full border border-ink-green/30 text-ink-green py-3 text-[10px] uppercase tracking-[0.2em] font-semibold hover:bg-ink-green hover:border-ink-green hover:text-[#D5C8AD] transition-all duration-300"
                   >
-                    Request Aficionado
+                    Request Concierge
                   </button>
                 </div>
               ))}
@@ -225,7 +245,7 @@ export default function Dashboard() {
             
             <div className="space-y-4">
               {userOrders.length === 0 ? (
-                <p className="text-xs text-ink-green/70 font-medium mt-4">No active aficionado requests.</p>
+                <p className="text-xs text-ink-green/70 font-medium mt-4">No active concierge requests.</p>
               ) : (
                 userOrders.map((order, i) => {
                   return (
@@ -238,14 +258,6 @@ export default function Dashboard() {
                         }`}>
                           {order.status}
                         </span>
-                        {order.status !== 'Completed' && (
-                          <button 
-                            onClick={() => updateOrderStatus(order.id, 'Completed')}
-                            className="text-[9px] uppercase tracking-widest text-ink-green/50 hover:text-ink-green transition-colors border-b border-ink-green/20 hover:border-ink-green"
-                          >
-                            Mark as Serviced
-                          </button>
-                        )}
                       </div>
                       <p className="font-serif font-semibold text-sm text-ink-green mb-4">{order.instrument}</p>
                       <div className="space-y-2">
@@ -287,35 +299,18 @@ export default function Dashboard() {
               <form onSubmit={handleAddPen} className="space-y-6">
                 <div>
                   <label className="block text-[9px] font-semibold uppercase tracking-widest text-ink-green mb-1">Brand / Maker *</label>
-                  <select required value={newPen.brand} onChange={e => {
-                    setNewPen({...newPen, brand: e.target.value, model: '', nib: ''})
-                  }} className="w-full bg-transparent border-b border-ink-green/30 pb-2 text-ink-green focus:outline-none focus:border-ink-green transition-colors appearance-none cursor-pointer">
-                    <option value="" disabled>Select a brand</option>
-                    {Object.keys(PEN_DATABASE).map(brand => <option key={brand} value={brand} className="bg-[#D5C8AD]">{brand}</option>)}
-                  </select>
+                  <input required type="text" value={newPen.brand} onChange={e => setNewPen({...newPen, brand: e.target.value})} placeholder="e.g. Montblanc" className="w-full bg-transparent border-b border-ink-green/30 pb-2 text-ink-green focus:outline-none focus:border-ink-green transition-colors text-sm" />
                 </div>
 
-                {newPen.brand && (
-                  <div>
-                    <label className="block text-[9px] font-semibold uppercase tracking-widest text-ink-green mb-1">Model Collection *</label>
-                    <select required value={newPen.model} onChange={e => {
-                      setNewPen({...newPen, model: e.target.value, nib: ''})
-                    }} className="w-full bg-transparent border-b border-ink-green/30 pb-2 text-ink-green focus:outline-none focus:border-ink-green transition-colors appearance-none cursor-pointer">
-                      <option value="" disabled>Select a model</option>
-                      {Object.keys(PEN_DATABASE[newPen.brand]).map(model => <option key={model} value={model} className="bg-[#D5C8AD]">{model}</option>)}
-                    </select>
-                  </div>
-                )}
+                <div>
+                  <label className="block text-[9px] font-semibold uppercase tracking-widest text-ink-green mb-1">Model Collection *</label>
+                  <input required type="text" value={newPen.model} onChange={e => setNewPen({...newPen, model: e.target.value})} placeholder="e.g. Meisterstück 149" className="w-full bg-transparent border-b border-ink-green/30 pb-2 text-ink-green focus:outline-none focus:border-ink-green transition-colors text-sm" />
+                </div>
 
-                {newPen.model && (
-                  <div>
-                    <label className="block text-[9px] font-semibold uppercase tracking-widest text-ink-green mb-1">Nib Specification *</label>
-                    <select required value={newPen.nib} onChange={e => setNewPen({...newPen, nib: e.target.value})} className="w-full bg-transparent border-b border-ink-green/30 pb-2 text-ink-green focus:outline-none focus:border-ink-green transition-colors appearance-none cursor-pointer">
-                      <option value="" disabled>Select a nib</option>
-                      {PEN_DATABASE[newPen.brand][newPen.model].map(nib => <option key={nib} value={nib} className="bg-[#D5C8AD]">{nib}</option>)}
-                    </select>
-                  </div>
-                )}
+                <div>
+                  <label className="block text-[9px] font-semibold uppercase tracking-widest text-ink-green mb-1">Nib Specification *</label>
+                  <input required type="text" value={newPen.nib} onChange={e => setNewPen({...newPen, nib: e.target.value})} placeholder="e.g. Medium - 18k Gold" className="w-full bg-transparent border-b border-ink-green/30 pb-2 text-ink-green focus:outline-none focus:border-ink-green transition-colors text-sm" />
+                </div>
 
                 <div>
                   <label className="block text-[9px] font-semibold uppercase tracking-widest text-ink-green mb-1">Upload Picture of your sword (Optional)</label>
@@ -362,7 +357,7 @@ export default function Dashboard() {
               
               <div className="flex-1 p-8 pr-12">
                 <p className="text-[10px] tracking-[0.3em] font-bold uppercase text-ink-green/60 mb-2">Commission Request</p>
-                <h3 className="font-serif font-black text-2xl md:text-3xl text-ink-green mb-2 leading-tight">The<br/>Aficionado<br/>Ritual</h3>
+                <h3 className="font-serif font-black text-2xl md:text-3xl text-ink-green mb-2 leading-tight">The<br/>Concierge<br/>Ritual</h3>
                 <p className="text-xs text-ink-green/80 font-medium mb-8 leading-relaxed">
                   Our master specialist will arrive at your premises to meticulously clean, tune, and refill the selected instrument.
                 </p>
@@ -383,117 +378,40 @@ export default function Dashboard() {
                       <input required type="time" value={booking.time} onChange={e => setBooking({...booking, time: e.target.value})} className="w-full bg-transparent border-b border-ink-green/30 pb-1 text-ink-green focus:outline-none focus:border-ink-green text-sm" />
                     </div>
                   </div>
-                   <div>
-                    <label className="block text-[9px] font-bold uppercase tracking-widest text-ink-green/70 mb-1">Estate / Office Address</label>
-                    <input required type="text" value={booking.location} onChange={e => setBooking({...booking, location: e.target.value})} placeholder="Full address" className="w-full bg-transparent border-b border-ink-green/30 pb-1 text-ink-green focus:outline-none focus:border-ink-green text-sm placeholder:text-ink-green/40" />
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[9px] font-bold uppercase tracking-widest text-ink-green/70 mb-1">Postal Code *</label>
+                        <input required type="text" maxLength={6} placeholder="400001" value={booking.postalCode} onChange={e => setBooking({...booking, postalCode: e.target.value.replace(/\D/g, '')})} className="w-full bg-transparent border-b border-ink-green/30 pb-1 text-ink-green focus:outline-none focus:border-ink-green text-sm placeholder:text-ink-green/40" />
+                      </div>
+                      <div>
+                        <label className="block text-[9px] font-bold uppercase tracking-widest text-ink-green/70 mb-1">City *</label>
+                        <input required type="text" placeholder="Mumbai" value={booking.city} onChange={e => setBooking({...booking, city: e.target.value})} className="w-full bg-transparent border-b border-ink-green/30 pb-1 text-ink-green focus:outline-none focus:border-ink-green text-sm placeholder:text-ink-green/40" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-[9px] font-bold uppercase tracking-widest text-ink-green/70 mb-1">Street Address / Estate *</label>
+                      <input required type="text" value={booking.streetAddress} onChange={e => setBooking({...booking, streetAddress: e.target.value})} placeholder="Building name, Floor, Street" className="w-full bg-transparent border-b border-ink-green/30 pb-1 text-ink-green focus:outline-none focus:border-ink-green text-sm placeholder:text-ink-green/40" />
+                    </div>
                   </div>
 
                   <div>
                     <label className="block text-[9px] font-bold uppercase tracking-widest text-ink-green/70 mb-1">Select Master Ink *</label>
-                    <select 
-                      required 
-                      value={booking.inkName} 
-                      onChange={e => setBooking({...booking, inkName: e.target.value})} 
-                      className="w-full bg-transparent border-b border-ink-green/30 pb-1 text-ink-green focus:outline-none focus:border-ink-green text-sm appearance-none cursor-pointer"
-                    >
-                      <option value="" disabled className="bg-[#D5C8AD]">Choose an ink</option>
-                      {inks.map(ink => (
-                        <option key={ink.backendId} value={ink.name} className="bg-[#D5C8AD]">
-                          {ink.name}
-                        </option>
-                      ))}
-                    </select>
+                    <input required type="text" value={booking.inkName} onChange={e => setBooking({...booking, inkName: e.target.value})} placeholder="e.g. Royal Blue" className="w-full bg-transparent border-b border-ink-green/30 pb-1 text-ink-green focus:outline-none focus:border-ink-green text-sm placeholder:text-ink-green/40" />
                   </div>
 
                   {/* Color selection moved to The Ink Sommelier on the right */}
                   
-                  <div>
-                    <label className="block text-[9px] font-bold uppercase tracking-widest text-ink-green/70 mb-2">Payment Method *</label>
-                    <div className="grid grid-cols-2 gap-4">
-                      <button 
-                        type="button" 
-                        onClick={() => setBooking({...booking, paymentMethod: 'cos'})}
-                        className={`py-3 text-[10px] uppercase tracking-widest font-bold border transition-colors ${booking.paymentMethod === 'cos' ? 'border-ink-green bg-ink-green text-[#D5C8AD]' : 'border-ink-green/30 text-ink-green/70 hover:border-ink-green'}`}
-                      >
-                        Cash on Service
-                      </button>
-                      <button 
-                        type="button" 
-                        onClick={() => setBooking({...booking, paymentMethod: 'online'})}
-                        className={`py-3 text-[10px] uppercase tracking-widest font-bold border transition-colors ${booking.paymentMethod === 'online' ? 'border-ink-green bg-ink-green text-[#D5C8AD]' : 'border-ink-green/30 text-ink-green/70 hover:border-ink-green'}`}
-                      >
-                        Pay Online
-                      </button>
+                  <div className="pt-4 border-t border-ink-green/10">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-[9px] uppercase tracking-widest text-ink-green/50">Service Ritual Fee</span>
+                      <span className="text-sm font-mono text-ink-green font-bold">₹{(content.servicePrice || 2500).toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-[9px] uppercase tracking-widest text-ink-green/50">Payment Terms</span>
+                      <span className="text-[10px] uppercase font-bold text-ink-green">Cash on Service</span>
                     </div>
                   </div>
-
-                  <AnimatePresence>
-                    {booking.paymentMethod === 'online' && (
-                      <motion.div 
-                        initial={{ height: 0, opacity: 0 }} 
-                        animate={{ height: 'auto', opacity: 1 }} 
-                        exit={{ height: 0, opacity: 0 }}
-                        className="overflow-hidden"
-                      >
-                        <div className="p-4 border border-ink-green/20 bg-white/20 mt-2 space-y-4">
-                          
-                          {/* Online Payment Type Sub-Selector */}
-                          <div className="flex gap-2 border-b border-ink-green/20 pb-2">
-                            <button type="button" onClick={() => setBooking({...booking, onlinePaymentType: 'upi'})} className={`text-[9px] uppercase tracking-widest font-bold px-3 py-1 transition-colors ${booking.onlinePaymentType === 'upi' ? 'bg-ink-green text-[#D5C8AD]' : 'text-ink-green/70 hover:bg-ink-green/10'}`}>UPI</button>
-                            <button type="button" onClick={() => setBooking({...booking, onlinePaymentType: 'card'})} className={`text-[9px] uppercase tracking-widest font-bold px-3 py-1 transition-colors ${booking.onlinePaymentType === 'card' ? 'bg-ink-green text-[#D5C8AD]' : 'text-ink-green/70 hover:bg-ink-green/10'}`}>Cards</button>
-                            <button type="button" onClick={() => setBooking({...booking, onlinePaymentType: 'netbanking'})} className={`text-[9px] uppercase tracking-widest font-bold px-3 py-1 transition-colors ${booking.onlinePaymentType === 'netbanking' ? 'bg-ink-green text-[#D5C8AD]' : 'text-ink-green/70 hover:bg-ink-green/10'}`}>Net Banking</button>
-                          </div>
-
-                          {/* Dynamic Payment Fields */}
-                          {booking.onlinePaymentType === 'upi' && (
-                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                               <label className="block text-[9px] font-bold uppercase tracking-widest text-ink-green/70 mb-1">Enter UPI ID (VPA)</label>
-                               <input type="text" placeholder="example@okhdfcbank" className="w-full bg-transparent border-b border-ink-green/30 pb-1 text-ink-green focus:outline-none focus:border-ink-green text-sm placeholder:text-ink-green/40" />
-                               <p className="text-[8px] text-ink-green/50 mt-2">A payment request will be sent to your connected UPI App.</p>
-                            </motion.div>
-                          )}
-
-                          {booking.onlinePaymentType === 'card' && (
-                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                              <div className="mb-4">
-                                <label className="block text-[9px] font-bold uppercase tracking-widest text-ink-green/70 mb-1">Cardholder Name</label>
-                                <input type="text" placeholder="John Doe" className="w-full bg-transparent border-b border-ink-green/30 pb-1 text-ink-green focus:outline-none focus:border-ink-green text-sm" />
-                              </div>
-                              <div className="mb-4">
-                                <label className="block text-[9px] font-bold uppercase tracking-widest text-ink-green/70 mb-1">Card Number</label>
-                                <input type="text" placeholder="0000 0000 0000 0000" className="w-full bg-transparent border-b border-ink-green/30 pb-1 text-ink-green focus:outline-none focus:border-ink-green font-mono text-sm" />
-                              </div>
-                              <div className="flex gap-4">
-                                <div className="flex-1">
-                                  <label className="block text-[9px] font-bold uppercase tracking-widest text-ink-green/70 mb-1">Expiry Date</label>
-                                  <input type="text" placeholder="MM/YY" className="w-full bg-transparent border-b border-ink-green/30 pb-1 text-ink-green focus:outline-none focus:border-ink-green font-mono text-sm" />
-                                </div>
-                                <div className="flex-1">
-                                  <label className="block text-[9px] font-bold uppercase tracking-widest text-ink-green/70 mb-1">CVV</label>
-                                  <input type="password" placeholder="***" className="w-full bg-transparent border-b border-ink-green/30 pb-1 text-ink-green focus:outline-none focus:border-ink-green font-mono text-sm" />
-                                </div>
-                              </div>
-                            </motion.div>
-                          )}
-
-                          {booking.onlinePaymentType === 'netbanking' && (
-                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                               <label className="block text-[9px] font-bold uppercase tracking-widest text-ink-green/70 mb-1">Select Bank</label>
-                               <select className="w-full bg-transparent border-b border-ink-green/30 pb-1 text-ink-green focus:outline-none focus:border-ink-green text-sm appearance-none cursor-pointer">
-                                 <option value="" disabled>Choose your bank</option>
-                                 <option value="sbi" className="bg-[#D5C8AD]">State Bank of India</option>
-                                 <option value="hdfc" className="bg-[#D5C8AD]">HDFC Bank</option>
-                                 <option value="icici" className="bg-[#D5C8AD]">ICICI Bank</option>
-                                 <option value="axis" className="bg-[#D5C8AD]">Axis Bank</option>
-                                 <option value="kotak" className="bg-[#D5C8AD]">Kotak Mahindra</option>
-                               </select>
-                            </motion.div>
-                          )}
-
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
                   
                   <button type="submit" className="w-full !mt-10 bg-ink-green text-[#D5C8AD] py-4 text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-ink-green/90 transition-colors shadow-md flex items-center justify-center gap-2">
                     Confirm Commission <ChevronRight className="w-3 h-3" />
@@ -533,7 +451,7 @@ export default function Dashboard() {
                 <p className="text-[10px] uppercase tracking-widest text-[#D5C8AD]/60 mb-4 border-b border-[#D5C8AD]/10 pb-2">Appointment Details</p>
                 <div className="space-y-4">
                   <div className="flex justify-between items-start">
-                    <span className="text-[9px] uppercase tracking-widest text-[#D5C8AD]/50">Aficionado Arrival</span>
+                    <span className="text-[9px] uppercase tracking-widest text-[#D5C8AD]/50">Concierge Arrival</span>
                     <span className="text-sm font-serif text-[#D5C8AD] font-bold">
                       {isOrderSuccess.date ? new Date(isOrderSuccess.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : 'Scheduled'} at {isOrderSuccess.bookingTime || '11:30 AM'}
                     </span>

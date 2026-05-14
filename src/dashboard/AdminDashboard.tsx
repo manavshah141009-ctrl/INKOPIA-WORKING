@@ -13,14 +13,7 @@ import { LayoutDashboard, Users, Bot, Settings, LogOut, ChevronRight, Palette, F
 import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 
-/* Corner star SVG component from the theme */
-function CornerStar({ className }: { className: string }) {
-  return (
-    <svg className={className} viewBox="0 0 32 32" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-      <polygon points="16,0 18,12 32,16 18,20 16,32 14,20 0,16 14,12" />
-    </svg>
-  );
-}
+
 
 export const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -32,10 +25,6 @@ export const AdminDashboard = () => {
         
         {/* Decorative page frame */}
         <div className="page-frame opacity-30 pointer-events-none" />
-        <CornerStar className="corner-star corner-star--tl opacity-20" />
-        <CornerStar className="corner-star corner-star--tr opacity-20" />
-        <CornerStar className="corner-star corner-star--bl opacity-20" />
-        <CornerStar className="corner-star corner-star--br opacity-20" />
 
         <Sidebar className="border-r border-ink-green/10 bg-background/90 backdrop-blur-xl">
           <SidebarHeader className="p-6 border-b border-ink-green/5">

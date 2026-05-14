@@ -38,3 +38,4 @@ server/uploads/*
 scratch/
 timepas.txt
 stress_test_report.md
+*.zip

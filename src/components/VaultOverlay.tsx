@@ -146,7 +146,7 @@ function BookingForm({ penType, onClose, onConfirmed }: { penType: string; onClo
         {penType}
       </p>
       <h2 className="font-serif text-3xl md:text-4xl text-white text-center mb-2 leading-tight">
-        Where shall we send<br />your Aficionado?
+        Where shall we send<br />your Concierge?
       </h2>
       <p className="text-[#555] text-xs text-center font-sans mb-10">
         We'll arrange a private consultation at your convenience.
@@ -242,7 +242,7 @@ function BookingForm({ penType, onClose, onConfirmed }: { penType: string; onClo
                 Arranging…
               </>
             ) : (
-              'Confirm Aficionado'
+              'Confirm Concierge'
             )}
           </button>
         </div>
@@ -272,7 +272,7 @@ function ConfirmationScreen({ penType, booking, onClose }: { penType: string; bo
         Booking Confirmed.
       </h2>
       <p className="text-[12px] tracking-[0.4em] uppercase text-[hsl(var(--gold))] font-sans mb-12 font-bold">
-        Your Aficionado is being prepared.
+        Your Concierge is being prepared.
       </p>
 
       <div className="w-full bg-[#111] border border-[hsl(var(--gold)/0.2)] rounded-lg overflow-hidden mb-12 shadow-2xl">
@@ -322,7 +322,7 @@ function ConfirmationScreen({ penType, booking, onClose }: { penType: string; bo
 
       <div className="max-w-md mx-auto mb-12">
         <p className="text-[11px] text-[#666] font-sans leading-relaxed mb-8">
-          A digital signature of this commission has been recorded in your <span className="text-[hsl(var(--gold))]">Inkopia Vault</span>. Our senior aficionado will contact you 24 hours prior to arrival to confirm the final coordination.
+          A digital signature of this commission has been recorded in your <span className="text-[hsl(var(--gold))]">Inkopia Vault</span>. Our senior concierge will contact you 24 hours prior to arrival to confirm the final coordination.
         </p>
       </div>
 
@@ -339,7 +339,7 @@ function ConfirmationScreen({ penType, booking, onClose }: { penType: string; bo
 
 export default function VaultOverlay({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [step, setStep] = useState<'form' | 'confirmed'>('form');
-  const [selectedPen] = useState<string>("Masterpiece Aficionado");
+  const [selectedPen] = useState<string>("Masterpiece Concierge");
   const [confirmedBooking, setConfirmedBooking] = useState<BookingData | null>(null);
   const { addOrder } = useOrders();
 
@@ -357,14 +357,14 @@ export default function VaultOverlay({ isOpen, onClose }: { isOpen: boolean; onC
       clientName: data.clientName,
       location: data.location,
       date: data.date,
-      service: 'Aficionado Commission',
+      service: 'Concierge Commission',
       instrument: selectedPen,
       paymentMethod: data.paymentMethod,
       bookingTime: data.time,
       amount: data.amount,
     }).catch(err => console.error('Background order sync failed:', err));
 
-    toast.success('Aficionado commissioned successfully.');
+    toast.success('Concierge commissioned successfully.');
   };
 
   return (

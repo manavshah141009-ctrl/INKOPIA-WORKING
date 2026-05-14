@@ -233,10 +233,11 @@
         "stripePublicKey": "",
         "firebaseApiKey": "",
         "firebaseProjectId": "",
-        "servicePrice": 1500
+        "servicePrice": 1500,
+        "penScale": 1
       },
       "theme": {
-        "backgroundColor": "#F5F5F5",
+        "backgroundColor": "#fbfaf6",
         "textColor": "#004225",
         "accentColor": "#D4AF37",
         "borderRadius": "8px",
@@ -248,7 +249,7 @@
     },
     "_id": "m49g7o1d0",
     "createdAt": "2026-04-29T12:05:26.583Z",
-    "updatedAt": "2026-04-29T12:28:37.133Z"
+    "updatedAt": "2026-05-09T09:10:23.052Z"
   },
   {
     "schemaId": "xdanlycax",
@@ -834,5 +835,188 @@
     "_id": "5eg7vzz5n",
     "createdAt": "2026-04-29T13:06:20.450Z",
     "updatedAt": "2026-05-06T08:50:10.694Z"
+  },
+  {
+    "schemaId": "69f05af0111796663e7c6723",
+    "data": {
+      "name": "INKOPIA",
+      "email": "inkopia12725@gmail.com",
+      "address": "Google Authenticated",
+      "phone": "",
+      "company": "N/A",
+      "designation": "Collector"
+    },
+    "_id": "ldin7bdvq",
+    "createdAt": "2026-05-09T08:42:44.867Z",
+    "updatedAt": "2026-05-09T08:46:47.994Z"
+  },
+  {
+    "schemaId": "lkh5hrvm1",
+    "data": {
+      "brand": "Montblanc",
+      "model": "Meisterstück 149",
+      "nib": "Medium - 18k Gold",
+      "silhouette": "cigar",
+      "ownerName": "INKOPIA"
+    },
+    "_id": "s0krvqj42",
+    "createdAt": "2026-05-09T08:44:05.384Z",
+    "updatedAt": "2026-05-09T08:44:05.384Z"
+  },
+  {
+    "schemaId": "69f05af0111796663e7c6722",
+    "data": {
+      "clientName": "INKOPIA",
+      "clientPhone": "N/A",
+      "location": "1104,devi krupa , malad east , mumbai -97",
+      "date": "2026-05-20",
+      "bookingTime": "12:30",
+      "service": "Aficionado Maintenance Ritual",
+      "instrument": "Montblanc Meisterstück 149",
+      "ink": "Oxblood Red",
+      "paymentMethod": "Cash on Service",
+      "amount": 1500,
+      "id": "ORD7197",
+      "status": "Pending",
+      "createdAt": "2026-05-09T08:46:27.411Z"
+    },
+    "_id": "1j2wsat4l",
+    "createdAt": "2026-05-09T08:46:27.433Z",
+    "updatedAt": "2026-05-09T08:46:27.433Z"
+  },
+  {
+    "schemaId": "69f05af0111796663e7c6723",
+    "data": {
+      "name": "vaibhav ",
+      "email": "vaibhav.rita53@gmail.com",
+      "address": "1104,devi krupa,",
+      "phone": "9920535353",
+      "company": "ftp ",
+      "designation": "ceo"
+    },
+    "_id": "ffw5h1zxz",
+    "createdAt": "2026-05-09T08:48:29.340Z",
+    "updatedAt": "2026-05-09T08:48:29.340Z"
+  },
+  {
+    "schemaId": "lkh5hrvm1",
+    "data": {
+      "brand": "Montblanc",
+      "model": "Meisterstück 149",
+      "nib": "Fine - 18k Gold",
+      "silhouette": "cigar",
+      "imageUrl": "blob:http://localhost:8080/5858cecb-04ea-485e-8d32-57eaa1cda46b",
+      "ownerName": "vaibhav "
+    },
+    "_id": "nr2x3n89m",
+    "createdAt": "2026-05-09T08:51:01.886Z",
+    "updatedAt": "2026-05-09T08:51:01.886Z"
+  },
+  {
+    "schemaId": "69f05af0111796663e7c6723",
+    "data": {
+      "name": "Launch Test",
+      "email": "test@inkopia.in",
+      "address": "Test Address",
+      "phone": "+91 99999 99999",
+      "company": "",
+      "designation": ""
+    },
+    "_id": "sy1luaia9",
+    "createdAt": "2026-05-13T18:03:39.302Z"
+  },
+  {
+    "schemaId": "69f05af0111796663e7c6723",
+    "data": {
+      "name": "Launch Test",
+      "email": "test-user@gmail.com",
+      "address": "Test Address",
+      "phone": "+91 99999 99999",
+      "company": "",
+      "designation": ""
+    },
+    "_id": "210ctwden",
+    "createdAt": "2026-05-13T18:04:40.301Z"
+  },
+  {
+    "schemaId": "lkh5hrvm1",
+    "data": {
+      "brand": "Montblanc",
+      "model": "StarWalker",
+      "nib": "Fine - 14k Gold",
+      "silhouette": "cigar",
+      "ownerName": "Launch Test"
+    },
+    "_id": "rcd82uirr",
+    "createdAt": "2026-05-13T18:06:59.332Z"
+  },
+  {
+    "schemaId": "69f05af0111796663e7c6722",
+    "data": {
+      "clientName": "Launch Test",
+      "clientPhone": "+91 99999 99999",
+      "location": "1102,devikrupa blg ",
+      "date": "2026-05-21",
+      "bookingTime": "23:39",
+      "service": "Aficionado Maintenance Ritual",
+      "instrument": "Montblanc StarWalker",
+      "ink": "Midnight Blue",
+      "paymentMethod": "Cash on Service",
+      "amount": 1500,
+      "id": "ORD1250",
+      "status": "Pending",
+      "createdAt": "2026-05-13T18:07:26.408Z"
+    },
+    "_id": "regjjpgx4",
+    "createdAt": "2026-05-13T18:07:26.411Z"
+  },
+  {
+    "schemaId": 4,
+    "data": {
+      "name": "Manav",
+      "email": "manavshaha502@gmail.com",
+      "address": "1102,Devikrupa Blg, Malad East, Mumbai -400097",
+      "phone": "9920943386",
+      "company": "",
+      "designation": ""
+    },
+    "_id": "6n2iavw6k",
+    "createdAt": "2026-05-13T18:27:02.040Z"
+  },
+  {
+    "schemaId": 3,
+    "data": {
+      "brand": "Visconti",
+      "model": "Divina Elegance",
+      "nib": "Fine - 18k Gold",
+      "silhouette": "cigar",
+      "ownerName": "Manav"
+    },
+    "_id": "srym4k4tg",
+    "createdAt": "2026-05-13T18:27:16.670Z"
+  },
+  {
+    "schemaId": 3,
+    "data": {
+      "brand": "Montblanc",
+      "model": "StarWalker",
+      "nib": "Broad - 14k Gold",
+      "silhouette": "cigar",
+      "ownerName": "Manav"
+    },
+    "_id": "vid90496s",
+    "createdAt": "2026-05-13T18:28:41.267Z"
+  },
+  {
+    "schemaId": 3,
+    "data": {
+      "brand": "Montblanc",
+      "model": "Meisterstück 149",
+      "nib": "Extra Fine - 18k Gold",
+      "silhouette": "cigar",
+      "ownerName": "Manav"
+    },
+    "_id": "mqa6i9o1o",
+    "createdAt": "2026-05-13T18:30:43.027Z"
   }
 ]

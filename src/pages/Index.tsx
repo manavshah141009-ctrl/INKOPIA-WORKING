@@ -6,20 +6,7 @@ import { useSite } from '@/context/SiteContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 
-/* Corner star SVG component matching the uploaded design */
-function CornerStar({ className }: { className: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 32 32"
-      fill="currentColor"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <polygon points="16,0 18,12 32,16 18,20 16,32 14,20 0,16 14,12" />
-      <polygon points="16,4 17.5,14 28,16 17.5,18 16,28 14.5,18 4,16 14.5,14" opacity="0.6" />
-    </svg>
-  );
-}
+
 
 /* Intersection observer hook for scroll animations */
 function useInView(threshold = 0.15) {
@@ -67,10 +54,6 @@ const Index = () => {
     <div className="relative w-full min-h-screen text-foreground selection:bg-gold selection:text-black">
       {/* Decorative borders — matching logo theme */}
       <div className="page-frame" />
-      <CornerStar className="corner-star corner-star--tl" />
-      <CornerStar className="corner-star corner-star--tr" />
-      <CornerStar className="corner-star corner-star--bl" />
-      <CornerStar className="corner-star corner-star--br" />
 
 
       {/* Login link */}
@@ -229,7 +212,7 @@ const Index = () => {
             </div>
 
             {/* Pillar 3 — The Infinite Palette */}
-            <div className="mb-40 md:mb-64 group">
+            <div className="group mb-20">
               <div className="flex flex-col md:flex-row items-baseline gap-6 md:gap-20 mb-10 md:mb-16">
                 <span className="text-6xl md:text-9xl font-serif text-gold/25 font-light italic leading-none">03</span>
                 <h3 className="text-4xl md:text-7xl font-serif text-accent uppercase tracking-tight leading-tight">
@@ -246,17 +229,6 @@ const Index = () => {
                 </div>
               </div>
             </div>
-
-            {/* Final Call to Action */}
-            <div className="flex flex-col items-center py-40">
-              <div className="gold-divider mb-16 w-32" />
-              <p className="text-3xl md:text-5xl text-accent font-serif mb-20 italic text-center leading-tight">
-                Ready for a fresh start <br className="hidden md:block" /> and a fresh colour?
-              </p>
-              <button className="gold-button scale-150 transform hover:scale-[1.6] transition-all duration-700 shadow-[0_0_50px_rgba(212,175,55,0.2)]">
-                Book Your Concierge Session
-              </button>
-            </div>
           </div>
         </section>
 
@@ -268,7 +240,15 @@ const Index = () => {
             ref={commission.ref}
             className={`flex flex-col items-center section-fade ${commission.isVisible ? 'visible' : ''}`}
           >
-            <div className={`gold-divider mb-8 ${commission.isVisible ? 'visible' : ''}`} style={{ width: commission.isVisible ? '48px' : '0' }} />
+            {/* Catch point line restored and shifted lower */}
+            <div className="flex flex-col items-center mb-16">
+              <p className="text-2xl md:text-4xl text-accent font-serif italic text-center leading-tight">
+                Ready for a fresh start <br className="hidden md:block" /> and a fresh colour?
+              </p>
+              <div className="gold-divider mt-8 w-24 mx-auto" />
+            </div>
+
+
             <p className="text-[10px] tracking-[0.5em] uppercase text-accent font-sans mb-4">
               {content.commissionTitle}
             </p>
@@ -292,7 +272,7 @@ const Index = () => {
               }}
               className="btn-inkopia px-16 py-5 text-[10px] font-sans tracking-[0.4em] uppercase font-bold relative z-10"
             >
-              {isLoggedIn ? "Enter Your Private Vault" : "Secure Your Commission"}
+              {isLoggedIn ? "Enter Your Private Vault" : "Book Your Concierge Session"}
             </button>
           </div>
         </section>

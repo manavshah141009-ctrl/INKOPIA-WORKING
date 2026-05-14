@@ -16,6 +16,15 @@ export const SiteSettings = () => {
   // Page creation state
   const [newPage, setNewPage] = useState({ title: '', slug: '' });
 
+  // Sync local state when context updates (e.g. from polling)
+  React.useEffect(() => {
+    setLocalTheme(theme);
+  }, [theme]);
+
+  React.useEffect(() => {
+    setLocalContent(content);
+  }, [content]);
+
   const handleThemeChange = (key: keyof typeof theme, value: string) => {
     setLocalTheme({ ...localTheme, [key]: value });
   };
@@ -403,7 +412,7 @@ export const SiteSettings = () => {
         
         <div className="space-y-4">
           <div className="space-y-2 max-w-md">
-            <Label className="text-[10px] uppercase tracking-widest font-bold opacity-60">Aficionado Service Fee (₹)</Label>
+            <Label className="text-[10px] uppercase tracking-widest font-bold opacity-60">Concierge Service Fee (₹)</Label>
             <div className="flex gap-2">
               <Input 
                 type="number"

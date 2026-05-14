@@ -70,7 +70,7 @@ const DEFAULT_CONTENT: SiteContent = {
     { title: 'The Prime', desc: 'Flawless fill and nib polish.' },
   ],
   commissionTitle: "Commission",
-  commissionHeading: "Reserve Your Aficionado.",
+  commissionHeading: "Reserve Your Concierge.",
   commissionText: "Experience the ultimate care for your collection.",
   commissionPenBrand: "Visconti",
   commissionPenName: "Homo Sapiens",
@@ -200,6 +200,10 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     initSite();
+
+    // Polling for live updates
+    const interval = setInterval(initSite, 10000); // 10s polling
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -221,11 +225,12 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const updated = { ...content, ...newContent };
     setContent(updated);
     if (schemaId) {
-      await dataApi.upsert({
+      const { data } = await dataApi.upsert({
         schemaId,
         uniqueId: configId,
         data: { content: updated, theme }
       });
+      if (data?._id && !configId) setConfigId(data._id);
     }
   };
 
@@ -233,11 +238,12 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const updated = { ...theme, ...newTheme };
     setTheme(updated);
     if (schemaId) {
-      await dataApi.upsert({
+      const { data } = await dataApi.upsert({
         schemaId,
         uniqueId: configId,
         data: { content, theme: updated }
       });
+      if (data?._id && !configId) setConfigId(data._id);
     }
   };
 

@@ -20,35 +20,19 @@ import axios from "axios";
 import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-/* Corner star SVG component matching the uploaded design */
-function CornerStar({ className }: { className: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 32 32"
-      fill="currentColor"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <polygon points="16,0 18,12 32,16 18,20 16,32 14,20 0,16 14,12" />
-      <polygon points="16,4 17.5,14 28,16 17.5,18 16,28 14.5,18 4,16 14.5,14" opacity="0.6" />
-    </svg>
-  );
-}
+
 
 interface FormData {
   name: string;
   email: string;
   company: string;
   designation: string;
-  address: string;
   phone: string;
-  addressType: 'home' | 'work';
 }
 
 interface FormErrors {
   name?: string;
   email?: string;
-  address?: string;
   phone?: string;
 }
 
@@ -65,9 +49,7 @@ const SignUp = () => {
     email: '',
     company: '',
     designation: '',
-    address: '',
     phone: '',
-    addressType: 'home',
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
@@ -94,8 +76,7 @@ const SignUp = () => {
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
       newErrors.email = 'Please enter a valid email address.';
     }
-    if (!form.address.trim()) newErrors.address = 'Address is required for scheduling.';
-    if (!form.phone.trim()) newErrors.phone = 'Phone number is required for SMS verification.';
+    if (!form.phone.trim()) newErrors.phone = 'Phone number is required for verification.';
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -107,7 +88,6 @@ const SignUp = () => {
       await addUser({
         name: form.name,
         email: form.email,
-        address: form.address,
         phone: form.phone,
         company: form.company,
         designation: form.designation
@@ -115,6 +95,7 @@ const SignUp = () => {
       
       localStorage.setItem('inkopia_auth', 'true');
       localStorage.setItem('inkopia_user_name', form.name);
+      localStorage.setItem('inkopia_user_email', form.email);
       localStorage.setItem('inkopia_user_phone', form.phone);
       toast.success(`Welcome to Inkopia, ${form.name.split(' ')[0]}. (Direct Access granted)`);
       setTimeout(() => navigate('/dashboard'), 700);
@@ -131,8 +112,21 @@ const SignUp = () => {
       return;
     }
     
-    // Proceed directly to signup as requested (Removing Phone Verification for now)
-    await handleDirectSignUp();
+    setIsSubmitting(true);
+    try {
+      // 1. Trigger Email OTP via backend
+      const API_URL = '/api';
+      await axios.post(`${API_URL}/auth/send-otp`, { email: form.email });
+      
+      // 2. Switch to OTP entry step
+      setStep('otp');
+      toast.success(`Verification code sent to ${form.email}`);
+    } catch (err: any) {
+      console.error('OTP Send Error:', err);
+      toast.error(err.response?.data?.error || 'Failed to send verification code. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleVerifyOTP = async (e: React.FormEvent) => {
@@ -145,13 +139,13 @@ const SignUp = () => {
     
     try {
       // Verify OTP via backend
-      await axios.post('http://localhost:5000/api/auth/verify-otp', { email: form.email, otp });
+      const API_URL = '/api';
+      await axios.post(`${API_URL}/auth/verify-otp`, { email: form.email, otp });
       
       // If verification successful, proceed to create user
       await addUser({
         name: form.name,
         email: form.email,
-        address: form.address,
         phone: form.phone,
         company: form.company,
         designation: form.designation
@@ -160,7 +154,7 @@ const SignUp = () => {
       setIsSubmitting(false);
       localStorage.setItem('inkopia_auth', 'true');
       localStorage.setItem('inkopia_user_name', form.name);
-      localStorage.setItem('inkopia_user_address', form.address);
+      localStorage.setItem('inkopia_user_email', form.email);
       toast.success(`Welcome to Inkopia, ${form.name.split(' ')[0]}. Your vault has been created.`);
       setTimeout(() => navigate('/dashboard'), 700);
     } catch (err: any) {
@@ -181,7 +175,6 @@ const SignUp = () => {
         await addUser({
           name: googleName,
           email: user.email || '',
-          address: 'Google Authenticated', // Placeholder since Google doesn't provide address
           phone: user.phoneNumber || '',
           company: 'N/A',
           designation: 'Collector'
@@ -190,6 +183,7 @@ const SignUp = () => {
         setIsSubmitting(false);
         localStorage.setItem('inkopia_auth', 'true');
         localStorage.setItem('inkopia_user_name', googleName);
+        localStorage.setItem('inkopia_user_email', user.email || '');
         toast.success(`Welcome to your vault, ${googleName.split(' ')[0]}.`);
         setTimeout(() => navigate('/dashboard'), 700);
       }
@@ -206,10 +200,6 @@ const SignUp = () => {
     <div className="relative w-full min-h-screen flex items-center justify-center py-24 md:py-32 px-6">
       {/* Decorative borders — matching logo theme */}
       <div className="page-frame" />
-      <CornerStar className="corner-star corner-star--tl" />
-      <CornerStar className="corner-star corner-star--tr" />
-      <CornerStar className="corner-star corner-star--bl" />
-      <CornerStar className="corner-star corner-star--br" />
 
 
       {/* Main Content Card */}
@@ -317,49 +307,7 @@ const SignUp = () => {
                 />
               </div>
 
-              {/* Address */}
-              <div className="flex flex-col">
-                <label className="text-[10px] uppercase tracking-[0.2em] text-ink-green font-medium mb-1">
-                  Address <span className="text-gold">*</span>
-                </label>
-                <input
-                  id="signup-address"
-                  type="text"
-                  value={form.address}
-                  onChange={set('address')}
-                  placeholder="Your residence or office"
-                  className={`${inputClass} mb-3 ${errors.address ? 'border-[hsl(var(--error))] shake-error' : 'border-ink-green/30 focus:border-gold'}`}
-                  required
-                />
-                <AnimatePresence>
-                  {errors.address && (
-                    <motion.p 
-                      initial={{ opacity: 0, y: -4 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -4 }}
-                      className="error-message -mt-2 mb-2"
-                    >
-                      {errors.address}
-                    </motion.p>
-                  )}
-                </AnimatePresence>
-                <div className="flex gap-4">
-                  {(['home', 'work'] as const).map(type => (
-                    <label key={type} className="flex items-center gap-1.5 cursor-pointer group">
-                      <input
-                        type="radio"
-                        name="addressType"
-                        checked={form.addressType === type}
-                        onChange={() => setForm(prev => ({ ...prev, addressType: type }))}
-                        className="appearance-none w-3 h-3 border border-ink-green/40 rounded-full checked:bg-gold checked:border-gold transition-all"
-                      />
-                      <span className="text-[9px] uppercase tracking-[0.1em] text-ink-green/70 group-hover:text-ink-green transition-colors capitalize">
-                        {type}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </div>
+
 
               {/* Phone No */}
               <div className="flex flex-col">
@@ -445,26 +393,13 @@ const SignUp = () => {
           </form>
         ) : (
           <div className="max-w-md mx-auto flex flex-col items-center text-center">
-            <h3 className="font-serif font-bold text-2xl text-ink-green mb-2">Confirm Phone No.</h3>
+            <h3 className="font-serif font-bold text-2xl text-ink-green mb-2">Verify Your Email</h3>
             <p className="text-xs text-ink-green/70 mb-8 font-medium leading-relaxed">
               Enter the 6-digit verification code sent to <br /> 
-              <span className="text-gold font-bold">{form.phone}</span>
+              <span className="text-gold font-bold">{form.email}</span>
             </p>
             
-            <form onSubmit={async (e) => {
-              e.preventDefault();
-              if (otp.length !== 6) return;
-              setIsSubmitting(true);
-              try {
-                if (confirmationResult) {
-                  await confirmationResult.confirm(otp);
-                  await handleDirectSignUp(); // Save to DB
-                }
-              } catch (err) {
-                setIsSubmitting(false);
-                toast.error('Invalid code. Please try again.');
-              }
-            }} className="flex flex-col items-center gap-10">
+            <form onSubmit={handleVerifyOTP} className="flex flex-col items-center gap-10">
               <InputOTP
                 maxLength={6}
                 value={otp}
@@ -495,7 +430,7 @@ const SignUp = () => {
                 onClick={() => setStep('form')}
                 className="text-[9px] uppercase tracking-[0.2em] text-ink-green/50 hover:text-ink-green transition-colors border-b border-transparent hover:border-ink-green"
               >
-                Change phone number
+                Change email address
               </button>
             </form>
           </div>

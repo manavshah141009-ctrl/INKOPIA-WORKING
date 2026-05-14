@@ -38,6 +38,7 @@ interface OrderContextType {
   pens: any[];
   users: UserData[];
   inks: InkData[];
+  agents: any[];
   isLoading: boolean;
   addOrder: (order: Omit<BookingData, 'id' | 'createdAt' | 'status'>) => Promise<void>;
   updateOrderStatus: (id: string, status: BookingData['status']) => Promise<void>;
@@ -47,6 +48,8 @@ interface OrderContextType {
   deleteUser: (backendId: string) => Promise<void>;
   addInk: (ink: Omit<InkData, 'backendId'>) => Promise<void>;
   deleteInk: (backendId: string) => Promise<void>;
+  addAgent: (agent: any) => Promise<void>;
+  deleteAgent: (backendId: string) => Promise<void>;
 }
 
 const OrderContext = createContext<OrderContextType | undefined>(undefined);
@@ -56,11 +59,13 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [pens, setPens] = useState<any[]>([]);
   const [users, setUsers] = useState<UserData[]>([]);
   const [inks, setInks] = useState<InkData[]>([]);
+  const [agents, setAgents] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [schemaId, setSchemaId] = useState<string | null>(null);
   const [vaultSchemaId, setVaultSchemaId] = useState<string | null>(null);
   const [userSchemaId, setUserSchemaId] = useState<string | null>(null);
   const [inkSchemaId, setInkSchemaId] = useState<string | null>(null);
+  const [agentSchemaId, setAgentSchemaId] = useState<string | null>(null);
 
   useEffect(() => {
     const initOrders = async (retries = 3) => {
@@ -165,52 +170,92 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           }
         }
         if (iSchema?._id) setInkSchemaId(iSchema._id);
+        
+        let aSchema = schemas.find((s: any) => s.collectionName === 'agents');
+        if (!aSchema) {
+          try {
+            const { data: newSchema } = await schemaApi.create({
+              collectionName: 'agents',
+              displayName: 'Concierge Agents',
+              fields: [
+                { name: 'name', label: 'Name', type: 'text' },
+                { name: 'role', label: 'Role', type: 'text' },
+                { name: 'type', label: 'Type', type: 'text' }
+              ]
+            });
+            aSchema = newSchema;
+          } catch (err) {
+            console.error('Failed to create agents schema:', err);
+          }
+        }
+        if (aSchema?._id) setAgentSchemaId(aSchema._id);
 
         // Fetch data ONLY if schemas were found or created successfully
         if (iSchema?._id) {
           const { data: inksData } = await dataApi.getBySchema(iSchema._id);
-          if (inksData && inksData.length === 0) {
-            const defaultInks = [
-              { name: 'Onyx Black', hex: '#0f0f0f' },
-              { name: 'Midnight Blue', hex: '#191970' },
-              { name: 'Oxblood Red', hex: '#4a0404' },
-              { name: 'Emerald Green', hex: '#2e8b57' },
-              { name: 'Imperial Purple', hex: '#4b0082' },
-              { name: 'Toffee Brown', hex: '#603311' }
-            ];
-            for (const ink of defaultInks) {
-              await dataApi.upsert({ schemaId: iSchema._id, data: ink });
-            }
-            const { data: updatedInks } = await dataApi.getBySchema(iSchema._id);
-            setInks(updatedInks.map((item: any) => ({ ...item.data, backendId: item._id })));
-          } else if (inksData) {
+          if (inksData) {
             setInks(inksData.map((item: any) => ({ ...item.data, backendId: item._id })));
           }
         }
 
+        if (aSchema?._id) {
+          const { data: agentsData } = await dataApi.getBySchema(aSchema._id);
+          if (agentsData) {
+            setAgents(agentsData.map((item: any) => ({ ...item.data, backendId: item._id })));
+          }
+        }
+        const isAdmin = localStorage.getItem('inkopia_admin_token') || localStorage.getItem('inkopia_auth_role') === 'admin';
+
         if (orderSchema?._id) {
           const { data: siteData } = await dataApi.getBySchema(orderSchema._id);
           if (siteData) {
-            const fetchedOrders: BookingData[] = siteData.map((item: any) => ({
+            const allOrders: BookingData[] = siteData.map((item: any) => ({
               ...item.data,
               backendId: item._id
             }));
-            setOrders(fetchedOrders.sort((a, b) => {
-              const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-              const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-              return dateB - dateA;
-            }));
+
+            if (isAdmin) {
+              setOrders(allOrders.sort((a, b) => {
+                const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+                const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+                return dateB - dateA;
+              }));
+            } else {
+              const userEmail = localStorage.getItem('inkopia_user_email');
+              const userName = localStorage.getItem('inkopia_user_name');
+              
+              const filteredOrders = allOrders.filter(order => 
+                (userEmail && order.clientEmail === userEmail) || 
+                (userName && order.clientName === userName)
+              );
+
+              setOrders(filteredOrders.sort((a, b) => {
+                const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+                const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+                return dateB - dateA;
+              }));
+            }
           }
         }
 
+
         if (vSchema?._id) {
+          const userEmail = localStorage.getItem('inkopia_user_email');
           const userName = localStorage.getItem('inkopia_user_name');
           const { data: vaultData } = await dataApi.getBySchema(vSchema._id);
+          
           if (vaultData) {
-            const userPens = vaultData
-              .filter((item: any) => item.data.ownerName === userName)
-              .map((item: any) => ({ ...item.data, id: item._id }));
-            setPens(userPens);
+            const allPens = vaultData.map((item: any) => ({ ...item.data, id: item._id }));
+            
+            // If admin, show all pens. If user, filter by email/name.
+            if (isAdmin) {
+              setPens(allPens);
+            } else {
+              const userPens = allPens.filter((pen: any) => {
+                return (userEmail && pen.ownerEmail === userEmail) || (userName && pen.ownerName === userName);
+              });
+              setPens(userPens);
+            }
           }
         }
 
@@ -240,6 +285,8 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
 
     initOrders();
+    const interval = setInterval(initOrders, 10000); // Poll every 10s
+    return () => clearInterval(interval);
   }, []);
 
   const addOrder = async (orderData: Omit<BookingData, 'id' | 'createdAt' | 'status'>) => {
@@ -291,7 +338,7 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         schemaId: vaultSchemaId,
         data: {
           ...penData,
-          ownerName: localStorage.getItem('inkopia_user_name')
+          ownerEmail: localStorage.getItem('inkopia_user_email')
         }
       });
       setPens([...pens, { ...penData, id: savedData._id }]);
@@ -384,11 +431,34 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
+  const addAgent = async (agentData: any) => {
+    if (!agentSchemaId) return;
+    try {
+      const { data: savedData } = await dataApi.upsert({
+        schemaId: agentSchemaId,
+        data: agentData
+      });
+      setAgents(prev => [...prev, { ...agentData, backendId: savedData._id }]);
+    } catch (err) {
+      console.error('Failed to add agent:', err);
+    }
+  };
+
+  const deleteAgent = async (backendId: string) => {
+    if (!agentSchemaId) return;
+    try {
+      await dataApi.delete(backendId);
+      setAgents(prev => prev.filter(a => a.backendId !== backendId));
+    } catch (err) {
+      console.error('Failed to delete agent:', err);
+    }
+  };
+
   return (
     <OrderContext.Provider value={{ 
-      orders, pens, users, inks, isLoading,
+      orders, pens, users, inks, agents, isLoading,
       addOrder, updateOrderStatus, addPen, addUser, updateUser, deleteUser,
-      addInk, deleteInk
+      addInk, deleteInk, addAgent, deleteAgent
     }}>
       {children}
     </OrderContext.Provider>
