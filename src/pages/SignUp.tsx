@@ -170,14 +170,19 @@ const SignUp = () => {
       const user = result.user;
       
       if (user) {
-        // Auto-fill form and save to backend
+        const idToken = await user.getIdToken();
         const googleName = user.displayName || 'Google Collector';
-        await addUser({
+        
+        // Send secure sync request with Firebase ID Token
+        await axios.post('/api/auth/sync-user', {
           name: googleName,
-          email: user.email || '',
           phone: user.phoneNumber || '',
           company: 'N/A',
           designation: 'Collector'
+        }, {
+          headers: {
+            Authorization: `Bearer ${idToken}`
+          }
         });
 
         setIsSubmitting(false);

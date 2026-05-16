@@ -10,6 +10,11 @@ dotenv.config({ path: path.join(__dirname, '.env') });
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Trust proxy headers from NGINX/load balancers in production
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
+
 // Initialize MySQL
 db.initDB();
 
@@ -24,9 +29,43 @@ process.on('unhandledRejection', (reason, promise) => {
   remoteLogger.error('Unhandled Rejection', { reason: reason?.toString() });
 });
 
-app.use(cors());
-app.use(express.json());
+// CORS Configuration - dynamically set from environment
+const allowedOrigins = process.env.NODE_ENV === 'production' 
+  ? (process.env.CORS_ORIGINS || '').split(',').map(o => o.trim()).filter(Boolean)
+  : ['http://localhost:8080', 'http://127.0.0.1:8080', 'http://localhost:3000', 'http://127.0.0.1:3000'];
+
+// Validate that production has CORS origins configured
+if (process.env.NODE_ENV === 'production' && allowedOrigins.length === 0) {
+  console.warn('⚠️ WARNING: CORS_ORIGINS not configured for production. API may be inaccessible.');
+}
+
+app.use(cors({
+  origin: allowedOrigins.length > 0 ? allowedOrigins : '*',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// Express 5 payload limits
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Async Error Handling Wrapper - catches unhandled promise rejections in async route handlers
+const asyncHandler = (fn) => (req, res, next) => {
+  return Promise.resolve(fn(req, res, next)).catch(next);
+};
+
+// Global error handler middleware - must be defined after all other middleware/routes
+const errorHandler = (err, req, res, next) => {
+  console.error('❌ Unhandled error:', err.message);
+  remoteLogger.error('Route Error', { message: err.message, path: req.path, stack: err.stack });
+  
+  res.status(err.status || 500).json({
+    error: process.env.NODE_ENV === 'production' ? 'Internal Server Error' : err.message,
+    timestamp: new Date().toISOString()
+  });
+};
 
 // Routes
 const schemaRoutes = require('./routes/schemaRoutes');
@@ -79,6 +118,9 @@ app.use((req, res) => {
     }
   });
 });
+
+// Global error handler middleware - must be defined last
+app.use(errorHandler);
 
 // Storage service initialization is automatic
 

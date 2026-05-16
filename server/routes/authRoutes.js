@@ -4,6 +4,7 @@ const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
 const db = require('../db');
 const axios = require('axios'); // For webhooks
+const verifyFirebaseToken = require('../middleware/firebaseAuth');
 
 // Generate 6-digit OTP
 const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
@@ -128,19 +129,29 @@ router.post('/verify-otp', async (req, res) => {
   }
 });
 
-// Google OAuth User Sync
-router.post('/sync-user', async (req, res) => {
-  const { email, firebaseUid } = req.body;
-  if (!email || !firebaseUid) return res.status(400).json({ error: 'Missing data' });
+// Secure Google OAuth User Sync
+router.post('/sync-user', verifyFirebaseToken, async (req, res) => {
+  // Extract trusted data from the verified token
+  const { email, uid: firebaseUid } = req.user;
+  // Extract optional profile data from body
+  const { name, phone, company, designation } = req.body;
+
+  if (!email || !firebaseUid) return res.status(400).json({ error: 'Missing token data' });
 
   try {
     const users = await db.query('SELECT id FROM users WHERE email = ?', [email]);
     if (users.length === 0) {
-      await db.query('INSERT INTO users (email, firebase_uid, is_verified) VALUES (?, ?, TRUE)', [email, firebaseUid]);
+      await db.query(
+        'INSERT INTO users (email, firebase_uid, name, phone, company, designation, is_verified) VALUES (?, ?, ?, ?, ?, ?, TRUE)', 
+        [email, firebaseUid, name, phone, company, designation]
+      );
     } else {
-      await db.query('UPDATE users SET firebase_uid = ?, is_verified = TRUE WHERE email = ?', [firebaseUid, email]);
+      await db.query(
+        'UPDATE users SET firebase_uid = ?, is_verified = TRUE, name = COALESCE(?, name), phone = COALESCE(?, phone) WHERE email = ?', 
+        [firebaseUid, name, phone, email]
+      );
     }
-    res.json({ success: true });
+    res.json({ success: true, email });
   } catch (err) {
     console.error('[AUTH] Sync user error:', err);
     res.status(500).json({ error: 'Failed to sync user' });

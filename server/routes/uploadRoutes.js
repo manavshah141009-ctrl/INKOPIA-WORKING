@@ -31,16 +31,21 @@ const upload = multer({
 
 router.post('/', upload.single('file'), async (req, res) => {
   if (!req.file) {
-    return res.status(400).send('No file uploaded.');
+    return res.status(400).json({ error: 'No file uploaded.' });
   }
 
-  // Generate the URL for the uploaded file
-  // In production, you would use your domain name
-  const protocol = req.protocol;
-  const host = req.get('host');
-  const imageUrl = `${protocol}://${host}/uploads/${req.file.filename}`;
+  try {
+    // Generate the URL for the uploaded file
+    // In production with NGINX reverse proxy, respect X-Forwarded-* headers
+    const protocol = req.get('x-forwarded-proto') || req.protocol || 'https';
+    const host = req.get('x-forwarded-host') || req.get('host') || 'localhost:3000';
+    const imageUrl = `${protocol}://${host}/uploads/${req.file.filename}`;
 
-  res.status(200).send({ url: imageUrl });
+    res.status(200).json({ url: imageUrl });
+  } catch (err) {
+    console.error('❌ Upload error:', err.message);
+    res.status(500).json({ error: 'File upload failed' });
+  }
 });
 
 module.exports = router;

@@ -1,0 +1,12 @@
+[shell_environment_policy]
+inherit = "core"
+
+[shell_environment_policy.set]
+ANTHROPIC_AUTH_TOKEN = "sk-qmV4VqK1nujYIycLyXTrEsmIAPFMhs3mpBQD1T0S7MuG3wPdpWEK1Nn9FTGPNvrK"
+ANTHROPIC_BASE_URL = "https://opencode.ai/zen"
+ANTHROPIC_DEFAULT_HAIKU_MODEL = "deepSeek-v4-flash-free"
+ANTHROPIC_DEFAULT_OPUS_MODEL = "minimax-m2.5-free"
+ANTHROPIC_DEFAULT_SONNET_MODEL = "nemotron-3-super-free"
+API_TIMEOUT_MS = "300000"
+CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = "1"
+DISABLE_AUTOUPDATER = "true"
