@@ -10,6 +10,8 @@ import AdminLogin from "./pages/AdminLogin.tsx";
 import { AdminDashboard } from "./dashboard/AdminDashboard.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import DynamicPage from "./pages/DynamicPage.tsx";
+import CompleteProfile from "./pages/CompleteProfile.tsx";
+import MyOrders from "./pages/MyOrders.tsx";
 import { SiteProvider } from "./context/SiteContext";
 import { OrderProvider } from "./context/OrderContext";
 import { Navigate } from "react-router-dom";
@@ -33,7 +35,9 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/signup" element={<SignUp />} />
+              <Route path="/complete-profile" element={<CompleteProfile />} />
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/my-orders" element={<MyOrders />} />
               <Route path="/admin-login" element={<AdminLogin />} />
               <Route path="/admin" element={
                 <ProtectedAdminRoute>

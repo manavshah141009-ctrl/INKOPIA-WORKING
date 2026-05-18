@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { dataApi, schemaApi } from '@/lib/api';
+import axios from 'axios';
 
 export interface BookingData {
   id: string;
@@ -190,7 +191,6 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         }
         if (aSchema?._id) setAgentSchemaId(aSchema._id);
 
-        // Fetch data ONLY if schemas were found or created successfully
         if (iSchema?._id) {
           const { data: inksData } = await dataApi.getBySchema(iSchema._id);
           if (inksData) {
@@ -204,43 +204,36 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             setAgents(agentsData.map((item: any) => ({ ...item.data, backendId: item._id })));
           }
         }
+        
         const isAdmin = localStorage.getItem('inkopia_admin_token') || localStorage.getItem('inkopia_auth_role') === 'admin';
-
-        if (orderSchema?._id) {
-          const { data: siteData } = await dataApi.getBySchema(orderSchema._id);
-          if (siteData) {
-            const allOrders: BookingData[] = siteData.map((item: any) => ({
-              ...item.data,
-              backendId: item._id
-            }));
-
-            if (isAdmin) {
-              setOrders(allOrders.sort((a, b) => {
-                const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-                const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-                return dateB - dateA;
-              }));
-            } else {
-              const userEmail = localStorage.getItem('inkopia_user_email');
-              const userName = localStorage.getItem('inkopia_user_name');
-              
-              const filteredOrders = allOrders.filter(order => 
-                (userEmail && order.clientEmail === userEmail) || 
-                (userName && order.clientName === userName)
-              );
-
-              setOrders(filteredOrders.sort((a, b) => {
-                const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-                const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-                return dateB - dateA;
-              }));
+        const userEmail = localStorage.getItem('inkopia_user_email');
+        
+        try {
+          const { data: allOrders } = await axios.get('/api/orders', {
+            params: {
+              role: isAdmin ? 'admin' : 'user',
+              email: userEmail
             }
-          }
+          });
+          
+          setOrders(allOrders.map((o: any) => ({
+            id: o.order_id,
+            clientName: o.customer_name,
+            clientEmail: o.customer_email,
+            location: o.pickup_address,
+            service: o.services,
+            instrument: o.notes, // Map notes or other fields as needed
+            status: o.status,
+            createdAt: o.created_at,
+            backendId: o.id,
+            conciergeName: o.concierge_name,
+            conciergePhone: o.concierge_phone
+          })));
+        } catch (orderErr) {
+          console.error('Failed to fetch orders from custom API:', orderErr);
         }
 
-
         if (vSchema?._id) {
-          const userEmail = localStorage.getItem('inkopia_user_email');
           const userName = localStorage.getItem('inkopia_user_name');
           const { data: vaultData } = await dataApi.getBySchema(vSchema._id);
           
@@ -289,40 +282,43 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return () => clearInterval(interval);
   }, []);
 
-  const addOrder = async (orderData: Omit<BookingData, 'id' | 'createdAt' | 'status'>) => {
-    const newOrder: BookingData = {
-      ...orderData,
-      id: `ORD${Math.floor(1000 + Math.random() * 9000)}`,
-      status: 'Pending',
-      createdAt: new Date().toISOString(),
-    };
-    
-    if (schemaId) {
-      try {
-        const { data: savedData } = await dataApi.upsert({
-          schemaId,
-          data: newOrder
-        });
-        setOrders([ { ...newOrder, backendId: savedData._id }, ...orders ]);
-      } catch (err) {
-        console.error('Failed to save order to backend:', err);
-      }
+  const addOrder = async (orderData: any) => {
+    try {
+      const { data: savedData } = await axios.post('/api/orders', {
+        customer_name: orderData.clientName,
+        customer_email: orderData.clientEmail,
+        customer_phone: orderData.clientPhone,
+        services: orderData.service,
+        pickup_address: orderData.location,
+        notes: orderData.instrument
+      });
+      const o = savedData.order;
+      const newOrder = {
+        id: o.order_id,
+        clientName: o.customer_name,
+        clientEmail: o.customer_email,
+        location: o.pickup_address,
+        service: o.services,
+        instrument: o.notes,
+        status: o.status,
+        createdAt: o.created_at,
+        backendId: o.id,
+        conciergeName: o.concierge_name,
+        conciergePhone: o.concierge_phone
+      };
+      setOrders([ newOrder, ...orders ]);
+    } catch (err) {
+      console.error('Failed to save order to backend:', err);
     }
   };
 
   const updateOrderStatus = async (id: string, status: BookingData['status']) => {
+    // Left empty or we can add PUT /api/orders/:id later
     const orderToUpdate = orders.find(o => o.id === id);
-    if (!orderToUpdate || !orderToUpdate.backendId || !schemaId) return;
+    if (!orderToUpdate || !orderToUpdate.backendId) return;
 
-    const updatedOrder = { ...orderToUpdate, status };
-    
     try {
-      await dataApi.upsert({
-        schemaId,
-        uniqueId: orderToUpdate.backendId,
-        data: updatedOrder
-      });
-      
+      await axios.put(`/api/orders/${orderToUpdate.backendId}/status`, { status });
       setOrders(orders.map(order => 
         order.id === id ? { ...order, status } : order
       ));

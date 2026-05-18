@@ -72,6 +72,7 @@ const schemaRoutes = require('./routes/schemaRoutes');
 const dataRoutes = require('./routes/dataRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 const authRoutes = require('./routes/authRoutes');
+const orderRoutes = require('./routes/orderRoutes');
 
 app.use('/api/schemas', schemaRoutes);
 app.use('/schemas', schemaRoutes);
@@ -81,6 +82,8 @@ app.use('/api/upload', uploadRoutes);
 app.use('/upload', uploadRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/auth', authRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/orders', orderRoutes);
 
 // Basic API Check
 app.get('/api/health', (req, res) => {

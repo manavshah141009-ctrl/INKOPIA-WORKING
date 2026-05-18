@@ -161,16 +161,21 @@ export default function Dashboard() {
           </Link>
           <span className="text-[10px] tracking-widest text-ink-green/70 uppercase ml-4 hidden md:inline-block border-l border-ink-green/20 pl-4">Private Vault</span>
         </div>
-        <button 
-          onClick={() => {
-            localStorage.removeItem('inkopia_auth');
-            localStorage.removeItem('inkopia_user_name');
-            navigate('/');
-          }}
-          className="text-xs uppercase tracking-[0.2em] text-ink-green/70 hover:text-ink-green transition-colors font-medium border-b border-transparent hover:border-ink-green pb-0.5"
-        >
-          Sign Out
-        </button>
+        <div className="flex gap-6 items-center">
+          <Link to="/my-orders" className="text-[10px] uppercase tracking-[0.2em] text-ink-green/70 hover:text-ink-green transition-colors font-semibold border-b border-transparent hover:border-ink-green pb-0.5">
+            Commissions
+          </Link>
+          <button 
+            onClick={() => {
+              localStorage.removeItem('inkopia_auth');
+              localStorage.removeItem('inkopia_user_name');
+              navigate('/');
+            }}
+            className="text-xs uppercase tracking-[0.2em] text-ink-green/70 hover:text-ink-green transition-colors font-medium border-b border-transparent hover:border-ink-green pb-0.5"
+          >
+            Sign Out
+          </button>
+        </div>
       </nav>
 
       <main className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 py-24 md:py-32">

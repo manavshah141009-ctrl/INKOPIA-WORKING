@@ -42,9 +42,27 @@ const initDB = async () => {
           role ENUM('user', 'admin') DEFAULT 'user',
           is_verified BOOLEAN DEFAULT FALSE,
           firebase_uid VARCHAR(255) UNIQUE,
+          name VARCHAR(255),
+          phone VARCHAR(50),
+          company VARCHAR(255),
+          designation VARCHAR(255),
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
+
+    // Alter users table for existing databases
+    try {
+      await pool.query(`ALTER TABLE users ADD COLUMN name VARCHAR(255);`);
+    } catch(e) {}
+    try {
+      await pool.query(`ALTER TABLE users ADD COLUMN phone VARCHAR(50);`);
+    } catch(e) {}
+    try {
+      await pool.query(`ALTER TABLE users ADD COLUMN company VARCHAR(255);`);
+    } catch(e) {}
+    try {
+      await pool.query(`ALTER TABLE users ADD COLUMN designation VARCHAR(255);`);
+    } catch(e) {}
 
     await pool.query(`
       CREATE TABLE IF NOT EXISTS site_configs (
@@ -78,22 +96,36 @@ const initDB = async () => {
     await pool.query(`
       CREATE TABLE IF NOT EXISTS orders (
           id INT AUTO_INCREMENT PRIMARY KEY,
+          order_id VARCHAR(50) UNIQUE NOT NULL,
           user_id INT,
-          client_name VARCHAR(255),
-          client_phone VARCHAR(50),
-          location TEXT,
-          service VARCHAR(255),
-          instrument VARCHAR(255),
-          payment_method VARCHAR(50),
-          booking_time VARCHAR(50),
-          appointment_date DATE,
-          amount DECIMAL(10, 2),
-          status ENUM('pending', 'processing', 'completed', 'cancelled') DEFAULT 'pending',
-          commission_details JSON,
+          customer_name VARCHAR(255),
+          customer_email VARCHAR(255),
+          customer_phone VARCHAR(50),
+          services TEXT,
+          pickup_address TEXT,
+          notes TEXT,
+          status ENUM('pending', 'confirmed', 'concierge_assigned', 'in_progress', 'completed') DEFAULT 'pending',
+          concierge_name VARCHAR(255),
+          concierge_phone VARCHAR(50),
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           FOREIGN KEY (user_id) REFERENCES users(id)
       );
     `);
+
+    // Alter orders table for existing databases (using generic drop/add for simplicity, or just try/catch add columns)
+    try {
+      await pool.query(`ALTER TABLE orders ADD COLUMN order_id VARCHAR(50) UNIQUE;`);
+      await pool.query(`ALTER TABLE orders ADD COLUMN customer_name VARCHAR(255);`);
+      await pool.query(`ALTER TABLE orders ADD COLUMN customer_email VARCHAR(255);`);
+      await pool.query(`ALTER TABLE orders ADD COLUMN customer_phone VARCHAR(50);`);
+      await pool.query(`ALTER TABLE orders ADD COLUMN services TEXT;`);
+      await pool.query(`ALTER TABLE orders ADD COLUMN pickup_address TEXT;`);
+      await pool.query(`ALTER TABLE orders ADD COLUMN notes TEXT;`);
+      await pool.query(`ALTER TABLE orders ADD COLUMN concierge_name VARCHAR(255);`);
+      await pool.query(`ALTER TABLE orders ADD COLUMN concierge_phone VARCHAR(50);`);
+      // Update ENUM values for status
+      await pool.query(`ALTER TABLE orders MODIFY COLUMN status ENUM('pending', 'confirmed', 'concierge_assigned', 'in_progress', 'completed') DEFAULT 'pending';`);
+    } catch(e) {}
 
     await pool.query(`
       CREATE TABLE IF NOT EXISTS inks (

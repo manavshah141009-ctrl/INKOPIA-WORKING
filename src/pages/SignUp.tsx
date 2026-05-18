@@ -174,7 +174,7 @@ const SignUp = () => {
         const googleName = user.displayName || 'Google Collector';
         
         // Send secure sync request with Firebase ID Token
-        await axios.post('/api/auth/sync-user', {
+        const { data } = await axios.post('/api/auth/sync-user', {
           name: googleName,
           phone: user.phoneNumber || '',
           company: 'N/A',
@@ -189,8 +189,15 @@ const SignUp = () => {
         localStorage.setItem('inkopia_auth', 'true');
         localStorage.setItem('inkopia_user_name', googleName);
         localStorage.setItem('inkopia_user_email', user.email || '');
-        toast.success(`Welcome to your vault, ${googleName.split(' ')[0]}.`);
-        setTimeout(() => navigate('/dashboard'), 700);
+
+        if (!data.user || !data.user.phone) {
+          toast.success(`Google Auth successful. Please complete your profile.`);
+          setTimeout(() => navigate('/complete-profile'), 500);
+        } else {
+          localStorage.setItem('inkopia_user_phone', data.user.phone);
+          toast.success(`Welcome to your vault, ${googleName.split(' ')[0]}.`);
+          setTimeout(() => navigate('/dashboard'), 700);
+        }
       }
     } catch (err: any) {
       setIsSubmitting(false);

@@ -139,22 +139,59 @@ router.post('/sync-user', verifyFirebaseToken, async (req, res) => {
   if (!email || !firebaseUid) return res.status(400).json({ error: 'Missing token data' });
 
   try {
-    const users = await db.query('SELECT id FROM users WHERE email = ?', [email]);
+    let users = await db.query('SELECT * FROM users WHERE email = ?', [email]);
     if (users.length === 0) {
-      await db.query(
+      const result = await db.query(
         'INSERT INTO users (email, firebase_uid, name, phone, company, designation, is_verified) VALUES (?, ?, ?, ?, ?, ?, TRUE)', 
-        [email, firebaseUid, name, phone, company, designation]
+        [email, firebaseUid, name || null, phone || null, company || null, designation || null]
       );
+      users = await db.query('SELECT * FROM users WHERE id = ?', [result.insertId]);
     } else {
       await db.query(
-        'UPDATE users SET firebase_uid = ?, is_verified = TRUE, name = COALESCE(?, name), phone = COALESCE(?, phone) WHERE email = ?', 
-        [firebaseUid, name, phone, email]
+        'UPDATE users SET firebase_uid = ?, is_verified = TRUE, name = COALESCE(?, name), phone = COALESCE(?, phone), company = COALESCE(?, company), designation = COALESCE(?, designation) WHERE email = ?', 
+        [firebaseUid, name || null, phone || null, company || null, designation || null, email]
       );
+      users = await db.query('SELECT * FROM users WHERE email = ?', [email]);
     }
-    res.json({ success: true, email });
+    
+    const userProfile = users[0];
+    res.json({ success: true, email, user: userProfile });
   } catch (err) {
     console.error('[AUTH] Sync user error:', err);
     res.status(500).json({ error: 'Failed to sync user' });
+  }
+});
+
+// Update Profile route for onboarding
+router.post('/update-profile', verifyFirebaseToken, async (req, res) => {
+  const { email } = req.user;
+  const { name, phone, company, designation } = req.body;
+
+  if (!phone) return res.status(400).json({ error: 'Phone number is required' });
+
+  // Basic Indian mobile validation: starts with 6-9 and has 10 digits
+  const phoneRegex = /^[6-9]\d{9}$/;
+  if (!phoneRegex.test(phone.replace(/\D/g, '').slice(-10))) {
+    return res.status(400).json({ error: 'Invalid Indian phone number' });
+  }
+
+  try {
+    // Prevent duplicate phones
+    const existingPhone = await db.query('SELECT id FROM users WHERE phone = ? AND email != ?', [phone, email]);
+    if (existingPhone.length > 0) {
+      return res.status(400).json({ error: 'Phone number is already registered' });
+    }
+
+    await db.query(
+      'UPDATE users SET name = ?, phone = ?, company = ?, designation = ? WHERE email = ?',
+      [name, phone, company || null, designation || null, email]
+    );
+
+    const users = await db.query('SELECT * FROM users WHERE email = ?', [email]);
+    res.json({ success: true, message: 'Profile updated successfully', user: users[0] });
+  } catch (err) {
+    console.error('[AUTH] Update profile error:', err);
+    res.status(500).json({ error: 'Failed to update profile' });
   }
 });
 
