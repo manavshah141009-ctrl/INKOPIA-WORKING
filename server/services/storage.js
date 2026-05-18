@@ -22,11 +22,15 @@ class Storage {
     // Check MySQL
     setTimeout(async () => {
       try {
-        await db.query('SELECT 1');
-        this.isMysqlConnected = true;
-        console.log('✅ Storage: MySQL (MilesWeb) mode active.');
+        const result = await db.query('SELECT 1');
+        if (result) {
+          this.isMysqlConnected = true;
+          console.log('✅ Storage: MySQL (MilesWeb) mode active.');
+        } else {
+          console.warn('⚠️ Storage: MySQL not available (pool is null).');
+        }
       } catch(e) {
-        console.warn('⚠️ Storage: MySQL not available.');
+        console.warn('⚠️ Storage: MySQL not available.', e.message);
       }
     }, 2000);
   }
@@ -106,6 +110,7 @@ class Storage {
             const keys = Object.keys(sqlData).map(k => `\`${k}\``).join(', ');
             const placeholders = Object.keys(sqlData).map(() => '?').join(', ');
             const result = await db.query(`INSERT INTO ${table} (${keys}) VALUES (${placeholders})`, Object.values(sqlData));
+            if (!result) throw new Error('Database query returned null (pool might be uninitialized)');
             return { _id: result.insertId, ...data };
           }
         }
