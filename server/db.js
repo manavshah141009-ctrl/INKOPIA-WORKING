@@ -107,6 +107,12 @@ const initDB = async () => {
           status ENUM('pending', 'confirmed', 'concierge_assigned', 'in_progress', 'completed') DEFAULT 'pending',
           concierge_name VARCHAR(255),
           concierge_phone VARCHAR(50),
+          base_amount DECIMAL(10,2) DEFAULT 2500.00,
+          discount_percent INT DEFAULT 0,
+          discount_amount DECIMAL(10,2) DEFAULT 0.00,
+          gst_amount DECIMAL(10,2) DEFAULT 0.00,
+          total_amount DECIMAL(10,2) DEFAULT 2950.00,
+          voucher_code VARCHAR(50) DEFAULT NULL,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           FOREIGN KEY (user_id) REFERENCES users(id)
       );
@@ -115,17 +121,64 @@ const initDB = async () => {
     // Alter orders table for existing databases (using generic drop/add for simplicity, or just try/catch add columns)
     try {
       await pool.query(`ALTER TABLE orders ADD COLUMN order_id VARCHAR(50) UNIQUE;`);
+    } catch(e) {}
+    try {
       await pool.query(`ALTER TABLE orders ADD COLUMN customer_name VARCHAR(255);`);
+    } catch(e) {}
+    try {
       await pool.query(`ALTER TABLE orders ADD COLUMN customer_email VARCHAR(255);`);
+    } catch(e) {}
+    try {
       await pool.query(`ALTER TABLE orders ADD COLUMN customer_phone VARCHAR(50);`);
+    } catch(e) {}
+    try {
       await pool.query(`ALTER TABLE orders ADD COLUMN services TEXT;`);
+    } catch(e) {}
+    try {
       await pool.query(`ALTER TABLE orders ADD COLUMN pickup_address TEXT;`);
+    } catch(e) {}
+    try {
       await pool.query(`ALTER TABLE orders ADD COLUMN notes TEXT;`);
+    } catch(e) {}
+    try {
       await pool.query(`ALTER TABLE orders ADD COLUMN concierge_name VARCHAR(255);`);
+    } catch(e) {}
+    try {
       await pool.query(`ALTER TABLE orders ADD COLUMN concierge_phone VARCHAR(50);`);
-      // Update ENUM values for status
+    } catch(e) {}
+    try {
+      await pool.query(`ALTER TABLE orders ADD COLUMN base_amount DECIMAL(10,2) DEFAULT 2500.00;`);
+    } catch(e) {}
+    try {
+      await pool.query(`ALTER TABLE orders ADD COLUMN discount_percent INT DEFAULT 0;`);
+    } catch(e) {}
+    try {
+      await pool.query(`ALTER TABLE orders ADD COLUMN discount_amount DECIMAL(10,2) DEFAULT 0.00;`);
+    } catch(e) {}
+    try {
+      await pool.query(`ALTER TABLE orders ADD COLUMN gst_amount DECIMAL(10,2) DEFAULT 0.00;`);
+    } catch(e) {}
+    try {
+      await pool.query(`ALTER TABLE orders ADD COLUMN total_amount DECIMAL(10,2) DEFAULT 2950.00;`);
+    } catch(e) {}
+    try {
+      await pool.query(`ALTER TABLE orders ADD COLUMN voucher_code VARCHAR(50) DEFAULT NULL;`);
+    } catch(e) {}
+    try {
       await pool.query(`ALTER TABLE orders MODIFY COLUMN status ENUM('pending', 'confirmed', 'concierge_assigned', 'in_progress', 'completed') DEFAULT 'pending';`);
     } catch(e) {}
+
+    // Create voucher_redemptions table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS voucher_redemptions (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          voucher_code VARCHAR(50) NOT NULL,
+          customer_email VARCHAR(255) NOT NULL,
+          order_id VARCHAR(50) NOT NULL,
+          redeemed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          UNIQUE KEY unique_redemption (voucher_code, customer_email)
+      );
+    `);
 
     await pool.query(`
       CREATE TABLE IF NOT EXISTS inks (

@@ -290,7 +290,9 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         customer_phone: orderData.clientPhone,
         services: orderData.service,
         pickup_address: orderData.location,
-        notes: orderData.instrument
+        notes: orderData.instrument,
+        voucher_code: orderData.voucherCode || orderData.voucher_code,
+        base_amount: orderData.baseAmount || orderData.amount || orderData.base_amount
       });
       const o = savedData.order;
       const newOrder = {
@@ -304,11 +306,13 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         createdAt: o.created_at,
         backendId: o.id,
         conciergeName: o.concierge_name,
-        conciergePhone: o.concierge_phone
+        conciergePhone: o.concierge_phone,
+        amount: o.total_amount ? parseFloat(o.total_amount) : (o.amount || 2500)
       };
       setOrders([ newOrder, ...orders ]);
     } catch (err) {
       console.error('Failed to save order to backend:', err);
+      throw err;
     }
   };
 

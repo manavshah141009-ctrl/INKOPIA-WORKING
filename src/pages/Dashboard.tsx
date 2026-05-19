@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, PenTool, Check, MapPin, Calendar, Clock, ChevronRight } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
+import axios from 'axios';
 import { InkopiaPenSVG } from '../components/InkopiaPenSVG';
 import { useOrders } from '../context/OrderContext';
 import { useSite } from '../context/SiteContext';
@@ -69,6 +70,13 @@ export default function Dashboard() {
   const [isBookingService, setIsBookingService] = useState<string | null>(null);
   const [isOrderSuccess, setIsOrderSuccess] = useState<any | null>(null);
 
+  // Voucher and pricing state
+  const [voucherCode, setVoucherCode] = useState('');
+  const [appliedVoucher, setAppliedVoucher] = useState('');
+  const [discountPercent, setDiscountPercent] = useState(0);
+  const [voucherError, setVoucherError] = useState('');
+  const [isValidatingVoucher, setIsValidatingVoucher] = useState(false);
+
   // New pen form state
   const [newPen, setNewPen] = useState<{brand: string, model: string, nib: string, silhouette: Pen['silhouette'], imageUrl?: string}>({ brand: '', model: '', nib: '', silhouette: 'cigar' });
 
@@ -118,6 +126,12 @@ export default function Dashboard() {
       return;
     }
 
+    const baseAmount = content.servicePrice || 2500;
+    const discountAmount = Math.round((baseAmount * discountPercent) / 100);
+    const priceAfterDiscount = baseAmount - discountAmount;
+    const gstAmount = Math.round(priceAfterDiscount * 0.18 * 100) / 100;
+    const totalAmount = Math.round((priceAfterDiscount + gstAmount) * 100) / 100;
+
     const orderData = {
       clientName: userName,
       clientEmail: localStorage.getItem('inkopia_user_email') || '',
@@ -128,15 +142,25 @@ export default function Dashboard() {
       service: 'Concierge Maintenance Ritual',
       instrument: pen ? `${pen.brand} ${pen.model}` : 'Fountain Pen',
       ink: booking.inkName,
-      paymentMethod: 'Cash on Service',
-      amount: content.servicePrice || 2500
+      paymentMethod: booking.paymentMethod === 'cos' ? 'Cash on Service' : 'UPI',
+      amount: totalAmount,
+      base_amount: baseAmount,
+      voucher_code: appliedVoucher || undefined
     };
 
     try {
       await addOrder(orderData);
-      setIsOrderSuccess(orderData);
+      setIsOrderSuccess({
+        ...orderData,
+        discount_amount: discountAmount,
+        gst_amount: gstAmount
+      });
       setIsBookingService(null);
       setBooking({ date: '', time: '', inkName: '', postalCode: '', streetAddress: '', city: '', paymentMethod: 'cos' });
+      setVoucherCode('');
+      setAppliedVoucher('');
+      setDiscountPercent(0);
+      setVoucherError('');
       toast.success('Your Concierge commission has been dispatched.');
     } catch (err) {
       toast.error('Failed to place order. Please try again.');
@@ -407,14 +431,95 @@ export default function Dashboard() {
 
                   {/* Color selection moved to The Ink Sommelier on the right */}
                   
-                  <div className="pt-4 border-t border-ink-green/10">
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-[9px] uppercase tracking-widest text-ink-green/50">Service Ritual Fee</span>
-                      <span className="text-sm font-mono text-ink-green font-bold">₹{(content.servicePrice || 2500).toLocaleString()}</span>
+                  <div>
+                    <label className="block text-[9px] font-bold uppercase tracking-widest text-ink-green/70 mb-1">Payment Method *</label>
+                    <select
+                      value={booking.paymentMethod}
+                      onChange={e => setBooking({...booking, paymentMethod: e.target.value})}
+                      className="w-full bg-transparent border-b border-ink-green/30 pb-1 text-ink-green focus:outline-none focus:border-ink-green text-sm appearance-none"
+                    >
+                      <option value="cos" className="bg-[#D3C2A3] text-ink-green">Cash on Service</option>
+                      <option value="upi" className="bg-[#D3C2A3] text-ink-green">UPI</option>
+                    </select>
+                  </div>
+
+                  {/* Dynamic Voucher Code Entry */}
+                  <div className="space-y-2 pt-2 border-t border-ink-green/10">
+                    <label className="block text-[9px] font-bold uppercase tracking-widest text-ink-green/70">Voucher Code</label>
+                    <div className="flex gap-3 items-end">
+                      <input
+                        type="text"
+                        placeholder="e.g. INK20"
+                        value={voucherCode}
+                        onChange={e => {
+                          setVoucherCode(e.target.value.toUpperCase());
+                          setVoucherError('');
+                        }}
+                        className="flex-1 bg-transparent border-b border-ink-green/30 pb-1 text-ink-green focus:outline-none focus:border-ink-green text-sm placeholder:text-ink-green/40 uppercase"
+                      />
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          if (!voucherCode.trim()) {
+                            setVoucherError('Please enter a voucher code.');
+                            return;
+                          }
+                          setIsValidatingVoucher(true);
+                          setVoucherError('');
+                          try {
+                            const email = localStorage.getItem('inkopia_user_email') || '';
+                            const { data } = await axios.post('/api/orders/validate-voucher', {
+                              voucher_code: voucherCode,
+                              customer_email: email
+                            });
+                            if (data.valid) {
+                              setDiscountPercent(data.discount_percent);
+                              setAppliedVoucher(data.code);
+                              toast.success(`Voucher ${data.code} applied! ${data.discount_percent}% Discount`);
+                            } else {
+                              setVoucherError(data.error || 'Invalid voucher code.');
+                              setDiscountPercent(0);
+                              setAppliedVoucher('');
+                            }
+                          } catch (err) {
+                            setVoucherError('Error validating voucher.');
+                          } finally {
+                            setIsValidatingVoucher(false);
+                          }
+                        }}
+                        disabled={isValidatingVoucher}
+                        className="px-4 py-2 border border-ink-green text-ink-green font-sans text-[10px] uppercase tracking-widest hover:bg-ink-green hover:text-[#D5C8AD] transition-colors"
+                      >
+                        {isValidatingVoucher ? '...' : 'Apply'}
+                      </button>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-[9px] uppercase tracking-widest text-ink-green/50">Payment Terms</span>
-                      <span className="text-[10px] uppercase font-bold text-ink-green">Cash on Service</span>
+                    {voucherError && <p className="text-[9px] text-red-500 mt-1">{voucherError}</p>}
+                    {appliedVoucher && (
+                      <p className="text-[9px] text-emerald-700 mt-1 font-semibold">
+                        ✓ Voucher {appliedVoucher} active! Save {discountPercent}% on Service Fee.
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Custom luxury Pricing Summary showing 18% GST */}
+                  <div className="pt-4 border-t border-ink-green/15 space-y-2">
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="text-[9px] uppercase tracking-widest text-ink-green/50">Base Service Fee</span>
+                      <span className="font-mono text-ink-green/80">₹{(content.servicePrice || 2500).toLocaleString()}</span>
+                    </div>
+                    {discountPercent > 0 && (
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="text-[9px] uppercase tracking-widest text-emerald-600 font-bold">Discount ({appliedVoucher} — {discountPercent}%)</span>
+                        <span className="font-mono text-emerald-600 font-bold">-₹{Math.round(((content.servicePrice || 2500) * discountPercent) / 100).toLocaleString()}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="text-[9px] uppercase tracking-widest text-ink-green/50">GST (18%)</span>
+                      <span className="font-mono text-ink-green/80">₹{Math.round(((content.servicePrice || 2500) - Math.round(((content.servicePrice || 2500) * discountPercent) / 100)) * 0.18 * 100 / 100).toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between items-center pt-2 border-t border-ink-green/10">
+                      <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-ink-green">Total Payable</span>
+                      <span className="text-xl font-mono text-ink-green font-bold">₹{Math.round((((content.servicePrice || 2500) - Math.round(((content.servicePrice || 2500) * discountPercent) / 100)) + (((content.servicePrice || 2500) - Math.round(((content.servicePrice || 2500) * discountPercent) / 100)) * 0.18)) * 100 / 100).toLocaleString()}</span>
                     </div>
                   </div>
                   
@@ -454,15 +559,29 @@ export default function Dashboard() {
               
               <div className="bg-white/5 backdrop-blur-sm border border-[#D5C8AD]/20 p-6 mb-8 text-left">
                 <p className="text-[10px] uppercase tracking-widest text-[#D5C8AD]/60 mb-4 border-b border-[#D5C8AD]/10 pb-2">Appointment Details</p>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-start">
+                <div className="space-y-3">
+                  <div className="flex justify-between items-start border-b border-[#D5C8AD]/10 pb-2">
                     <span className="text-[9px] uppercase tracking-widest text-[#D5C8AD]/50">Concierge Arrival</span>
                     <span className="text-sm font-serif text-[#D5C8AD] font-bold">
                       {isOrderSuccess.date ? new Date(isOrderSuccess.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : 'Scheduled'} at {isOrderSuccess.bookingTime || '11:30 AM'}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-[9px] uppercase tracking-widest text-[#D5C8AD]/50">Payable Amount</span>
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-[9px] uppercase tracking-widest text-[#D5C8AD]/50">Base Ritual Fee</span>
+                    <span className="font-mono text-[#D5C8AD]/85">₹{(isOrderSuccess.base_amount || 2500).toLocaleString()}</span>
+                  </div>
+                  {isOrderSuccess.discount_amount > 0 && (
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="text-[9px] uppercase tracking-widest text-emerald-400 font-semibold">Discount ({isOrderSuccess.voucher_code})</span>
+                      <span className="font-mono text-emerald-400 font-semibold">-₹{isOrderSuccess.discount_amount.toLocaleString()}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-[9px] uppercase tracking-widest text-[#D5C8AD]/50">GST (18%)</span>
+                    <span className="font-mono text-[#D5C8AD]/85">₹{isOrderSuccess.gst_amount.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between items-center pt-2 border-t border-[#D5C8AD]/20">
+                    <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#D5C8AD]">Net Payable</span>
                     <span className="text-xl font-mono text-white font-black">₹{(isOrderSuccess.amount || 2500).toLocaleString()}</span>
                   </div>
                 </div>

@@ -4,6 +4,7 @@ import { X, CheckCircle, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useOrders } from '@/context/OrderContext';
 import { useSite } from '@/context/SiteContext';
+import axios from 'axios';
 
 const PEN_SILHOUETTES = [
   { id: 'cigar', name: 'The Cigar Shape', description: 'Classic rounded profile, timeless elegance' },
@@ -102,11 +103,25 @@ function BookingForm({ penType, onClose, onConfirmed }: { penType: string; onClo
     locationType: 'Residence',
     date: '',
     time: '14:00',
-    amount: content.servicePrice,
+    amount: content.servicePrice || 2500,
     paymentMethod: 'Cash on Service'
   }));
+
+  // Voucher and pricing state
+  const [voucherCode, setVoucherCode] = useState('');
+  const [appliedVoucher, setAppliedVoucher] = useState('');
+  const [discountPercent, setDiscountPercent] = useState(0);
+  const [voucherError, setVoucherError] = useState('');
+  const [isValidatingVoucher, setIsValidatingVoucher] = useState(false);
+
   const [errors, setErrors] = useState<Partial<Record<keyof BookingData, string>>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const baseAmount = content.servicePrice || 2500;
+  const discountAmount = Math.round((baseAmount * discountPercent) / 100);
+  const priceAfterDiscount = baseAmount - discountAmount;
+  const gstAmount = Math.round(priceAfterDiscount * 0.18 * 100) / 100;
+  const totalAmount = Math.round((priceAfterDiscount + gstAmount) * 100) / 100;
 
   const validate = (): boolean => {
     const errs: BookingErrors = {};
@@ -127,9 +142,14 @@ function BookingForm({ penType, onClose, onConfirmed }: { penType: string; onClo
     e.preventDefault();
     if (!validate()) return;
     setIsSubmitting(true);
-    await new Promise(r => setTimeout(r, 1400));
+    await new Promise(r => setTimeout(r, 1000));
     setIsSubmitting(false);
-    onConfirmed(booking);
+    onConfirmed({
+      ...booking,
+      amount: totalAmount,
+      baseAmount: baseAmount,
+      voucherCode: appliedVoucher || undefined
+    });
   };
 
   const inputBase = 'w-full bg-transparent border-b pb-3 pt-1 text-white font-sans text-sm tracking-wide placeholder:text-[#555] focus:outline-none transition-colors duration-300';
@@ -219,6 +239,7 @@ function BookingForm({ penType, onClose, onConfirmed }: { penType: string; onClo
           </div>
         </div>
         <div>
+          <label className="text-[9px] uppercase tracking-widest text-[hsl(var(--gold)/0.6)] mb-2 block">Payment Method</label>
           <select
             value={booking.paymentMethod}
             onChange={e => setBooking(b => ({ ...b, paymentMethod: e.target.value }))}
@@ -229,6 +250,87 @@ function BookingForm({ penType, onClose, onConfirmed }: { penType: string; onClo
             <option value="UPI" className="bg-[#0A0A0A] text-white">UPI</option>
           </select>
         </div>
+
+        {/* Dynamic Voucher Code Entry */}
+        <div className="space-y-2 pt-2 border-t border-[hsl(var(--gold)/0.1)]">
+          <label className="text-[9px] uppercase tracking-widest text-[hsl(var(--gold)/0.6)] block">Voucher Code</label>
+          <div className="flex gap-3 items-end">
+            <input
+              type="text"
+              placeholder="e.g. INK20"
+              value={voucherCode}
+              onChange={e => {
+                setVoucherCode(e.target.value.toUpperCase());
+                setVoucherError('');
+              }}
+              className="flex-1 bg-transparent border-b pb-3 pt-1 text-white font-sans text-sm tracking-wide placeholder:text-[#555] focus:outline-none border-[hsl(var(--gold)/0.3)] focus:border-[hsl(var(--gold))] uppercase"
+            />
+            <button
+              type="button"
+              onClick={async () => {
+                if (!voucherCode.trim()) {
+                  setVoucherError('Please enter a voucher code.');
+                  return;
+                }
+                setIsValidatingVoucher(true);
+                setVoucherError('');
+                try {
+                  const email = localStorage.getItem('inkopia_user_email') || '';
+                  const { data } = await axios.post('/api/orders/validate-voucher', {
+                    voucher_code: voucherCode,
+                    customer_email: email
+                  });
+                  if (data.valid) {
+                    setDiscountPercent(data.discount_percent);
+                    setAppliedVoucher(data.code);
+                    toast.success(`Voucher ${data.code} applied! ${data.discount_percent}% Discount`);
+                  } else {
+                    setVoucherError(data.error || 'Invalid voucher code.');
+                    setDiscountPercent(0);
+                    setAppliedVoucher('');
+                  }
+                } catch (err) {
+                  setVoucherError('Error validating voucher.');
+                } finally {
+                  setIsValidatingVoucher(false);
+                }
+              }}
+              disabled={isValidatingVoucher}
+              className="px-4 py-2 border border-[hsl(var(--gold))] text-[hsl(var(--gold))] font-sans text-[10px] uppercase tracking-widest hover:bg-[hsl(var(--gold))] hover:text-black transition-colors"
+            >
+              {isValidatingVoucher ? '...' : 'Apply'}
+            </button>
+          </div>
+          {voucherError && <p className="text-[9px] text-red-400 mt-1">{voucherError}</p>}
+          {appliedVoucher && (
+            <p className="text-[9px] text-emerald-400 mt-1">
+              ✓ Voucher {appliedVoucher} active! Save {discountPercent}% on Service Fee.
+            </p>
+          )}
+        </div>
+
+        {/* Custom luxury Pricing Summary showing 18% GST */}
+        <div className="pt-4 border-t border-[hsl(var(--gold)/0.15)] space-y-2">
+          <div className="flex justify-between items-center text-xs">
+            <span className="text-[9px] uppercase tracking-widest text-[#666]">Base Service Fee</span>
+            <span className="font-mono text-white/80">₹{baseAmount.toLocaleString()}</span>
+          </div>
+          {discountPercent > 0 && (
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-[9px] uppercase tracking-widest text-emerald-500">Discount ({appliedVoucher} — {discountPercent}%)</span>
+              <span className="font-mono text-emerald-500">-₹{discountAmount.toLocaleString()}</span>
+            </div>
+          )}
+          <div className="flex justify-between items-center text-xs">
+            <span className="text-[9px] uppercase tracking-widest text-[#666]">GST (18%)</span>
+            <span className="font-mono text-white/80">₹{gstAmount.toLocaleString()}</span>
+          </div>
+          <div className="flex justify-between items-center pt-2 border-t border-[hsl(var(--gold)/0.05)]">
+            <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-[hsl(var(--gold))]">Total Payable</span>
+            <span className="text-xl font-mono text-[hsl(var(--gold))] font-bold">₹{totalAmount.toLocaleString()}</span>
+          </div>
+        </div>
+
         <div className="pt-4">
           <button
             id="vault-confirm"
@@ -252,6 +354,16 @@ function BookingForm({ penType, onClose, onConfirmed }: { penType: string; onClo
 }
 
 function ConfirmationScreen({ penType, booking, onClose }: { penType: string; booking: BookingData; onClose: () => void }) {
+  const basePrice = booking.baseAmount || 2500;
+  const totalAmount = booking.amount;
+  const appliedVoucher = booking.voucherCode;
+  
+  // Calculate reverse breakdown for UI if not stored explicitly
+  const discountPercent = appliedVoucher ? (appliedVoucher === 'INK10' ? 10 : appliedVoucher === 'INK15' ? 15 : 20) : 0;
+  const discountAmount = Math.round((basePrice * discountPercent) / 100);
+  const priceAfterDiscount = basePrice - discountAmount;
+  const gstAmount = Math.round(priceAfterDiscount * 0.18 * 100) / 100;
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
@@ -283,8 +395,8 @@ function ConfirmationScreen({ penType, booking, onClose }: { penType: string; bo
               <h3 className="text-2xl font-serif text-white">{booking.locationType} Visit</h3>
             </div>
             <div className="text-center md:text-right">
-              <p className="text-[10px] uppercase tracking-widest text-[#666] mb-2">Total Payable</p>
-              <p className="text-3xl font-serif text-[hsl(var(--gold))]">₹{booking.amount.toLocaleString()}</p>
+              <p className="text-[10px] uppercase tracking-widest text-[#666] mb-2">Total Payable (with 18% GST)</p>
+              <p className="text-3xl font-serif text-[hsl(var(--gold))]">₹{totalAmount.toLocaleString()}</p>
             </div>
           </div>
         </div>
@@ -306,15 +418,30 @@ function ConfirmationScreen({ penType, booking, onClose }: { penType: string; bo
             </div>
           </div>
 
-          <div className="space-y-6 bg-[hsl(var(--gold)/0.03)] p-6 rounded border border-[hsl(var(--gold)/0.05)]">
-            <div>
-              <p className="text-[10px] uppercase tracking-widest text-[#666] mb-2">Payment Details</p>
-              <p className="text-sm text-white">{booking.paymentMethod}</p>
-              <p className="text-[10px] text-[#555] mt-1 italic">Please ensure availability at the time of service.</p>
+          <div className="space-y-4 bg-[hsl(var(--gold)/0.03)] p-6 rounded border border-[hsl(var(--gold)/0.05)] text-left">
+            <div className="flex justify-between border-b border-[#222] pb-2 text-xs">
+              <span className="text-[#666] uppercase tracking-wider text-[9px]">Base Service Fee:</span>
+              <span className="text-white/80 font-mono">₹{basePrice.toLocaleString()}</span>
             </div>
-            <div>
-              <p className="text-[10px] uppercase tracking-widest text-[#666] mb-2">Assigned Pen</p>
-              <p className="text-sm text-white">{penType}</p>
+            {discountAmount > 0 && (
+              <div className="flex justify-between border-b border-[#222] pb-2 text-xs">
+                <span className="text-emerald-500 uppercase tracking-wider text-[9px]">Discount ({appliedVoucher}):</span>
+                <span className="text-emerald-500 font-mono">-₹{discountAmount.toLocaleString()}</span>
+              </div>
+            )}
+            <div className="flex justify-between border-b border-[#222] pb-2 text-xs">
+              <span className="text-[#666] uppercase tracking-wider text-[9px]">GST (18%):</span>
+              <span className="text-white/80 font-mono">₹{gstAmount.toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between font-bold pt-2 text-xs">
+              <span className="text-[hsl(var(--gold))] uppercase tracking-wider text-[10px]">Net Payable:</span>
+              <span className="text-[hsl(var(--gold))] font-mono">₹{totalAmount.toLocaleString()}</span>
+            </div>
+            <div className="pt-2 text-[9px] text-[#555] italic">
+              Payment Mode: {booking.paymentMethod}
+            </div>
+            <div className="text-[9px] text-[#555] italic">
+              Assigned Pen: {penType}
             </div>
           </div>
         </div>
@@ -355,6 +482,8 @@ export default function VaultOverlay({ isOpen, onClose }: { isOpen: boolean; onC
     
     addOrder({
       clientName: data.clientName,
+      clientEmail: localStorage.getItem('inkopia_user_email') || '',
+      clientPhone: localStorage.getItem('inkopia_user_phone') || 'N/A',
       location: data.location,
       date: data.date,
       service: 'Concierge Commission',
@@ -362,6 +491,8 @@ export default function VaultOverlay({ isOpen, onClose }: { isOpen: boolean; onC
       paymentMethod: data.paymentMethod,
       bookingTime: data.time,
       amount: data.amount,
+      voucher_code: data.voucherCode,
+      base_amount: data.baseAmount
     }).catch(err => console.error('Background order sync failed:', err));
 
     toast.success('Concierge commissioned successfully.');
