@@ -220,14 +220,19 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             id: o.order_id,
             clientName: o.customer_name,
             clientEmail: o.customer_email,
+            clientPhone: o.customer_phone,
             location: o.pickup_address,
             service: o.services,
             instrument: o.notes, // Map notes or other fields as needed
-            status: o.status,
+            status: o.status === 'completed' || o.status === 'Completed' ? 'Completed' : (o.status === 'in_progress' || o.status === 'In Progress' ? 'In Progress' : 'Pending'),
             createdAt: o.created_at,
             backendId: o.id,
             conciergeName: o.concierge_name,
-            conciergePhone: o.concierge_phone
+            conciergePhone: o.concierge_phone,
+            paymentMethod: o.payment_method,
+            date: o.appointment_date,
+            bookingTime: o.booking_time,
+            amount: o.total_amount ? parseFloat(o.total_amount) : (o.amount || 2500)
           })));
         } catch (orderErr) {
           console.error('Failed to fetch orders from custom API:', orderErr);
@@ -292,21 +297,28 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         pickup_address: orderData.location,
         notes: orderData.instrument,
         voucher_code: orderData.voucherCode || orderData.voucher_code,
-        base_amount: orderData.baseAmount || orderData.amount || orderData.base_amount
+        base_amount: orderData.baseAmount || orderData.amount || orderData.base_amount,
+        appointment_date: orderData.date,
+        booking_time: orderData.bookingTime,
+        payment_method: orderData.paymentMethod
       });
       const o = savedData.order;
       const newOrder = {
         id: o.order_id,
         clientName: o.customer_name,
         clientEmail: o.customer_email,
+        clientPhone: o.customer_phone,
         location: o.pickup_address,
         service: o.services,
         instrument: o.notes,
-        status: o.status,
+        status: o.status === 'completed' || o.status === 'Completed' ? 'Completed' : (o.status === 'in_progress' || o.status === 'In Progress' ? 'In Progress' : 'Pending'),
         createdAt: o.created_at,
         backendId: o.id,
         conciergeName: o.concierge_name,
         conciergePhone: o.concierge_phone,
+        paymentMethod: o.payment_method,
+        date: o.appointment_date,
+        bookingTime: o.booking_time,
         amount: o.total_amount ? parseFloat(o.total_amount) : (o.amount || 2500)
       };
       setOrders([ newOrder, ...orders ]);

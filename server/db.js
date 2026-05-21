@@ -113,6 +113,9 @@ const initDB = async () => {
           gst_amount DECIMAL(10,2) DEFAULT 0.00,
           total_amount DECIMAL(10,2) DEFAULT 2950.00,
           voucher_code VARCHAR(50) DEFAULT NULL,
+          appointment_date VARCHAR(255) DEFAULT NULL,
+          booking_time VARCHAR(255) DEFAULT NULL,
+          payment_method VARCHAR(255) DEFAULT NULL,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           FOREIGN KEY (user_id) REFERENCES users(id)
       );
@@ -163,6 +166,15 @@ const initDB = async () => {
     } catch(e) {}
     try {
       await pool.query(`ALTER TABLE orders ADD COLUMN voucher_code VARCHAR(50) DEFAULT NULL;`);
+    } catch(e) {}
+    try {
+      await pool.query(`ALTER TABLE orders ADD COLUMN appointment_date VARCHAR(255) DEFAULT NULL;`);
+    } catch(e) {}
+    try {
+      await pool.query(`ALTER TABLE orders ADD COLUMN booking_time VARCHAR(255) DEFAULT NULL;`);
+    } catch(e) {}
+    try {
+      await pool.query(`ALTER TABLE orders ADD COLUMN payment_method VARCHAR(255) DEFAULT NULL;`);
     } catch(e) {}
     try {
       await pool.query(`ALTER TABLE orders MODIFY COLUMN status ENUM('pending', 'confirmed', 'concierge_assigned', 'in_progress', 'completed') DEFAULT 'pending';`);

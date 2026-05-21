@@ -80,7 +80,8 @@ router.post('/', async (req, res) => {
     const { 
       customer_name, customer_email, customer_phone, 
       services, pickup_address, notes,
-      voucher_code, base_amount
+      voucher_code, base_amount,
+      appointment_date, booking_time, payment_method
     } = req.body;
 
     // ── Price Calculation ──
@@ -120,13 +121,15 @@ router.post('/', async (req, res) => {
         `INSERT INTO orders (
           order_id, customer_name, customer_email, customer_phone, 
           services, pickup_address, notes, concierge_name, concierge_phone, status,
-          base_amount, discount_percent, discount_amount, gst_amount, total_amount, voucher_code
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?, ?, ?, ?)`,
+          base_amount, discount_percent, discount_amount, gst_amount, total_amount, voucher_code,
+          appointment_date, booking_time, payment_method
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           order_id, customer_name, customer_email, customer_phone, 
           services || '', pickup_address || '', notes || '', concierge_name, concierge_phone,
           serviceBasePrice, discountPercent, discountAmount, gstAmount, totalPayable,
-          appliedVoucher || null
+          appliedVoucher || null,
+          appointment_date || null, booking_time || null, payment_method || null
         ]
       );
     } catch (err) {
@@ -169,6 +172,9 @@ router.post('/', async (req, res) => {
         gst_amount: gstAmount,
         total_amount: totalPayable,
         voucher_code: appliedVoucher || null,
+        appointment_date: appointment_date || null,
+        booking_time: booking_time || null,
+        payment_method: payment_method || null,
         created_at: new Date()
       };
     }
@@ -272,7 +278,7 @@ router.post('/', async (req, res) => {
       transporter.sendMail(conciergeMailOptions).catch(e => console.error('[MAIL] Concierge email failed:', e));
     }
 
-    res.status(201).json({ success: true, order: newOrder[0] });
+    res.status(201).json({ success: true, order: newOrder });
   } catch (err) {
     console.error('Error creating order:', err);
     res.status(500).json({ error: 'Failed to create order' });
@@ -282,7 +288,12 @@ router.post('/', async (req, res) => {
 // ─── UPDATE order status ─────────────────────────────────────
 router.put('/:id/status', async (req, res) => {
   try {
-    const { status } = req.body;
+    let { status } = req.body;
+    // Map capitalized/spaced frontend status to lowercase/underscored MySQL status
+    if (status === 'Pending') status = 'pending';
+    else if (status === 'In Progress') status = 'in_progress';
+    else if (status === 'Completed') status = 'completed';
+    
     await db.query('UPDATE orders SET status = ? WHERE id = ?', [status, req.params.id]);
     res.json({ success: true });
   } catch (err) {
