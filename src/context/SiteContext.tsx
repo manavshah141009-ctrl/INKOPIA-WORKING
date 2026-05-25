@@ -200,10 +200,6 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     initSite();
-
-    // Polling for live updates
-    const interval = setInterval(initSite, 10000); // 10s polling
-    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {

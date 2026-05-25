@@ -20,19 +20,17 @@ class Storage {
 
   async init() {
     // Check MySQL
-    setTimeout(async () => {
-      try {
-        const result = await db.query('SELECT 1');
-        if (result) {
-          this.isMysqlConnected = true;
-          console.log('✅ Storage: MySQL (MilesWeb) mode active.');
-        } else {
-          console.warn('⚠️ Storage: MySQL not available (pool is null).');
-        }
-      } catch(e) {
-        console.warn('⚠️ Storage: MySQL not available.', e.message);
+    try {
+      const result = await db.query('SELECT 1');
+      if (result) {
+        this.isMysqlConnected = true;
+        console.log('✅ Storage: MySQL (MilesWeb) mode active.');
+      } else {
+        console.warn('⚠️ Storage: MySQL not available (pool is null).');
       }
-    }, 2000);
+    } catch(e) {
+      console.warn('⚠️ Storage: MySQL not available.', e.message);
+    }
   }
 
   async find(modelName, query = {}) {

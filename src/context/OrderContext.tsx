@@ -69,15 +69,18 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [agentSchemaId, setAgentSchemaId] = useState<string | null>(null);
 
   useEffect(() => {
-    const initOrders = async (retries = 3) => {
+    let isMounted = true;
+    let pollInterval: any = null;
+
+    // Fetch static schemas and collections ONCE on mount
+    const initStaticData = async (retries = 3, delay = 2000) => {
       try {
-        // 1. Get or create schemas
         const response = await schemaApi.getAll();
         const schemas = response?.data || [];
         
         if (!Array.isArray(schemas)) {
           console.error('Expected schemas array from backend, got:', schemas);
-          setIsLoading(false);
+          if (isMounted) setIsLoading(false);
           return;
         }
         
@@ -108,6 +111,7 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             console.error('Failed to create orders schema:', err);
           }
         }
+        if (!isMounted) return;
         if (orderSchema?._id) setSchemaId(orderSchema._id);
 
         let vSchema = schemas.find((s: any) => s.collectionName === 'vault');
@@ -130,6 +134,7 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             console.error('Failed to create vault schema:', err);
           }
         }
+        if (!isMounted) return;
         if (vSchema?._id) setVaultSchemaId(vSchema._id);
 
         let uSchema = schemas.find((s: any) => s.collectionName === 'users');
@@ -152,6 +157,7 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             console.error('Failed to create users schema:', err);
           }
         }
+        if (!isMounted) return;
         if (uSchema?._id) setUserSchemaId(uSchema._id);
 
         let iSchema = schemas.find((s: any) => s.collectionName === 'inks');
@@ -170,6 +176,7 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             console.error('Failed to create inks schema:', err);
           }
         }
+        if (!isMounted) return;
         if (iSchema?._id) setInkSchemaId(iSchema._id);
         
         let aSchema = schemas.find((s: any) => s.collectionName === 'agents');
@@ -189,63 +196,33 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             console.error('Failed to create agents schema:', err);
           }
         }
+        if (!isMounted) return;
         if (aSchema?._id) setAgentSchemaId(aSchema._id);
 
+        // Fetch Inks and Agents once
         if (iSchema?._id) {
           const { data: inksData } = await dataApi.getBySchema(iSchema._id);
-          if (inksData) {
+          if (inksData && isMounted) {
             setInks(inksData.map((item: any) => ({ ...item.data, backendId: item._id })));
           }
         }
 
         if (aSchema?._id) {
           const { data: agentsData } = await dataApi.getBySchema(aSchema._id);
-          if (agentsData) {
+          if (agentsData && isMounted) {
             setAgents(agentsData.map((item: any) => ({ ...item.data, backendId: item._id })));
           }
         }
-        
+
+        // Fetch vault once
         const isAdmin = localStorage.getItem('inkopia_admin_token') || localStorage.getItem('inkopia_auth_role') === 'admin';
         const userEmail = localStorage.getItem('inkopia_user_email');
-        
-        try {
-          const { data: allOrders } = await axios.get('/api/orders', {
-            params: {
-              role: isAdmin ? 'admin' : 'user',
-              email: userEmail
-            }
-          });
-          
-          setOrders(allOrders.map((o: any) => ({
-            id: o.order_id,
-            clientName: o.customer_name,
-            clientEmail: o.customer_email,
-            clientPhone: o.customer_phone,
-            location: o.pickup_address,
-            service: o.services,
-            instrument: o.notes, // Map notes or other fields as needed
-            status: o.status === 'completed' || o.status === 'Completed' ? 'Completed' : (o.status === 'in_progress' || o.status === 'In Progress' ? 'In Progress' : 'Pending'),
-            createdAt: o.created_at,
-            backendId: o.id,
-            conciergeName: o.concierge_name,
-            conciergePhone: o.concierge_phone,
-            paymentMethod: o.payment_method,
-            date: o.appointment_date,
-            bookingTime: o.booking_time,
-            amount: o.total_amount ? parseFloat(o.total_amount) : (o.amount || 2500)
-          })));
-        } catch (orderErr) {
-          console.error('Failed to fetch orders from custom API:', orderErr);
-        }
+        const userName = localStorage.getItem('inkopia_user_name');
 
         if (vSchema?._id) {
-          const userName = localStorage.getItem('inkopia_user_name');
           const { data: vaultData } = await dataApi.getBySchema(vSchema._id);
-          
-          if (vaultData) {
+          if (vaultData && isMounted) {
             const allPens = vaultData.map((item: any) => ({ ...item.data, id: item._id }));
-            
-            // If admin, show all pens. If user, filter by email/name.
             if (isAdmin) {
               setPens(allPens);
             } else {
@@ -257,9 +234,10 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           }
         }
 
+        // Fetch users once
         if (uSchema?._id) {
           const { data: usersData } = await dataApi.getBySchema(uSchema._id);
-          if (usersData) {
+          if (usersData && isMounted) {
             const fetchedUsers = usersData.map((item: any) => ({
               ...item.data,
               backendId: item._id
@@ -267,13 +245,19 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             setUsers(fetchedUsers);
           }
         }
-        setIsLoading(false);
+
+        // Trigger first fetch for dynamic orders list
+        await fetchDynamicOrders();
+        if (isMounted) setIsLoading(false);
+
+        // Start periodic polling for orders only (every 30s)
+        pollInterval = setInterval(fetchDynamicOrders, 30000);
       } catch (err) {
-        console.error('Failed to fetch orders from backend:', err);
-        if (retries > 0) {
-          console.log(`Retrying... (${retries} attempts left)`);
-          setTimeout(() => initOrders(retries - 1), 2000);
-        } else {
+        console.error('Failed to initialize schemas/static data from backend:', err);
+        if (retries > 0 && isMounted) {
+          console.log(`Retrying static data initialization in ${delay}ms... (${retries} attempts left)`);
+          setTimeout(() => initStaticData(retries - 1, delay * 2), delay);
+        } else if (isMounted) {
           import('sonner').then(({ toast }) => {
             toast.error('Backend connection failed. Please ensure the backend is reachable.');
           });
@@ -282,9 +266,51 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       }
     };
 
-    initOrders();
-    const interval = setInterval(initOrders, 10000); // Poll every 10s
-    return () => clearInterval(interval);
+    // Keep dynamic orders fetching clean and isolated with NO retries on failures
+    const fetchDynamicOrders = async () => {
+      try {
+        const isAdmin = localStorage.getItem('inkopia_admin_token') || localStorage.getItem('inkopia_auth_role') === 'admin';
+        const userEmail = localStorage.getItem('inkopia_user_email');
+        
+        const { data: allOrders } = await axios.get('/api/orders', {
+          params: {
+            role: isAdmin ? 'admin' : 'user',
+            email: userEmail
+          }
+        });
+        
+        if (isMounted) {
+          setOrders(allOrders.map((o: any) => ({
+            id: o.order_id,
+            clientName: o.customer_name,
+            clientEmail: o.customer_email,
+            clientPhone: o.customer_phone,
+            location: o.pickup_address,
+            service: o.services,
+            instrument: o.notes,
+            status: o.status === 'completed' || o.status === 'Completed' ? 'Completed' : (o.status === 'in_progress' || o.status === 'In Progress' ? 'In Progress' : 'Pending'),
+            createdAt: o.created_at,
+            backendId: o.id,
+            conciergeName: o.concierge_name,
+            conciergePhone: o.concierge_phone,
+            paymentMethod: o.payment_method,
+            date: o.appointment_date,
+            bookingTime: o.booking_time,
+            amount: o.total_amount ? parseFloat(o.total_amount) : (o.amount || 2500)
+          })));
+        }
+      } catch (orderErr) {
+        console.error('Failed to poll orders from backend:', orderErr);
+        // Fail silently during polling to prevent retry storms
+      }
+    };
+
+    initStaticData();
+
+    return () => {
+      isMounted = false;
+      if (pollInterval) clearInterval(pollInterval);
+    };
   }, []);
 
   const addOrder = async (orderData: any) => {
