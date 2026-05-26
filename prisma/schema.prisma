@@ -1,0 +1,196 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model agents {
+  id         Int            @id @default(autoincrement())
+  name       String         @db.VarChar(255)
+  role       String         @db.VarChar(255)
+  type       agents_type?   @default(ai)
+  status     agents_status? @default(active)
+  created_at DateTime?      @default(now()) @db.Timestamp(0)
+}
+
+model dynamic_pages {
+  id         Int       @id @default(autoincrement())
+  title      String    @db.VarChar(255)
+  slug       String    @unique(map: "slug") @db.VarChar(255)
+  content    String?   @db.LongText
+  created_at DateTime? @default(now()) @db.Timestamp(0)
+}
+
+model inks {
+  id         Int       @id @default(autoincrement())
+  name       String    @db.VarChar(255)
+  hex        String    @db.VarChar(7)
+  created_at DateTime? @default(now()) @db.Timestamp(0)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model orders {
+  id                 Int            @id @default(autoincrement())
+  user_id            Int?
+  client_name        String?        @db.VarChar(255)
+  client_phone       String?        @db.VarChar(50)
+  location           String?        @db.Text
+  service            String?        @db.VarChar(255)
+  instrument         String?        @db.VarChar(255)
+  payment_method     String?        @db.VarChar(50)
+  booking_time       String?        @db.VarChar(50)
+  appointment_date   DateTime?      @db.Date
+  amount             Decimal?       @db.Decimal(10, 2)
+  status             orders_status? @default(pending)
+  commission_details String?        @db.LongText
+  created_at         DateTime?      @default(now()) @db.Timestamp(0)
+  customer_email     String?        @db.VarChar(255)
+  pickup_address     String?        @db.Text
+  concierge_name     String?        @db.VarChar(255)
+  concierge_phone    String?        @db.VarChar(50)
+  special_notes      String?        @db.Text
+  updated_at         DateTime?      @default(now()) @db.Timestamp(0)
+  order_id           String?        @db.VarChar(100)
+  customer_name      String?        @db.VarChar(255)
+  customer_phone     String?        @db.VarChar(50)
+  services           String?        @db.Text
+  notes              String?        @db.Text
+  base_amount        Decimal?       @default(2500.00) @db.Decimal(10, 2)
+  discount_percent   Int?           @default(0)
+  discount_amount    Decimal?       @default(0.00) @db.Decimal(10, 2)
+  gst_amount         Decimal?       @default(0.00) @db.Decimal(10, 2)
+  total_amount       Decimal?       @default(2950.00) @db.Decimal(10, 2)
+  voucher_code       String?        @db.VarChar(50)
+  isNewPen           Boolean        @default(false)
+  lastRefilledDate   DateTime?
+  lastServiceDate    DateTime?
+  users              users?         @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "orders_ibfk_1")
+
+  @@index([user_id], map: "user_id")
+}
+
+model PenRegistration {
+  id               String   @id @default(uuid())
+  brand            String
+  model            String
+  nib              String
+  silhouette       String?
+  imageUrl         String?
+  ownerName        String
+  ownerEmail       String
+  
+  // Post-Ritual Retention Fields
+  isNewPen         Boolean  @default(false)
+  lastRefilledDate DateTime?
+  lastServiceDate  DateTime?
+  
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([ownerEmail])
+}
+
+model Booking {
+  id               String   @id @default(uuid())
+  orderId          String   @unique
+  customerName     String
+  customerEmail    String
+  customerPhone    String?
+  services         String   @db.Text
+  pickupAddress    String   @db.Text
+  notes            String?  @db.Text
+  status           String   @default("pending")
+  conciergeName    String?
+  conciergePhone   String?
+  amount           Decimal  @default(2500.00) @db.Decimal(10, 2)
+  appointmentDate  String?
+  bookingTime      String?
+  paymentMethod    String?
+  
+  // Post-Ritual Retention Fields
+  isNewPen         Boolean  @default(false)
+  lastRefilledDate DateTime?
+  lastServiceDate  DateTime?
+  
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([customerEmail])
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model site_configs {
+  id          Int       @id @default(autoincrement())
+  config_key  String    @unique(map: "config_key") @db.VarChar(50)
+  config_data String    @db.LongText
+  updated_at  DateTime? @default(now()) @db.Timestamp(0)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model site_data_generic {
+  id         Int       @id @default(autoincrement())
+  schema_id  String    @db.VarChar(255)
+  data       String    @db.LongText
+  created_at DateTime? @default(now()) @db.Timestamp(0)
+  updated_at DateTime? @default(now()) @db.Timestamp(0)
+}
+
+model users {
+  id                 Int                  @id @default(autoincrement())
+  email              String               @unique(map: "email") @db.VarChar(255)
+  role               users_role?          @default(user)
+  is_verified        Boolean?             @default(false)
+  firebase_uid       String?              @unique(map: "firebase_uid") @db.VarChar(255)
+  created_at         DateTime?            @default(now()) @db.Timestamp(0)
+  name               String?              @db.VarChar(255)
+  phone              String?              @db.VarChar(50)
+  company            String?              @db.VarChar(255)
+  designation        String?              @db.VarChar(255)
+  orders             orders[]
+  verification_codes verification_codes[]
+}
+
+model verification_codes {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  code       String   @db.VarChar(6)
+  expires_at DateTime @db.Timestamp(0)
+  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "verification_codes_ibfk_1")
+
+  @@index([user_id], map: "user_id")
+}
+
+model voucher_redemptions {
+  id             Int       @id @default(autoincrement())
+  voucher_code   String    @db.VarChar(50)
+  customer_email String    @db.VarChar(255)
+  order_id       String    @db.VarChar(50)
+  redeemed_at    DateTime? @default(now()) @db.Timestamp(0)
+
+  @@unique([voucher_code, customer_email], map: "unique_redemption")
+}
+
+enum users_role {
+  user
+  admin
+}
+
+enum agents_type {
+  ai
+  human
+}
+
+enum agents_status {
+  active
+  inactive
+}
+
+enum orders_status {
+  pending
+  confirmed
+  concierge_assigned
+  in_progress
+  completed
+}
