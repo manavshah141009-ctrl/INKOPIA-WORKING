@@ -48,7 +48,7 @@ router.post('/', async (req, res) => {
       const mailOptions = {
         from: `"Inkopia Concierge" <${fromEmail}>`,
         to: data.clientEmail,
-        subject: 'Order Confirmed: Your Concierge Maintenance Ritual',
+        subject: 'Order Confirmed: Your Concierge Cleaning & Refilling Ritual',
         html: `
           <div style="font-family: serif; color: #004225; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #D5C8AD; background-color: #fcfaf7;">
             <div style="text-align: center; margin-bottom: 30px;">

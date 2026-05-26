@@ -104,7 +104,7 @@ export async function GET(request: Request) {
         `;
       } else {
         // Standard Ink Sommelier Notification
-        emailSubject = `Maintenance Curation: Your ${pen.brand} ${pen.model}`;
+        emailSubject = `Bespoke Care Curation: Your ${pen.brand} ${pen.model}`;
         emailHtmlBody = `
           <p style="margin: 0 0 20px 0; font-size: 15px; line-height: 1.8;">
             Sir/Madam,

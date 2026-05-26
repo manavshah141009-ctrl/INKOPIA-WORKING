@@ -139,7 +139,7 @@ export default function Dashboard() {
       location: `${booking.streetAddress}, ${booking.city} - ${booking.postalCode}`,
       date: booking.date,
       bookingTime: booking.time,
-      service: 'Concierge Maintenance Ritual',
+      service: 'Concierge Cleaning & Refilling Ritual',
       instrument: pen ? `${pen.brand} ${pen.model}` : 'Fountain Pen',
       ink: booking.inkName,
       paymentMethod: booking.paymentMethod === 'cos' ? 'Cash on Service' : 'UPI',

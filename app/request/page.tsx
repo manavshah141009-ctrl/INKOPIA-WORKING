@@ -81,7 +81,7 @@ export default function RequestRitualPage() {
           </h1>
           <div className="w-16 h-[1px] bg-[#D4AF37] mx-auto my-6" />
           <p className="text-sm font-sans text-[#001220]/60 leading-relaxed font-light">
-            Indulge your writing instruments with archival maintenance. Our Concierge Service delivers immaculate feed flushes and precise calibration directly to your desk.
+            Indulge your writing instruments with archival cleaning and refilling. Our Concierge Service delivers immaculate feed flushes and precise calibration directly to your desk.
           </p>
         </div>
 
