@@ -14,7 +14,7 @@ export const UpgradePanel = () => {
     { id: '3d', name: "Interactive 3D Pen Rendering", description: "Enables Three.js visualizer on all landing pages.", icon: <Box className="w-5 h-5" />, default: true },
     { id: 'ink', name: "Dynamic Ink Physics", description: "Real-time ink flow simulations in the Concierge ritual.", icon: <Droplets className="w-5 h-5" />, default: true },
     { id: 'shimmer', name: "Luxe Gold Shimmer Effects", description: "Adds metallic shine to headings and dividers.", icon: <Sparkles className="w-5 h-5" />, default: false },
-    { id: 'ai', name: "Predictive Maintenance AI", description: "Predicts when a nib needs pointing based on user usage.", icon: <Zap className="w-5 h-5" />, default: false },
+    { id: 'ai', name: "Predictive Flow Curation AI", description: "Predicts when a reservoir needs refilling based on user usage.", icon: <Zap className="w-5 h-5" />, default: false },
   ];
 
   return (

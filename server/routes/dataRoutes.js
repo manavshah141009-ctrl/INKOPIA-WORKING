@@ -21,7 +21,16 @@ const transporter = nodemailer.createTransport({
 router.get('/:schemaId', async (req, res) => {
   try {
     const data = await storage.find('SiteData', { schemaId: req.params.schemaId });
-    res.json(data);
+    const formattedData = (data || []).map(item => {
+      if (item.data) {
+        try {
+          const str = JSON.stringify(item.data).replace(/Maintenance/g, 'Cleaning & Refilling');
+          item.data = JSON.parse(str);
+        } catch (e) {}
+      }
+      return item;
+    });
+    res.json(formattedData);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

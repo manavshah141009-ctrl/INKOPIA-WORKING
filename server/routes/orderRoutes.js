@@ -67,7 +67,11 @@ router.get('/', async (req, res) => {
     }
     
     const orders = await db.query(query, params);
-    res.json(orders || []);
+    const formattedOrders = (orders || []).map(o => ({
+      ...o,
+      services: (o.services || '').replace(/Maintenance/g, 'Cleaning & Refilling')
+    }));
+    res.json(formattedOrders);
   } catch (err) {
     console.error('Error fetching orders:', err);
     res.status(500).json({ error: 'Failed to fetch orders' });
