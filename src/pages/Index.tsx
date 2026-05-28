@@ -309,6 +309,57 @@ const Index = () => {
         )}
       </div>
 
+      {/* Site Footer with Customer Support */}
+      <footer className="relative z-10 border-t border-ink-green/10 bg-[#D3C2A3]/30 backdrop-blur-md pt-20 pb-12 mt-20">
+        <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 md:grid-cols-3 gap-12 mb-16">
+          {/* Logo & Philosophy */}
+          <div className="space-y-4">
+            <img 
+              src="/logo.jpg" 
+              alt="Inkopia" 
+              className="h-12 w-auto opacity-95" 
+              style={{ clipPath: 'inset(15% 10% 18% 10%)' }} 
+            />
+            <p className="font-serif italic text-sm text-ink-green/70 leading-relaxed max-w-xs">
+              "The Pen is The Mightiest Sword." Premium concierge cleaning and refilling rituals for luxury writing instruments.
+            </p>
+          </div>
+
+          {/* Customer Support Section */}
+          <div className="space-y-4">
+            <h4 className="font-serif text-sm font-bold uppercase tracking-wider text-ink-green">Customer Support</h4>
+            <div className="space-y-3 text-xs font-sans text-ink-green/80">
+              <p className="flex items-center gap-2">
+                <span className="font-bold text-[10px] tracking-wider uppercase text-gold block w-12">Email:</span>
+                <a href="mailto:info@inkopia.in" className="hover:text-gold transition-colors font-medium border-b border-transparent hover:border-gold pb-0.5">info@inkopia.in</a>
+              </p>
+              <p className="flex items-center gap-2">
+                <span className="font-bold text-[10px] tracking-wider uppercase text-gold block w-12">Phone:</span>
+                <a href="tel:9876535353" className="hover:text-gold transition-colors font-medium border-b border-transparent hover:border-gold pb-0.5">+91 98765 35353</a>
+              </p>
+              <p className="text-[10px] text-ink-green/60 uppercase tracking-widest pt-2">Available 10:00 AM – 8:00 PM IST</p>
+            </div>
+          </div>
+
+          {/* Service Philosophy */}
+          <div className="space-y-4">
+            <h4 className="font-serif text-sm font-bold uppercase tracking-wider text-ink-green">Private Concierge</h4>
+            <p className="text-xs text-ink-green/75 leading-relaxed">
+              Experience the private sommelier refilling service for luxury fountain pens at your private residence or executive office.
+            </p>
+          </div>
+        </div>
+
+        {/* Copyright */}
+        <div className="max-w-7xl mx-auto px-6 md:px-12 pt-8 border-t border-ink-green/5 flex flex-col md:flex-row justify-between items-center gap-4 text-ink-green/55">
+          <p className="text-[10px] uppercase tracking-widest">© {new Date().getFullYear()} Inkopia Experience • Private & Confidential</p>
+          <div className="flex gap-6 text-[9px] uppercase tracking-widest font-semibold">
+            <Link to="/admin-login" className="hover:text-gold transition-colors">Command Center</Link>
+            <span className="opacity-30">|</span>
+            <span className="text-gold">Zero-Borders Premium</span>
+          </div>
+        </div>
+      </footer>
 
     </div>
   );
