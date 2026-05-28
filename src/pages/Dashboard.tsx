@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, PenTool, Check, MapPin, Calendar, Clock, ChevronRight } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
@@ -93,7 +93,7 @@ export default function Dashboard() {
   });
 
   // Pre-fill phone if available when opening booking dialog
-  React.useEffect(() => {
+  useEffect(() => {
     if (isBookingService) {
       const storedPhone = localStorage.getItem('inkopia_user_phone') || '';
       setBooking(prev => ({ ...prev, clientPhone: storedPhone }));
