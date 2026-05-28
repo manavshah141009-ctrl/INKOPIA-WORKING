@@ -40,10 +40,12 @@ interface OrderContextType {
   users: UserData[];
   inks: InkData[];
   agents: any[];
+  notifications: any[];
   isLoading: boolean;
   addOrder: (order: Omit<BookingData, 'id' | 'createdAt' | 'status'>) => Promise<void>;
   updateOrderStatus: (id: string, status: BookingData['status']) => Promise<void>;
   addPen: (pen: any) => Promise<void>;
+  updatePen: (id: string, updates: any) => Promise<void>;
   addUser: (user: UserData) => Promise<void>;
   updateUser: (backendId: string, updates: Partial<UserData>) => Promise<void>;
   deleteUser: (backendId: string) => Promise<void>;
@@ -51,6 +53,8 @@ interface OrderContextType {
   deleteInk: (backendId: string) => Promise<void>;
   addAgent: (agent: any) => Promise<void>;
   deleteAgent: (backendId: string) => Promise<void>;
+  addNotification: (notification: any) => Promise<void>;
+  deleteNotification: (backendId: string) => Promise<void>;
 }
 
 const OrderContext = createContext<OrderContextType | undefined>(undefined);
@@ -61,12 +65,14 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [users, setUsers] = useState<UserData[]>([]);
   const [inks, setInks] = useState<InkData[]>([]);
   const [agents, setAgents] = useState<any[]>([]);
+  const [notifications, setNotifications] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [schemaId, setSchemaId] = useState<string | null>(null);
   const [vaultSchemaId, setVaultSchemaId] = useState<string | null>(null);
   const [userSchemaId, setUserSchemaId] = useState<string | null>(null);
   const [inkSchemaId, setInkSchemaId] = useState<string | null>(null);
   const [agentSchemaId, setAgentSchemaId] = useState<string | null>(null);
+  const [notifSchemaId, setNotifSchemaId] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -199,7 +205,28 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         if (!isMounted) return;
         if (aSchema?._id) setAgentSchemaId(aSchema._id);
 
-        // Fetch Inks and Agents once
+        let nSchema = schemas.find((s: any) => s.collectionName === 'notifications');
+        if (!nSchema) {
+          try {
+            const { data: newSchema } = await schemaApi.create({
+              collectionName: 'notifications',
+              displayName: 'Broadcast Announcements',
+              fields: [
+                { name: 'title', label: 'Title', type: 'text' },
+                { name: 'message', label: 'Message', type: 'text' },
+                { name: 'target', label: 'Target', type: 'text' },
+                { name: 'createdAt', label: 'Created At', type: 'date' }
+              ]
+            });
+            nSchema = newSchema;
+          } catch (err) {
+            console.error('Failed to create notifications schema:', err);
+          }
+        }
+        if (!isMounted) return;
+        if (nSchema?._id) setNotifSchemaId(nSchema._id);
+
+        // Fetch Inks, Agents, and Notifications once
         if (iSchema?._id) {
           const { data: inksData } = await dataApi.getBySchema(iSchema._id);
           if (inksData && isMounted) {
@@ -211,6 +238,13 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           const { data: agentsData } = await dataApi.getBySchema(aSchema._id);
           if (agentsData && isMounted) {
             setAgents(agentsData.map((item: any) => ({ ...item.data, backendId: item._id })));
+          }
+        }
+
+        if (nSchema?._id) {
+          const { data: notifData } = await dataApi.getBySchema(nSchema._id);
+          if (notifData && isMounted) {
+            setNotifications(notifData.map((item: any) => ({ ...item.data, id: item._id })));
           }
         }
 
@@ -371,17 +405,68 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const addPen = async (penData: any) => {
     if (!vaultSchemaId) return;
+    const email = localStorage.getItem('inkopia_user_email');
+    const name = localStorage.getItem('inkopia_user_name');
     try {
       const { data: savedData } = await dataApi.upsert({
         schemaId: vaultSchemaId,
         data: {
           ...penData,
-          ownerEmail: localStorage.getItem('inkopia_user_email')
+          ownerEmail: email,
+          ownerName: name
         }
       });
-      setPens([...pens, { ...penData, id: savedData._id }]);
+      setPens([...pens, { ...penData, id: savedData._id, ownerEmail: email, ownerName: name }]);
     } catch (err: any) {
       console.error('Failed to save pen to vault:', err.response?.data || err.message);
+    }
+  };
+
+  const updatePen = async (id: string, updates: any) => {
+    if (!vaultSchemaId) return;
+    try {
+      const penToUpdate = pens.find(p => p.id === id);
+      if (!penToUpdate) return;
+      const updatedData = { ...penToUpdate, ...updates };
+      delete updatedData.id;
+      
+      await dataApi.upsert({
+        schemaId: vaultSchemaId,
+        data: updatedData,
+        uniqueId: id
+      });
+      
+      setPens(pens.map(pen => pen.id === id ? { ...pen, ...updates } : pen));
+    } catch (err: any) {
+      console.error('Failed to update pen in vault:', err.response?.data || err.message);
+      throw err;
+    }
+  };
+
+  const addNotification = async (notifData: any) => {
+    if (!notifSchemaId) return;
+    try {
+      const { data: savedData } = await dataApi.upsert({
+        schemaId: notifSchemaId,
+        data: {
+          ...notifData,
+          createdAt: new Date().toISOString()
+        }
+      });
+      setNotifications([...notifications, { ...notifData, id: savedData._id, createdAt: new Date().toISOString() }]);
+    } catch (err: any) {
+      console.error('Failed to add notification:', err.response?.data || err.message);
+      throw err;
+    }
+  };
+
+  const deleteNotification = async (backendId: string) => {
+    try {
+      await dataApi.delete(backendId);
+      setNotifications(notifications.filter(n => n.id !== backendId));
+    } catch (err: any) {
+      console.error('Failed to delete notification:', err.response?.data || err.message);
+      throw err;
     }
   };
 
@@ -494,9 +579,9 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   return (
     <OrderContext.Provider value={{ 
-      orders, pens, users, inks, agents, isLoading,
-      addOrder, updateOrderStatus, addPen, addUser, updateUser, deleteUser,
-      addInk, deleteInk, addAgent, deleteAgent
+      orders, pens, users, inks, agents, notifications, isLoading,
+      addOrder, updateOrderStatus, addPen, updatePen, addUser, updateUser, deleteUser,
+      addInk, deleteInk, addAgent, deleteAgent, addNotification, deleteNotification
     }}>
       {children}
     </OrderContext.Provider>

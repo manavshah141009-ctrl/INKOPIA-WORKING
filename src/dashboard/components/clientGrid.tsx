@@ -136,7 +136,10 @@ export const ClientGrid = () => {
                         (client.name && p.ownerName === client.name)
                       ).map((p, idx) => (
                         <div key={idx} className="bg-black/5 p-1.5 border border-ink-green/5 text-[9px] font-semibold text-ink-green flex justify-between items-center normal-case">
-                          <span className="truncate max-w-[120px] font-serif">{p.brand} {p.model}</span>
+                          <div className="flex flex-col truncate max-w-[120px]">
+                            <span className="truncate font-serif font-bold">{p.brand} {p.model}</span>
+                            {p.mechanism && <span className="text-[8px] text-gold uppercase tracking-wider">{p.mechanism}</span>}
+                          </div>
                           <span className="text-[8px] text-ink-green/60 uppercase font-mono tracking-wider">{p.nib}</span>
                         </div>
                       ))}

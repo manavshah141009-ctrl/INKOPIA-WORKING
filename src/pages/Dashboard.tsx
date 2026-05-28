@@ -28,11 +28,12 @@ interface ServiceRequest {
   status: 'pending' | 'confirmed';
 }
 
-const PEN_SILHOUETTES = [
-  { id: 'cigar', name: 'Cigar Shape' },
-  { id: 'flat-top', name: 'Flat Top' },
-  { id: 'faceted', name: 'Faceted' },
-  { id: 'vintage', name: 'Vintage' },
+const PEN_MECHANISMS = [
+  { id: 'piston', name: 'Piston Filler' },
+  { id: 'converter', name: 'Cartridge / Converter' },
+  { id: 'eyedropper', name: 'Eyedropper' },
+  { id: 'vacuum', name: 'Vacuum Filler' },
+  { id: 'lever', name: 'Lever / Sac Filler (Vintage)' }
 ] as const;
 
 const PEN_DATABASE: Record<string, Record<string, string[]>> = {
@@ -58,11 +59,23 @@ const PEN_DATABASE: Record<string, Record<string, string[]>> = {
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { addOrder, orders: backendOrders, pens, addPen, updateOrderStatus, inks } = useOrders();
+  const { addOrder, orders: backendOrders, pens, addPen, updatePen, updateOrderStatus, inks, notifications } = useOrders();
   const { content } = useSite();
   const isMobile = useIsMobile();
   const userName = localStorage.getItem('inkopia_user_name') || 'Collector';
   const userEmail = localStorage.getItem('inkopia_user_email');
+  
+  // Filter strictly so client only sees their own pens
+  const userPens = pens.filter((pen: any) => {
+    if (userEmail && pen.ownerEmail) {
+      return pen.ownerEmail.toLowerCase() === userEmail.toLowerCase();
+    }
+    if (userName && pen.ownerName) {
+      return pen.ownerName.toLowerCase() === userName.toLowerCase();
+    }
+    return false;
+  });
+
   const userOrders = backendOrders.filter(order => order.clientEmail === userEmail || order.clientName === userName);
   
   // Modals state
@@ -78,7 +91,7 @@ export default function Dashboard() {
   const [isValidatingVoucher, setIsValidatingVoucher] = useState(false);
 
   // New pen form state
-  const [newPen, setNewPen] = useState<{brand: string, model: string, nib: string, silhouette: Pen['silhouette'], imageUrl?: string}>({ brand: '', model: '', nib: '', silhouette: 'cigar' });
+  const [newPen, setNewPen] = useState<{brand: string, model: string, nib: string, mechanism: string, imageUrl?: string}>({ brand: '', model: '', nib: '', mechanism: 'piston' });
 
   // Booking form state
   const [booking, setBooking] = useState({ 
@@ -104,7 +117,7 @@ export default function Dashboard() {
     e.preventDefault();
     await addPen(newPen);
     setIsAddingPen(false);
-    setNewPen({ brand: '', model: '', nib: '', silhouette: 'cigar', imageUrl: undefined });
+    setNewPen({ brand: '', model: '', nib: '', mechanism: 'piston', imageUrl: undefined });
   };
 
   const handleBookService = async (e: React.FormEvent) => {
@@ -233,6 +246,31 @@ export default function Dashboard() {
           </h1>
         </header>
 
+        {/* Broadcast Announcements */}
+        {notifications.filter((n: any) => n.target === 'all' || (userEmail && n.target.toLowerCase() === userEmail.toLowerCase())).map((notif: any) => (
+          <div key={notif.id} className="mb-6 p-6 bg-gold/10 border border-[hsl(var(--gold)/0.3)] text-ink-green backdrop-blur-sm relative animate-in fade-in slide-in-from-top-2 duration-300">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-[9px] uppercase tracking-[0.25em] font-bold px-2 py-0.5 bg-gold/20 text-gold border border-gold/10">Broadcast Announcement</span>
+              <span className="text-[8px] uppercase tracking-widest text-ink-green/50 font-mono">
+                {new Date(notif.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+              </span>
+            </div>
+            <h4 className="text-sm font-serif font-bold text-ink-green mb-1">{notif.title}</h4>
+            <p className="text-xs text-ink-green/85 leading-relaxed">{notif.message}</p>
+          </div>
+        ))}
+
+        {/* Legacy Missing Mechanism Warning */}
+        {userPens.some((p: any) => !p.mechanism) && (
+          <div className="mb-10 p-5 bg-red-950/20 border border-red-500/35 text-ink-green backdrop-blur-sm animate-in fade-in slide-in-from-top-2 duration-300">
+            <span className="text-xs uppercase tracking-widest font-bold text-red-600 block mb-1">⚠️ Action Required</span>
+            <p className="text-xs text-ink-green/80 font-medium">
+              Some of your registered writing instruments are missing a filling mechanism specification. 
+              Please select the correct mechanism on the instrument cards below so our concierge arrives fully prepared with correct tools.
+            </p>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           
           {/* Main Collection Area */}
@@ -249,7 +287,7 @@ export default function Dashboard() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {pens.map(pen => (
+              {userPens.map(pen => (
                 <div key={pen.id} className="group flex flex-col p-6 bg-white/30 backdrop-blur-sm border border-ink-green/20 hover:border-ink-green/50 transition-all duration-500 hover:-translate-y-1 shadow-sm">
                   {pen.imageUrl ? (
                     <div className="w-full h-32 mb-6 flex items-center justify-center border-b border-ink-green/10 pb-4">
@@ -264,21 +302,46 @@ export default function Dashboard() {
                     <PenTool className="w-5 h-5 text-ink-green group-hover:text-gold transition-colors" />
                   </div>
                   
-                  <div className="space-y-1 mb-8">
-                    <p className="text-xs text-ink-green/80 font-medium"><span className="text-ink-green/60 uppercase tracking-widest text-[9px] mr-2">Nib</span> {pen.nib}</p>
-                    <p className="text-xs text-ink-green/80 font-medium"><span className="text-ink-green/60 uppercase tracking-widest text-[9px] mr-2">Shape</span> {PEN_SILHOUETTES.find(s => s.id === pen.silhouette)?.name}</p>
+                  <div className="space-y-2 mb-8">
+                    <p className="text-xs text-ink-green/80 font-medium"><span className="text-ink-green/60 uppercase tracking-widest text-[9px] mr-2 font-bold">Nib</span> {pen.nib}</p>
+                    {pen.mechanism ? (
+                      <p className="text-xs text-ink-green/80 font-medium"><span className="text-ink-green/60 uppercase tracking-widest text-[9px] mr-2 font-bold">Mechanism</span> {PEN_MECHANISMS.find(m => m.id === pen.mechanism)?.name || pen.mechanism}</p>
+                    ) : (
+                      <div className="pt-2 border-t border-gold/15">
+                        <span className="text-[9px] uppercase tracking-widest text-red-500 font-bold block mb-1">⚠️ Missing Mechanism</span>
+                        <select 
+                          onChange={async (e) => {
+                            if (e.target.value) {
+                              try {
+                                await updatePen(pen.id, { mechanism: e.target.value });
+                                toast.success('Mechanism updated successfully');
+                              } catch (err) {
+                                toast.error('Failed to update mechanism');
+                              }
+                            }
+                          }}
+                          className="w-full bg-[#D5C8AD] border border-red-500/40 text-xs px-2 py-1 text-ink-green outline-none"
+                        >
+                          <option value="">Select Mechanism...</option>
+                          {PEN_MECHANISMS.map(m => (
+                            <option key={m.id} value={m.id} className="bg-[#D5C8AD]">{m.name}</option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
                   </div>
 
                   <button 
                     onClick={() => setIsBookingService(pen.id)}
-                    className="mt-auto w-full border border-ink-green/30 text-ink-green py-3 text-[10px] uppercase tracking-[0.2em] font-semibold hover:bg-ink-green hover:border-ink-green hover:text-[#D5C8AD] transition-all duration-300"
+                    disabled={!pen.mechanism}
+                    className="mt-auto w-full border border-ink-green/30 text-ink-green py-3 text-[10px] uppercase tracking-[0.2em] font-semibold hover:bg-ink-green hover:border-ink-green hover:text-[#D5C8AD] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Request Concierge
                   </button>
                 </div>
               ))}
 
-              {pens.length === 0 && (
+              {userPens.length === 0 && (
                 <div className="col-span-full py-16 flex flex-col items-center justify-center border border-dashed border-ink-green/30 bg-white/20 text-center">
                   <PenTool className="w-8 h-8 text-ink-green/50 mb-4" />
                   <p className="text-sm text-ink-green/70 mb-2 font-serif italic">Your vault is currently empty.</p>
@@ -381,9 +444,9 @@ export default function Dashboard() {
                 </div>
 
                 <div>
-                  <label className="block text-[9px] font-semibold uppercase tracking-widest text-ink-green mb-1">Silhouette Profile (Optional)</label>
-                  <select value={newPen.silhouette} onChange={e => setNewPen({...newPen, silhouette: e.target.value as any})} className="w-full bg-transparent border-b border-ink-green/30 pb-2 text-ink-green focus:outline-none focus:border-ink-green transition-colors appearance-none cursor-pointer">
-                    {PEN_SILHOUETTES.map(s => <option key={s.id} value={s.id} className="bg-[#D5C8AD]">{s.name}</option>)}
+                  <label className="block text-[9px] font-semibold uppercase tracking-widest text-ink-green mb-1">Filling Mechanism *</label>
+                  <select required value={newPen.mechanism} onChange={e => setNewPen({...newPen, mechanism: e.target.value})} className="w-full bg-transparent border-b border-ink-green/30 pb-2 text-ink-green focus:outline-none focus:border-ink-green transition-colors appearance-none cursor-pointer text-sm">
+                    {PEN_MECHANISMS.map(m => <option key={m.id} value={m.id} className="bg-[#D5C8AD]">{m.name}</option>)}
                   </select>
                 </div>
                 <button type="submit" className="w-full mt-8 bg-ink-green text-[#D5C8AD] py-4 text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-ink-green/90 transition-colors shadow-md">Register to Vault</button>
