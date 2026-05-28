@@ -335,7 +335,7 @@ const Index = () => {
               </p>
               <p className="flex items-center gap-2">
                 <span className="font-bold text-[10px] tracking-wider uppercase text-gold block w-12">Phone:</span>
-                <a href="tel:9876535353" className="hover:text-gold transition-colors font-medium border-b border-transparent hover:border-gold pb-0.5">+91 98765 35353</a>
+                <a href="tel:9768535353" className="hover:text-gold transition-colors font-medium border-b border-transparent hover:border-gold pb-0.5">+91 97685 35353</a>
               </p>
               <p className="text-[10px] text-ink-green/60 uppercase tracking-widest pt-2">Available 10:00 AM – 8:00 PM IST</p>
             </div>
