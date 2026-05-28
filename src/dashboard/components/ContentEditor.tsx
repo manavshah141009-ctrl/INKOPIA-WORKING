@@ -199,6 +199,149 @@ export const ContentEditor = () => {
             </div>
           </AccordionContent>
         </AccordionItem>
+
+        {/* Dynamic Website Copy Upgrades */}
+        <AccordionItem value="website_copy" className="border border-ink-green/10 rounded-lg px-4 bg-white/5">
+          <AccordionTrigger className="text-xs uppercase tracking-[0.2em] font-bold hover:no-underline">Extended Copy & Buttons</AccordionTrigger>
+          <AccordionContent className="space-y-4 pt-4 pb-6">
+            <div className="space-y-2">
+              <Label className="text-[10px] uppercase tracking-widest font-bold opacity-60">Discover Section Subtitle</Label>
+              <Textarea 
+                value={localContent.discoverSubtitle || ''} 
+                onChange={(e) => handleChange('discoverSubtitle', e.target.value)}
+                className="bg-background/50 border-ink-green/10 min-h-[80px]"
+              />
+            </div>
+            
+            <div className="border-t border-ink-green/5 pt-4 space-y-4">
+              <h4 className="text-[10px] uppercase tracking-widest font-bold text-gold">Concierge Sommelier Pillars</h4>
+              
+              <div className="space-y-2">
+                <Label className="text-[9px] uppercase tracking-widest font-bold opacity-50">Pillar 1 Title</Label>
+                <Input value={localContent.conciergeSommelierPillar1Title || ''} onChange={(e) => handleChange('conciergeSommelierPillar1Title', e.target.value)} className="bg-background/50 border-ink-green/10" />
+                <Label className="text-[9px] uppercase tracking-widest font-bold opacity-50">Pillar 1 Text</Label>
+                <Textarea value={localContent.conciergeSommelierPillar1Text || ''} onChange={(e) => handleChange('conciergeSommelierPillar1Text', e.target.value)} className="bg-background/50 border-ink-green/10" />
+              </div>
+
+              <div className="space-y-2 pt-2 border-t border-ink-green/5">
+                <Label className="text-[9px] uppercase tracking-widest font-bold opacity-50">Pillar 2 Title</Label>
+                <Input value={localContent.conciergeSommelierPillar2Title || ''} onChange={(e) => handleChange('conciergeSommelierPillar2Title', e.target.value)} className="bg-background/50 border-ink-green/10" />
+                <Label className="text-[9px] uppercase tracking-widest font-bold opacity-50">Pillar 2 Text</Label>
+                <Textarea value={localContent.conciergeSommelierPillar2Text || ''} onChange={(e) => handleChange('conciergeSommelierPillar2Text', e.target.value)} className="bg-background/50 border-ink-green/10" />
+              </div>
+
+              <div className="space-y-2 pt-2 border-t border-ink-green/5">
+                <Label className="text-[9px] uppercase tracking-widest font-bold opacity-50">Pillar 3 Title</Label>
+                <Input value={localContent.conciergeSommelierPillar3Title || ''} onChange={(e) => handleChange('conciergeSommelierPillar3Title', e.target.value)} className="bg-background/50 border-ink-green/10" />
+                <Label className="text-[9px] uppercase tracking-widest font-bold opacity-50">Pillar 3 Text</Label>
+                <Textarea value={localContent.conciergeSommelierPillar3Text || ''} onChange={(e) => handleChange('conciergeSommelierPillar3Text', e.target.value)} className="bg-background/50 border-ink-green/10" />
+              </div>
+            </div>
+
+            <div className="border-t border-ink-green/5 pt-4 grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-[10px] uppercase tracking-widest font-bold opacity-60">CTA Button (Unauthenticated)</Label>
+                <Input value={localContent.bookServiceButtonText || ''} onChange={(e) => handleChange('bookServiceButtonText', e.target.value)} className="bg-background/50 border-ink-green/10" />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[10px] uppercase tracking-widest font-bold opacity-60">CTA Button (Authenticated)</Label>
+                <Input value={localContent.vaultEntranceButtonText || ''} onChange={(e) => handleChange('vaultEntranceButtonText', e.target.value)} className="bg-background/50 border-ink-green/10" />
+              </div>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        {/* Mumbai Service Coverage Area Displays */}
+        <AccordionItem value="mumbai_regions" className="border border-ink-green/10 rounded-lg px-4 bg-white/5">
+          <AccordionTrigger className="text-xs uppercase tracking-[0.2em] font-bold hover:no-underline">Mumbai Coverage Areas</AccordionTrigger>
+          <AccordionContent className="space-y-4 pt-4 pb-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="space-y-2 p-3 bg-black/5 border border-ink-green/10 rounded-none">
+                <h4 className="text-[10px] uppercase tracking-widest font-bold text-gold">Western Corridor</h4>
+                <Label className="text-[9px] uppercase tracking-widest opacity-50">Title</Label>
+                <Input value={localContent.regionWesternTitle || ''} onChange={(e) => handleChange('regionWesternTitle', e.target.value)} className="bg-background/50 border-ink-green/10" />
+                <Label className="text-[9px] uppercase tracking-widest opacity-50">Subtitle Coverage</Label>
+                <Input value={localContent.regionWesternText || ''} onChange={(e) => handleChange('regionWesternText', e.target.value)} className="bg-background/50 border-ink-green/10" />
+              </div>
+
+              <div className="space-y-2 p-3 bg-black/5 border border-ink-green/10 rounded-none">
+                <h4 className="text-[10px] uppercase tracking-widest font-bold text-gold">Central corridor</h4>
+                <Label className="text-[9px] uppercase tracking-widest opacity-50">Title</Label>
+                <Input value={localContent.regionCentralTitle || ''} onChange={(e) => handleChange('regionCentralTitle', e.target.value)} className="bg-background/50 border-ink-green/10" />
+                <Label className="text-[9px] uppercase tracking-widest opacity-50">Subtitle Coverage</Label>
+                <Input value={localContent.regionCentralText || ''} onChange={(e) => handleChange('regionCentralText', e.target.value)} className="bg-background/50 border-ink-green/10" />
+              </div>
+
+              <div className="space-y-2 p-3 bg-black/5 border border-ink-green/10 rounded-none">
+                <h4 className="text-[10px] uppercase tracking-widest font-bold text-gold">Town Zone</h4>
+                <Label className="text-[9px] uppercase tracking-widest opacity-50">Title</Label>
+                <Input value={localContent.regionTownTitle || ''} onChange={(e) => handleChange('regionTownTitle', e.target.value)} className="bg-background/50 border-ink-green/10" />
+                <Label className="text-[9px] uppercase tracking-widest opacity-50">Subtitle Coverage</Label>
+                <Input value={localContent.regionTownText || ''} onChange={(e) => handleChange('regionTownText', e.target.value)} className="bg-background/50 border-ink-green/10" />
+              </div>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        {/* Section Visibilities (On/Off switches) */}
+        <AccordionItem value="section_visibilities" className="border border-ink-green/10 rounded-lg px-4 bg-white/5">
+          <AccordionTrigger className="text-xs uppercase tracking-[0.2em] font-bold hover:no-underline">Page Section Toggles (On / Off)</AccordionTrigger>
+          <AccordionContent className="space-y-4 pt-4 pb-6">
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center justify-between p-3 bg-black/5 border border-ink-green/5">
+                <div className="flex flex-col">
+                  <span className="text-xs font-semibold">Concierge Section</span>
+                  <span className="text-[9px] text-ink-green/50 uppercase tracking-widest">Main service statement introduction</span>
+                </div>
+                <input 
+                  type="checkbox" 
+                  checked={localContent.showConciergeSection !== false}
+                  onChange={(e) => handleChange('showConciergeSection', e.target.checked)}
+                  className="w-4 h-4 cursor-pointer accent-gold"
+                />
+              </div>
+
+              <div className="flex items-center justify-between p-3 bg-black/5 border border-ink-green/5">
+                <div className="flex flex-col">
+                  <span className="text-xs font-semibold">White-Glove Ceremony Pillars</span>
+                  <span className="text-[9px] text-ink-green/50 uppercase tracking-widest">01, 02, and 03 text-only statements</span>
+                </div>
+                <input 
+                  type="checkbox" 
+                  checked={localContent.showWhiteGloveSection !== false}
+                  onChange={(e) => handleChange('showWhiteGloveSection', e.target.checked)}
+                  className="w-4 h-4 cursor-pointer accent-gold"
+                />
+              </div>
+
+              <div className="flex items-center justify-between p-3 bg-black/5 border border-ink-green/5">
+                <div className="flex flex-col">
+                  <span className="text-xs font-semibold">Mumbai Coverage Zones Grid</span>
+                  <span className="text-[9px] text-ink-green/50 uppercase tracking-widest">Western, Central, and Town limits</span>
+                </div>
+                <input 
+                  type="checkbox" 
+                  checked={localContent.showCoverageSection !== false}
+                  onChange={(e) => handleChange('showCoverageSection', e.target.checked)}
+                  className="w-4 h-4 cursor-pointer accent-gold"
+                />
+              </div>
+
+              <div className="flex items-center justify-between p-3 bg-black/5 border border-ink-green/5">
+                <div className="flex flex-col">
+                  <span className="text-xs font-semibold">Commission / Booking Section</span>
+                  <span className="text-[9px] text-ink-green/50 uppercase tracking-widest">Selected highlights & Call-to-action button</span>
+                </div>
+                <input 
+                  type="checkbox" 
+                  checked={localContent.showCommissionSection !== false}
+                  onChange={(e) => handleChange('showCommissionSection', e.target.checked)}
+                  className="w-4 h-4 cursor-pointer accent-gold"
+                />
+              </div>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
       </Accordion>
 
       <div className="pt-6 flex justify-end">

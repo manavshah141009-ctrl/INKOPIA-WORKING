@@ -88,6 +88,23 @@ router.post('/', async (req, res) => {
       appointment_date, booking_time, payment_method
     } = req.body;
 
+    // ── Geographic Pincode Validation ──
+    let pincode = '';
+    if (pickup_address) {
+      // Extract 6-digit pincode from the end of pickup address
+      const match = pickup_address.match(/\b\d{6}\b/);
+      if (match) pincode = match[0].trim();
+    }
+
+    if (!pincode) {
+      return res.status(400).json({ error: 'Validation Error', message: 'A valid 6-digit Mumbai pincode is required for service.' });
+    }
+
+    const serviceable = await db.query('SELECT id FROM serviceable_pincodes WHERE pincode = ?', [pincode]);
+    if (!serviceable || serviceable.length === 0) {
+      return res.status(400).json({ error: 'Out of Service Area', message: 'Sorry, we do not currently service this area.' });
+    }
+
     // ── Price Calculation ──
     const serviceBasePrice = parseFloat(base_amount) || 2500;
     let discountPercent = 0;

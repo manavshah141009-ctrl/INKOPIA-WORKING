@@ -226,6 +226,14 @@ const initDB = async () => {
         );
       `);
 
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS serviceable_pincodes (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            pincode VARCHAR(10) UNIQUE NOT NULL,
+            region VARCHAR(100) NOT NULL
+        );
+      `);
+
       console.log('✅ MySQL Tables Initialized');
     } catch (err) {
       console.error('❌ MySQL Initialization Error:', err.message);

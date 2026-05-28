@@ -81,8 +81,22 @@ export const ClientGrid = () => {
           <CardContent>
             {editingId === client.backendId ? (
               <div className="flex flex-col gap-2 mt-2">
-                <input placeholder="Address" className="text-xs text-ink-green/70 border-b border-ink-green/30 bg-transparent focus:outline-none" value={editForm.address || ''} onChange={e => setEditForm({...editForm, address: e.target.value})} />
-                <input placeholder="Phone" className="text-xs text-ink-green/70 border-b border-ink-green/30 bg-transparent focus:outline-none" value={editForm.phone || ''} onChange={e => setEditForm({...editForm, phone: e.target.value})} />
+                <div className="space-y-1">
+                  <label className="text-[8px] uppercase tracking-widest text-ink-green/50">Address</label>
+                  <input placeholder="Address" className="w-full text-xs text-ink-green/70 border-b border-ink-green/30 bg-transparent focus:outline-none" value={editForm.address || ''} onChange={e => setEditForm({...editForm, address: e.target.value})} />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[8px] uppercase tracking-widest text-ink-green/50">Phone</label>
+                  <input placeholder="Phone" className="w-full text-xs text-ink-green/70 border-b border-ink-green/30 bg-transparent focus:outline-none" value={editForm.phone || ''} onChange={e => setEditForm({...editForm, phone: e.target.value})} />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[8px] uppercase tracking-widest text-ink-green/50">Company</label>
+                  <input placeholder="Company" className="w-full text-xs text-ink-green/70 border-b border-ink-green/30 bg-transparent focus:outline-none" value={editForm.company || ''} onChange={e => setEditForm({...editForm, company: e.target.value})} />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[8px] uppercase tracking-widest text-ink-green/50">Designation</label>
+                  <input placeholder="Designation" className="w-full text-xs text-ink-green/70 border-b border-ink-green/30 bg-transparent focus:outline-none" value={editForm.designation || ''} onChange={e => setEditForm({...editForm, designation: e.target.value})} />
+                </div>
               </div>
             ) : (
               <div className="flex flex-col gap-2 mt-2 text-[10px] uppercase tracking-widest font-bold text-ink-green/70">
@@ -90,13 +104,44 @@ export const ClientGrid = () => {
                   <span className="text-ink-green/40">Instruments</span>
                   <span>{client.pensCount} Registered</span>
                 </div>
-                <div className="flex flex-col gap-1 text-right">
+                <div className="flex justify-between items-center">
+                  <span className="text-ink-green/40">Company</span>
+                  <span className="truncate max-w-[150px]">{client.company || 'N/A'}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-ink-green/40">Designation</span>
+                  <span className="truncate max-w-[150px]">{client.designation || 'N/A'}</span>
+                </div>
+                <div className="flex flex-col gap-1 text-left">
                   <span className="text-ink-green/40">Location</span>
                   <span className="break-words max-w-[200px] leading-relaxed">{client.address || 'N/A'}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-ink-green/40">Phone</span>
                   <span>{client.phone || 'N/A'}</span>
+                </div>
+                
+                {/* User's registered instruments list */}
+                <div className="mt-4 pt-3 border-t border-ink-green/10 space-y-2">
+                  <span className="text-[8px] text-gold tracking-widest uppercase font-bold">Instrument Portfolio</span>
+                  {pens.filter(p => 
+                    (client.email && p.ownerEmail === client.email) || 
+                    (client.name && p.ownerName === client.name)
+                  ).length === 0 ? (
+                    <p className="text-[9px] text-ink-green/40 italic font-medium normal-case">No instruments registered in this vault.</p>
+                  ) : (
+                    <div className="max-h-24 overflow-y-auto space-y-1 pr-1">
+                      {pens.filter(p => 
+                        (client.email && p.ownerEmail === client.email) || 
+                        (client.name && p.ownerName === client.name)
+                      ).map((p, idx) => (
+                        <div key={idx} className="bg-black/5 p-1.5 border border-ink-green/5 text-[9px] font-semibold text-ink-green flex justify-between items-center normal-case">
+                          <span className="truncate max-w-[120px] font-serif">{p.brand} {p.model}</span>
+                          <span className="text-[8px] text-ink-green/60 uppercase font-mono tracking-wider">{p.nib}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             )}

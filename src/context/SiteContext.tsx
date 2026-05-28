@@ -32,6 +32,32 @@ export interface SiteContent {
   firebaseProjectId: string;
   servicePrice: number;
   penScale: number;
+  
+  // Dynamic Website Copy Upgrades
+  discoverSubtitle: string;
+  conciergeSommelierPillar1Title: string;
+  conciergeSommelierPillar1Text: string;
+  conciergeSommelierPillar2Title: string;
+  conciergeSommelierPillar2Text: string;
+  conciergeSommelierPillar3Title: string;
+  conciergeSommelierPillar3Text: string;
+  bookServiceButtonText: string;
+  vaultEntranceButtonText: string;
+  
+  // Service Area Displays
+  regionWesternTitle: string;
+  regionWesternText: string;
+  regionCentralTitle: string;
+  regionCentralText: string;
+  regionTownTitle: string;
+  regionTownText: string;
+
+  // Toggle Visibility Switches
+  showConciergeSection: boolean;
+  showWhiteGloveSection: boolean;
+  showCoverageSection: boolean;
+  showCommissionSection: boolean;
+  showDynamicPages: boolean;
 }
 
 export interface SiteTheme {
@@ -81,6 +107,32 @@ const DEFAULT_CONTENT: SiteContent = {
   firebaseProjectId: "",
   servicePrice: 2500,
   penScale: 1.0,
+  
+  // Dynamic Website Copy Upgrades
+  discoverSubtitle: "We bring the world's finest pen care and ink library directly to your home or office. Zero mess, zero downtime, and endless colour possibilities.",
+  conciergeSommelierPillar1Title: "The Mobile Atelier",
+  conciergeSommelierPillar1Text: "No mailing your precious pens. No dropping them off. Our trained artisans come directly to your residence or workplace at a time that suits you.",
+  conciergeSommelierPillar2Title: "Sacred Preservation",
+  conciergeSommelierPillar2Text: "We treat your instruments with the utmost respect. We meticulously flush, clean, and inspect your pens by hand, strictly avoiding harsh ultrasonic machines.",
+  conciergeSommelierPillar3Title: "The Infinite Palette",
+  conciergeSommelierPillar3Text: "Refill on the spot from our library of 500+ premium inks. Choose your exact colour today, without the commitment of buying the bottle.",
+  bookServiceButtonText: "Book Your Concierge Session",
+  vaultEntranceButtonText: "Enter Your Private Vault",
+  
+  // Service Area Displays
+  regionWesternTitle: "Western",
+  regionWesternText: "Whole corridor",
+  regionCentralTitle: "Central",
+  regionCentralText: "Till Ghatkopar",
+  regionTownTitle: "Town",
+  regionTownText: "Till Colaba",
+
+  // Toggle Visibility Switches
+  showConciergeSection: true,
+  showWhiteGloveSection: true,
+  showCoverageSection: true,
+  showCommissionSection: true,
+  showDynamicPages: true,
 };
 
 const DEFAULT_THEME: SiteTheme = {

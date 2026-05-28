@@ -72,7 +72,7 @@ model orders {
 }
 
 model PenRegistration {
-  id               String   @id @default(uuid())
+  id               String    @id @default(uuid())
   brand            String
   model            String
   nib              String
@@ -80,42 +80,36 @@ model PenRegistration {
   imageUrl         String?
   ownerName        String
   ownerEmail       String
-  
-  // Post-Ritual Retention Fields
-  isNewPen         Boolean  @default(false)
+  isNewPen         Boolean   @default(false)
   lastRefilledDate DateTime?
   lastServiceDate  DateTime?
-  
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   @@index([ownerEmail])
 }
 
 model Booking {
-  id               String   @id @default(uuid())
-  orderId          String   @unique
+  id               String    @id @default(uuid())
+  orderId          String    @unique
   customerName     String
   customerEmail    String
   customerPhone    String?
-  services         String   @db.Text
-  pickupAddress    String   @db.Text
-  notes            String?  @db.Text
-  status           String   @default("pending")
+  services         String    @db.Text
+  pickupAddress    String    @db.Text
+  notes            String?   @db.Text
+  status           String    @default("pending")
   conciergeName    String?
   conciergePhone   String?
-  amount           Decimal  @default(2500.00) @db.Decimal(10, 2)
+  amount           Decimal   @default(2500.00) @db.Decimal(10, 2)
   appointmentDate  String?
   bookingTime      String?
   paymentMethod    String?
-  
-  // Post-Ritual Retention Fields
-  isNewPen         Boolean  @default(false)
+  isNewPen         Boolean   @default(false)
   lastRefilledDate DateTime?
   lastServiceDate  DateTime?
-  
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   @@index([customerEmail])
 }
@@ -194,3 +188,10 @@ enum orders_status {
   in_progress
   completed
 }
+
+model ServiceablePincode {
+  id      Int    @id @default(autoincrement())
+  pincode String @unique @db.VarChar(10)
+  region  String @db.VarChar(100)
+}
+

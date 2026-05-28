@@ -100,182 +100,213 @@ const Index = () => {
         </section>
 
         {/* The Concierge */}
-        <section className="min-h-screen flex items-center px-8 md:px-12 lg:px-20 py-20 md:py-0">
-          <div
-            ref={concierge.ref}
-            className={`max-w-md lg:max-w-lg section-fade ${concierge.isVisible ? 'visible' : ''}`}
-          >
-            <div className={`gold-divider mb-6 ${concierge.isVisible ? 'visible' : ''}`} />
-            <p className="text-[10px] tracking-[0.5em] uppercase text-accent font-sans mb-3">
-              {content.conciergeTitle}
-            </p>
-            <h2 className="text-3xl md:text-5xl lg:text-7xl font-serif font-bold text-foreground leading-[1.1] md:leading-[0.95] mb-6">
-              {(content.conciergeHeading || "").split('.').map((part, i) => (
-                <span key={i} className="block md:inline">{part}{i === 0 && part ? '.' : ''}{i === 0 && <br className="hidden md:block" />}</span>
-              ))}
-            </h2>
-            <p className="text-sm md:text-base text-foreground/70 leading-relaxed font-sans font-light max-w-sm">
-              {content.conciergeText}
-            </p>
-          </div>
-          
-          {/* Decorative background logo for Concierge */}
-          {!isMobile && (
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 opacity-[0.03] rotate-12 pointer-events-none">
-              <img src="/logo.png" alt="" className="w-[800px] grayscale" />
+        {(content.showConciergeSection !== false) && (
+          <section className="min-h-screen flex items-center px-8 md:px-12 lg:px-20 py-20 md:py-0">
+            <div
+              ref={concierge.ref}
+              className={`max-w-md lg:max-w-lg section-fade ${concierge.isVisible ? 'visible' : ''}`}
+            >
+              <div className={`gold-divider mb-6 ${concierge.isVisible ? 'visible' : ''}`} />
+              <p className="text-[10px] tracking-[0.5em] uppercase text-accent font-sans mb-3">
+                {content.conciergeTitle}
+              </p>
+              <h2 className="text-3xl md:text-5xl lg:text-7xl font-serif font-bold text-foreground leading-[1.1] md:leading-[0.95] mb-6">
+                {(content.conciergeHeading || "").split('.').map((part, i) => (
+                  <span key={i} className="block md:inline">{part}{i === 0 && part ? '.' : ''}{i === 0 && <br className="hidden md:block" />}</span>
+                ))}
+              </h2>
+              <p className="text-sm md:text-base text-foreground/70 leading-relaxed font-sans font-light max-w-sm">
+                {content.conciergeText}
+              </p>
             </div>
-          )}
-        </section>
+            
+            {/* Decorative background logo for Concierge */}
+            {!isMobile && (
+              <div className="absolute right-0 top-1/2 -translate-y-1/2 opacity-[0.03] rotate-12 pointer-events-none">
+                <img src="/logo.png" alt="" className="w-[800px] grayscale" />
+              </div>
+            )}
+          </section>
+        )}
 
         {/* The White-Glove Concierge Service — Text Only Statement Layout */}
-        <section className="relative py-24 md:py-40 overflow-hidden">
-          {/* Subtle frosted backdrop so the 3D pen shows through clearly */}
-          <div className="absolute inset-0 backdrop-blur-[2px] bg-white/10 pointer-events-none" />
+        {(content.showWhiteGloveSection !== false) && (
+          <section className="relative py-24 md:py-40 overflow-hidden">
+            {/* Subtle frosted backdrop so the 3D pen shows through clearly */}
+            <div className="absolute inset-0 backdrop-blur-[2px] bg-white/10 pointer-events-none" />
 
-          <div ref={ritual.ref} className={`relative z-10 section-fade max-w-6xl mx-auto px-6 ${ritual.isVisible ? 'visible' : ''}`}>
-            
-            {/* Main Statement Header */}
-            <div className="flex flex-col items-center text-center mb-40 md:mb-64">
-              <div className="gold-divider mb-16" style={{ width: ritual.isVisible ? '160px' : '0' }} />
-              <h2 className="text-4xl md:text-8xl font-serif text-accent mb-20 italic leading-[1.1] max-w-5xl">
-                "Focus entirely on the writing. <br className="hidden md:block" /> Let us handle the mess."
-              </h2>
-              <div className="flex items-center gap-6 md:gap-10 mb-10">
-                <div className="w-10 md:w-16 h-[1px] bg-gold/40" />
-                <p className="text-[12px] md:text-[20px] tracking-[0.8em] md:tracking-[1.2em] uppercase text-gold font-sans font-extrabold whitespace-nowrap">
-                  The White-Glove Concierge
+            <div ref={ritual.ref} className={`relative z-10 section-fade max-w-6xl mx-auto px-6 ${ritual.isVisible ? 'visible' : ''}`}>
+              
+              {/* Main Statement Header */}
+              <div className="flex flex-col items-center text-center mb-40 md:mb-64">
+                <div className="gold-divider mb-16" style={{ width: ritual.isVisible ? '160px' : '0' }} />
+                <h2 className="text-4xl md:text-8xl font-serif text-accent mb-20 italic leading-[1.1] max-w-5xl">
+                  "Focus entirely on the writing. <br className="hidden md:block" /> Let us handle the mess."
+                </h2>
+                <div className="flex items-center gap-6 md:gap-10 mb-10">
+                  <div className="w-10 md:w-16 h-[1px] bg-gold/40" />
+                  <p className="text-[12px] md:text-[20px] tracking-[0.8em] md:tracking-[1.2em] uppercase text-gold font-sans font-extrabold whitespace-nowrap">
+                    The White-Glove Concierge
+                  </p>
+                  <div className="w-10 md:w-16 h-[1px] bg-gold/40" />
+                </div>
+                <p className="text-lg md:text-3xl text-foreground/50 font-sans max-w-4xl leading-relaxed italic font-medium">
+                  We bring the world's finest pen care and ink library directly to your home or office. 
+                  Zero mess, zero downtime, and endless colour possibilities.
                 </p>
-                <div className="w-10 md:w-16 h-[1px] bg-gold/40" />
               </div>
-              <p className="text-lg md:text-3xl text-foreground/50 font-sans max-w-4xl leading-relaxed italic font-medium">
-                We bring the world's finest pen care and ink library directly to your home or office. 
-                Zero mess, zero downtime, and endless colour possibilities.
-              </p>
-            </div>
 
-            {/* Pillar 1 — The Mobile Atelier */}
-            <div className="mb-40 md:mb-64 group">
-              <div className="flex flex-col md:flex-row items-baseline gap-6 md:gap-20 mb-10 md:mb-16">
-                <span className="text-6xl md:text-9xl font-serif text-gold/25 font-light italic leading-none">01</span>
-                <h3 className="text-4xl md:text-7xl font-serif text-accent uppercase tracking-tight leading-tight">
-                  The Mobile <br className="hidden md:block" /> Atelier
-                </h3>
+              {/* Pillar 1 — The Mobile Atelier */}
+              <div className="mb-40 md:mb-64 group">
+                <div className="flex flex-col md:flex-row items-baseline gap-6 md:gap-20 mb-10 md:mb-16">
+                  <span className="text-6xl md:text-9xl font-serif text-gold/25 font-light italic leading-none">01</span>
+                  <h3 className="text-4xl md:text-7xl font-serif text-accent uppercase tracking-tight leading-tight">
+                    {content.conciergeSommelierPillar1Title || "The Mobile Atelier"}
+                  </h3>
+                </div>
+                <div className="md:ml-40 max-w-4xl border-l-2 border-gold/20 pl-8 md:pl-20 py-6">
+                  <p className="text-xl md:text-4xl text-foreground/80 font-sans leading-relaxed font-medium italic">
+                    {content.conciergeSommelierPillar1Text || "No mailing your precious pens. No dropping them off. Our trained artisans come directly to your residence or workplace at a time that suits you."}
+                  </p>
+                  <div className="mt-12 flex items-center gap-6">
+                    <span className="text-[12px] md:text-[15px] uppercase tracking-[0.6em] text-gold font-bold">Convenience redefined</span>
+                    <div className="flex-1 h-[1px] bg-gradient-to-r from-gold/40 to-transparent" />
+                  </div>
+                </div>
               </div>
-              <div className="md:ml-40 max-w-4xl border-l-2 border-gold/20 pl-8 md:pl-20 py-6">
-                <p className="text-xl md:text-4xl text-foreground/80 font-sans leading-relaxed font-medium italic">
-                  No mailing your precious pens. No dropping them off. Our trained artisans come directly to your residence or workplace at a time that suits you.
-                </p>
-                <div className="mt-12 flex items-center gap-6">
-                  <span className="text-[12px] md:text-[15px] uppercase tracking-[0.6em] text-gold font-bold">Convenience redefined</span>
-                  <div className="flex-1 h-[1px] bg-gradient-to-r from-gold/40 to-transparent" />
+
+              {/* Star Motif Divider */}
+              <div className="flex justify-center mb-32 md:mb-56">
+                 <div className="relative flex items-center justify-center w-12 h-12">
+                  <div className="absolute inset-0 bg-gold/20 rounded-full blur-xl animate-pulse" />
+                  <svg viewBox="0 0 24 24" className="w-6 h-6 text-gold/60 relative z-10" fill="currentColor">
+                    <polygon points="12,0 13.5,9 24,12 13.5,15 12,24 10.5,15 0,12 10.5,9" />
+                  </svg>
+                </div>
+              </div>
+
+              {/* Pillar 2 — Sacred Preservation */}
+              <div className="mb-40 md:mb-64 group text-right flex flex-col items-end">
+                <div className="flex flex-col md:flex-row-reverse items-baseline gap-6 md:gap-20 mb-10 md:mb-16">
+                  <span className="text-6xl md:text-9xl font-serif text-gold/25 font-light italic leading-none">02</span>
+                  <h3 className="text-4xl md:text-7xl font-serif text-accent uppercase tracking-tight leading-tight">
+                    {content.conciergeSommelierPillar2Title || "Sacred Preservation"}
+                  </h3>
+                </div>
+                <div className="md:mr-40 max-w-4xl border-r-2 border-gold/20 pr-8 md:pr-20 py-6">
+                  <p className="text-xl md:text-4xl text-foreground/80 font-sans leading-relaxed font-medium italic">
+                    {content.conciergeSommelierPillar2Text || "We treat your instruments with the utmost respect. We meticulously flush, clean, and inspect your pens by hand, strictly avoiding harsh ultrasonic machines."}
+                  </p>
+                  <div className="mt-12 flex items-center gap-6 flex-row-reverse">
+                    <span className="text-[12px] md:text-[15px] uppercase tracking-[0.6em] text-gold font-bold">Artisanal hand-care</span>
+                    <div className="flex-1 h-[1px] bg-gradient-to-l from-gold/40 to-transparent" />
+                  </div>
+                </div>
+              </div>
+
+               {/* Star Motif Divider */}
+               <div className="flex justify-center mb-40 md:mb-64">
+                 <div className="relative flex items-center justify-center w-16 h-16">
+                  <div className="absolute inset-0 bg-gold/25 rounded-full blur-2xl animate-pulse" />
+                  <svg viewBox="0 0 24 24" className="w-8 h-8 text-gold/70 relative z-10" fill="currentColor">
+                    <polygon points="12,0 13.5,9 24,12 13.5,15 12,24 10.5,15 0,12 10.5,9" />
+                  </svg>
+                </div>
+              </div>
+
+              {/* Pillar 3 — The Infinite Palette */}
+              <div className="group mb-20">
+                <div className="flex flex-col md:flex-row items-baseline gap-6 md:gap-20 mb-10 md:mb-16">
+                  <span className="text-6xl md:text-9xl font-serif text-gold/25 font-light italic leading-none">03</span>
+                  <h3 className="text-4xl md:text-7xl font-serif text-accent uppercase tracking-tight leading-tight">
+                    {content.conciergeSommelierPillar3Title || "The Infinite Palette"}
+                  </h3>
+                </div>
+                <div className="md:ml-40 max-w-4xl border-l-2 border-gold/20 pl-8 md:pl-20 py-6">
+                  <p className="text-xl md:text-4xl text-foreground/80 font-sans leading-relaxed font-medium italic">
+                    {content.conciergeSommelierPillar3Text || "Refill on the spot from our library of 500+ premium inks. Choose your exact colour today, without the commitment of buying the bottle."}
+                  </p>
+                  <div className="mt-12 flex items-center gap-6">
+                    <span className="text-[12px] md:text-[15px] uppercase tracking-[0.6em] text-gold font-bold">Endless possibilities</span>
+                    <div className="flex-1 h-[1px] bg-gradient-to-r from-gold/40 to-transparent" />
+                  </div>
                 </div>
               </div>
             </div>
+          </section>
+        )}
 
-            {/* Star Motif Divider */}
-            <div className="flex justify-center mb-32 md:mb-56">
-               <div className="relative flex items-center justify-center w-12 h-12">
-                <div className="absolute inset-0 bg-gold/20 rounded-full blur-xl animate-pulse" />
-                <svg viewBox="0 0 24 24" className="w-6 h-6 text-gold/60 relative z-10" fill="currentColor">
-                  <polygon points="12,0 13.5,9 24,12 13.5,15 12,24 10.5,15 0,12 10.5,9" />
-                </svg>
-              </div>
-            </div>
-
-            {/* Pillar 2 — Sacred Preservation */}
-            <div className="mb-40 md:mb-64 group text-right flex flex-col items-end">
-              <div className="flex flex-col md:flex-row-reverse items-baseline gap-6 md:gap-20 mb-10 md:mb-16">
-                <span className="text-6xl md:text-9xl font-serif text-gold/25 font-light italic leading-none">02</span>
-                <h3 className="text-4xl md:text-7xl font-serif text-accent uppercase tracking-tight leading-tight">
-                  Sacred <br className="hidden md:block" /> Preservation
-                </h3>
-              </div>
-              <div className="md:mr-40 max-w-4xl border-r-2 border-gold/20 pr-8 md:pr-20 py-6">
-                <p className="text-xl md:text-4xl text-foreground/80 font-sans leading-relaxed font-medium italic">
-                  We treat your instruments with the utmost respect. We meticulously flush, clean, and inspect your pens by hand, strictly avoiding harsh ultrasonic machines.
-                </p>
-                <div className="mt-12 flex items-center gap-6 flex-row-reverse">
-                  <span className="text-[12px] md:text-[15px] uppercase tracking-[0.6em] text-gold font-bold">Artisanal hand-care</span>
-                  <div className="flex-1 h-[1px] bg-gradient-to-l from-gold/40 to-transparent" />
+        {/* Service Coverage Area Display - Clean Mobile First Layout */}
+        {(content.showCoverageSection !== false) && (
+          <section className="py-20 bg-black/5 border-y border-gold/10">
+            <div className="max-w-6xl mx-auto px-6 text-center">
+              <p className="text-[10px] tracking-[0.5em] uppercase text-accent font-sans mb-3">Service Coverage</p>
+              <h2 className="text-3xl md:text-5xl font-serif font-bold text-ink-green mb-12">Our Mumbai Coverage Zones</h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="border border-gold/10 p-6 bg-white/20 backdrop-blur-sm shadow-sm flex flex-col items-center">
+                  <span className="text-xs uppercase tracking-widest text-gold mb-2 font-bold">{content.regionWesternTitle || "Western"}</span>
+                  <p className="text-lg font-serif font-semibold text-ink-green">{content.regionWesternText || "Whole corridor"}</p>
+                </div>
+                <div className="border border-gold/10 p-6 bg-white/20 backdrop-blur-sm shadow-sm flex flex-col items-center">
+                  <span className="text-xs uppercase tracking-widest text-gold mb-2 font-bold">{content.regionCentralTitle || "Central"}</span>
+                  <p className="text-lg font-serif font-semibold text-ink-green">{content.regionCentralText || "Till Ghatkopar"}</p>
+                </div>
+                <div className="border border-gold/10 p-6 bg-white/20 backdrop-blur-sm shadow-sm flex flex-col items-center">
+                  <span className="text-xs uppercase tracking-widest text-gold mb-2 font-bold">{content.regionTownTitle || "Town"}</span>
+                  <p className="text-lg font-serif font-semibold text-ink-green">{content.regionTownText || "Till Colaba"}</p>
                 </div>
               </div>
             </div>
-
-             {/* Star Motif Divider */}
-             <div className="flex justify-center mb-40 md:mb-64">
-               <div className="relative flex items-center justify-center w-16 h-16">
-                <div className="absolute inset-0 bg-gold/25 rounded-full blur-2xl animate-pulse" />
-                <svg viewBox="0 0 24 24" className="w-8 h-8 text-gold/70 relative z-10" fill="currentColor">
-                  <polygon points="12,0 13.5,9 24,12 13.5,15 12,24 10.5,15 0,12 10.5,9" />
-                </svg>
-              </div>
-            </div>
-
-            {/* Pillar 3 — The Infinite Palette */}
-            <div className="group mb-20">
-              <div className="flex flex-col md:flex-row items-baseline gap-6 md:gap-20 mb-10 md:mb-16">
-                <span className="text-6xl md:text-9xl font-serif text-gold/25 font-light italic leading-none">03</span>
-                <h3 className="text-4xl md:text-7xl font-serif text-accent uppercase tracking-tight leading-tight">
-                  The Infinite <br className="hidden md:block" /> Palette
-                </h3>
-              </div>
-              <div className="md:ml-40 max-w-4xl border-l-2 border-gold/20 pl-8 md:pl-20 py-6">
-                <p className="text-xl md:text-4xl text-foreground/80 font-sans leading-relaxed font-medium italic">
-                  Refill on the spot from our library of 500+ premium inks. Choose your exact colour today, without the commitment of buying the bottle.
-                </p>
-                <div className="mt-12 flex items-center gap-6">
-                  <span className="text-[12px] md:text-[15px] uppercase tracking-[0.6em] text-gold font-bold">Endless possibilities</span>
-                  <div className="flex-1 h-[1px] bg-gradient-to-r from-gold/40 to-transparent" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-
+          </section>
+        )}
 
         {/* Commission */}
-        <section className="min-h-screen flex flex-col items-center justify-center px-6">
-          <div
-            ref={commission.ref}
-            className={`flex flex-col items-center section-fade ${commission.isVisible ? 'visible' : ''}`}
-          >
-            {/* Catch point line restored and shifted lower */}
-            <div className="flex flex-col items-center mb-16">
-              <p className="text-2xl md:text-4xl text-accent font-serif italic text-center leading-tight">
-                Ready for a fresh start <br className="hidden md:block" /> and a fresh colour?
-              </p>
-              <div className="gold-divider mt-8 w-24 mx-auto" />
-            </div>
-
-
-            <p className="text-[10px] tracking-[0.5em] uppercase text-accent font-sans mb-4">
-              {content.commissionTitle}
-            </p>
-            <h2 className="text-3xl md:text-5xl lg:text-7xl font-serif font-bold text-foreground text-center leading-[1.1] md:leading-[0.95] mb-6">
-              {(content.commissionHeading || "").split('.').map((part, i) => (
-                <span key={i} className="block md:inline">{part}{i === 0 && part ? '.' : ''}{i === 0 && <br className="hidden md:block" />}</span>
-              ))}
-            </h2>
-            <p className="max-w-sm text-center text-sm text-foreground/70 leading-relaxed mb-8 font-sans font-light">
-              {content.commissionText}
-            </p>
-            <div className="mb-12 text-center border border-gold/20 p-8 glass-panel max-w-md relative overflow-hidden group">
-              <div className="absolute inset-0 bg-gold/5 -translate-x-full group-hover:translate-x-0 transition-transform duration-1000" />
-              <p className="text-[10px] uppercase tracking-widest text-gold mb-2 font-bold relative z-10">Current Highlight</p>
-              <h4 className="font-serif text-2xl text-primary mb-2 relative z-10">{content.commissionPenBrand}</h4>
-              <p className="italic text-muted-foreground font-serif text-lg relative z-10">{content.commissionPenName}</p>
-            </div>
-            <button
-              onClick={() => {
-                navigate(isLoggedIn ? '/dashboard' : '/signup');
-              }}
-              className="btn-inkopia px-16 py-5 text-[10px] font-sans tracking-[0.4em] uppercase font-bold relative z-10"
+        {(content.showCommissionSection !== false) && (
+          <section className="min-h-screen flex flex-col items-center justify-center px-6">
+            <div
+              ref={commission.ref}
+              className={`flex flex-col items-center section-fade ${commission.isVisible ? 'visible' : ''}`}
             >
-              {isLoggedIn ? "Enter Your Private Vault" : "Book Your Concierge Session"}
-            </button>
-          </div>
-        </section>
+              {/* Catch point line restored and shifted lower */}
+              <div className="flex flex-col items-center mb-16">
+                <p className="text-2xl md:text-4xl text-accent font-serif italic text-center leading-tight">
+                  Ready for a fresh start <br className="hidden md:block" /> and a fresh colour?
+                </p>
+                <div className="gold-divider mt-8 w-24 mx-auto" />
+              </div>
+
+
+              <p className="text-[10px] tracking-[0.5em] uppercase text-accent font-sans mb-4">
+                {content.commissionTitle}
+              </p>
+              <h2 className="text-3xl md:text-5xl lg:text-7xl font-serif font-bold text-foreground text-center leading-[1.1] md:leading-[0.95] mb-6">
+                {(content.commissionHeading || "").split('.').map((part, i) => (
+                  <span key={i} className="block md:inline">{part}{i === 0 && part ? '.' : ''}{i === 0 && <br className="hidden md:block" />}</span>
+                ))}
+              </h2>
+              <p className="max-w-sm text-center text-sm text-foreground/70 leading-relaxed mb-8 font-sans font-light">
+                {content.commissionText}
+              </p>
+              <div className="mb-12 text-center border border-gold/20 p-8 glass-panel max-w-md relative overflow-hidden group">
+                <div className="absolute inset-0 bg-gold/5 -translate-x-full group-hover:translate-x-0 transition-transform duration-1000" />
+                <p className="text-[10px] uppercase tracking-widest text-gold mb-2 font-bold relative z-10">Current Highlight</p>
+                <h4 className="font-serif text-2xl text-primary mb-2 relative z-10">{content.commissionPenBrand}</h4>
+                <p className="italic text-muted-foreground font-serif text-lg relative z-10">{content.commissionPenName}</p>
+              </div>
+              <button
+                onClick={() => {
+                  navigate(isLoggedIn ? '/dashboard' : '/signup');
+                }}
+                className="btn-inkopia px-16 py-5 text-[10px] font-sans tracking-[0.4em] uppercase font-bold relative z-10"
+              >
+                {isLoggedIn 
+                  ? (content.vaultEntranceButtonText || "Enter Your Private Vault") 
+                  : (content.bookServiceButtonText || "Book Your Concierge Session")}
+              </button>
+            </div>
+          </section>
+        )}
       </div>
 
 

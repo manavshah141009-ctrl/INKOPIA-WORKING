@@ -88,8 +88,17 @@ export default function Dashboard() {
     postalCode: '', 
     streetAddress: '', 
     city: '', 
-    paymentMethod: 'cos' 
+    paymentMethod: 'cos',
+    clientPhone: ''
   });
+
+  // Pre-fill phone if available when opening booking dialog
+  React.useEffect(() => {
+    if (isBookingService) {
+      const storedPhone = localStorage.getItem('inkopia_user_phone') || '';
+      setBooking(prev => ({ ...prev, clientPhone: storedPhone }));
+    }
+  }, [isBookingService]);
 
   const handleAddPen = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -126,6 +135,11 @@ export default function Dashboard() {
       return;
     }
 
+    if (!booking.clientPhone.trim() || booking.clientPhone.length < 10) {
+      toast.error('Please enter a valid 10-digit mobile phone number.');
+      return;
+    }
+
     const baseAmount = content.servicePrice || 2500;
     const discountAmount = Math.round((baseAmount * discountPercent) / 100);
     const priceAfterDiscount = baseAmount - discountAmount;
@@ -135,7 +149,7 @@ export default function Dashboard() {
     const orderData = {
       clientName: userName,
       clientEmail: localStorage.getItem('inkopia_user_email') || '',
-      clientPhone: localStorage.getItem('inkopia_user_phone') || 'N/A',
+      clientPhone: booking.clientPhone.trim(),
       location: `${booking.streetAddress}, ${booking.city} - ${booking.postalCode}`,
       date: booking.date,
       bookingTime: booking.time,
@@ -150,20 +164,28 @@ export default function Dashboard() {
 
     try {
       await addOrder(orderData);
+      // Save phone locally for future bookings
+      localStorage.setItem('inkopia_user_phone', booking.clientPhone.trim());
+      
       setIsOrderSuccess({
         ...orderData,
         discount_amount: discountAmount,
         gst_amount: gstAmount
       });
       setIsBookingService(null);
-      setBooking({ date: '', time: '', inkName: '', postalCode: '', streetAddress: '', city: '', paymentMethod: 'cos' });
+      setBooking({ date: '', time: '', inkName: '', postalCode: '', streetAddress: '', city: '', paymentMethod: 'cos', clientPhone: '' });
       setVoucherCode('');
       setAppliedVoucher('');
       setDiscountPercent(0);
       setVoucherError('');
       toast.success('Your Concierge commission has been dispatched.');
-    } catch (err) {
-      toast.error('Failed to place order. Please try again.');
+    } catch (err: any) {
+      console.error(err);
+      if (err.response && err.response.data && err.response.data.message) {
+        toast.error(err.response.data.message);
+      } else {
+        toast.error('Failed to place order. Please try again.');
+      }
     }
   };
 
@@ -421,6 +443,10 @@ export default function Dashboard() {
                     <div>
                       <label className="block text-[9px] font-bold uppercase tracking-widest text-ink-green/70 mb-1">Street Address / Estate *</label>
                       <input required type="text" value={booking.streetAddress} onChange={e => setBooking({...booking, streetAddress: e.target.value})} placeholder="Building name, Floor, Street" className="w-full bg-transparent border-b border-ink-green/30 pb-1 text-ink-green focus:outline-none focus:border-ink-green text-sm placeholder:text-ink-green/40" />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] font-bold uppercase tracking-widest text-ink-green/70 mb-1">Mobile Phone Number *</label>
+                      <input required type="tel" maxLength={10} value={booking.clientPhone} onChange={e => setBooking({...booking, clientPhone: e.target.value.replace(/\D/g, '')})} placeholder="10-digit mobile number" className="w-full bg-transparent border-b border-ink-green/30 pb-1 text-ink-green focus:outline-none focus:border-ink-green text-sm placeholder:text-ink-green/40" />
                     </div>
                   </div>
 
