@@ -59,7 +59,7 @@ const PEN_DATABASE: Record<string, Record<string, string[]>> = {
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { addOrder, orders: backendOrders, pens, addPen, updatePen, updateOrderStatus, inks, notifications } = useOrders();
+  const { addOrder, orders: backendOrders, pens, addPen, updatePen, updateOrderStatus, inks, notifications, brandPricings } = useOrders();
   const { content } = useSite();
   const isMobile = useIsMobile();
   const userName = localStorage.getItem('inkopia_user_name') || 'Collector';
@@ -83,14 +83,7 @@ export default function Dashboard() {
   const [isBookingService, setIsBookingService] = useState<string | null>(null);
   const [isOrderSuccess, setIsOrderSuccess] = useState<any | null>(null);
 
-  // Voucher and pricing state
-  const [voucherCode, setVoucherCode] = useState('');
-  const [appliedVoucher, setAppliedVoucher] = useState('');
-  const [discountPercent, setDiscountPercent] = useState(0);
-  const [voucherError, setVoucherError] = useState('');
-  const [isValidatingVoucher, setIsValidatingVoucher] = useState(false);
-
-  // New pen form state
+  // Pricing state
   const [newPen, setNewPen] = useState<{brand: string, model: string, nib: string, mechanism: string, imageUrl?: string}>({ brand: '', model: '', nib: '', mechanism: 'piston' });
 
   // Booking form state
@@ -101,9 +94,11 @@ export default function Dashboard() {
     postalCode: '', 
     streetAddress: '', 
     city: '', 
-    paymentMethod: 'cos',
+    state: '',
     clientPhone: ''
   });
+  const [customInkBrand, setCustomInkBrand] = useState('');
+  const [inkColor, setInkColor] = useState('');
 
   // Pre-fill phone if available when opening booking dialog
   useEffect(() => {
@@ -112,6 +107,14 @@ export default function Dashboard() {
       setBooking(prev => ({ ...prev, clientPhone: storedPhone }));
     }
   }, [isBookingService]);
+
+  // Dynamic pricing calculations for the currently selected INK in the booking drawer
+  const activePricingTier = brandPricings?.find((p: any) => p.brand.toLowerCase() === booking.inkName.toLowerCase());
+  const isCustomBrand = booking.inkName === 'other';
+  
+  const activeBaseAmount = activePricingTier ? Number(activePricingTier.price) : (content.servicePrice || 2500);
+  const activeGstAmount = Math.round(activeBaseAmount * 0.18 * 100) / 100;
+  const activeTotalAmount = (isCustomBrand || !booking.inkName) ? 0 : Math.round((activeBaseAmount + activeGstAmount) * 100) / 100;
 
   const handleAddPen = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -153,26 +156,19 @@ export default function Dashboard() {
       return;
     }
 
-    const baseAmount = content.servicePrice || 2500;
-    const discountAmount = Math.round((baseAmount * discountPercent) / 100);
-    const priceAfterDiscount = baseAmount - discountAmount;
-    const gstAmount = Math.round(priceAfterDiscount * 0.18 * 100) / 100;
-    const totalAmount = Math.round((priceAfterDiscount + gstAmount) * 100) / 100;
-
     const orderData = {
       clientName: userName,
       clientEmail: localStorage.getItem('inkopia_user_email') || '',
       clientPhone: booking.clientPhone.trim(),
-      location: `${booking.streetAddress}, ${booking.city} - ${booking.postalCode}`,
+      location: `${booking.streetAddress}, ${booking.city}, ${booking.state} - ${booking.postalCode}`,
       date: booking.date,
       bookingTime: booking.time,
       service: 'Concierge Cleaning & Refilling Ritual',
       instrument: pen ? `${pen.brand} ${pen.model}` : 'Fountain Pen',
-      ink: booking.inkName,
-      paymentMethod: booking.paymentMethod === 'cos' ? 'Cash on Service' : 'UPI',
-      amount: totalAmount,
-      base_amount: baseAmount,
-      voucher_code: appliedVoucher || undefined
+      ink: `${isCustomBrand ? customInkBrand : booking.inkName} - ${inkColor}`,
+      paymentMethod: 'Cash on Service',
+      amount: activeTotalAmount,
+      base_amount: (isCustomBrand || !booking.inkName) ? 0 : activeBaseAmount
     };
 
     try {
@@ -182,14 +178,12 @@ export default function Dashboard() {
       
       setIsOrderSuccess({
         ...orderData,
-        discount_amount: discountAmount,
-        gst_amount: gstAmount
+        gst_amount: activeGstAmount
       });
       setIsBookingService(null);
-      setBooking({ date: '', time: '', inkName: '', postalCode: '', streetAddress: '', city: '', paymentMethod: 'cos', clientPhone: '' });
-      setVoucherCode('');
-      setAppliedVoucher('');
-      setDiscountPercent(0);
+      setBooking({ date: '', time: '', inkName: '', postalCode: '', streetAddress: '', city: '', state: '', clientPhone: '' });
+      setCustomInkBrand('');
+      setInkColor('');
       setVoucherError('');
       toast.success('Your Concierge commission has been dispatched.');
     } catch (err: any) {
@@ -481,6 +475,14 @@ export default function Dashboard() {
                   <p className="font-serif font-bold text-ink-green">{pens.find(p => p.id === isBookingService)?.brand} {pens.find(p => p.id === isBookingService)?.model}</p>
                 </div>
 
+                {content.acceptingOrders === false ? (
+                  <div className="text-center space-y-4 p-6 border border-ink-green/20 bg-ink-green/5 mb-8">
+                    <h3 className="text-xl font-serif text-ink-green">Currently Unavailable</h3>
+                    <p className="text-sm font-sans text-ink-green/80">
+                      We are temporarily not accepting new commission requests at this time. Please check back later.
+                    </p>
+                  </div>
+                ) : (
                 <form onSubmit={handleBookService} className="space-y-6">
                   <div className="flex gap-4">
                     <div className="flex-1">
@@ -493,19 +495,25 @@ export default function Dashboard() {
                     </div>
                   </div>
                   <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-[9px] font-bold uppercase tracking-widest text-ink-green/70 mb-1">Postal Code *</label>
-                        <input required type="text" maxLength={6} placeholder="400001" value={booking.postalCode} onChange={e => setBooking({...booking, postalCode: e.target.value.replace(/\D/g, '')})} className="w-full bg-transparent border-b border-ink-green/30 pb-1 text-ink-green focus:outline-none focus:border-ink-green text-sm placeholder:text-ink-green/40" />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="md:col-span-2">
+                        <label className="block text-[9px] font-bold uppercase tracking-widest text-ink-green/70 mb-1">Street Address / Estate *</label>
+                        <input required type="text" value={booking.streetAddress} onChange={e => setBooking({...booking, streetAddress: e.target.value})} placeholder="Building name, Floor, Street" className="w-full bg-transparent border-b border-ink-green/30 pb-1 text-ink-green focus:outline-none focus:border-ink-green text-sm placeholder:text-ink-green/40" />
                       </div>
                       <div>
                         <label className="block text-[9px] font-bold uppercase tracking-widest text-ink-green/70 mb-1">City *</label>
                         <input required type="text" placeholder="Mumbai" value={booking.city} onChange={e => setBooking({...booking, city: e.target.value})} className="w-full bg-transparent border-b border-ink-green/30 pb-1 text-ink-green focus:outline-none focus:border-ink-green text-sm placeholder:text-ink-green/40" />
                       </div>
-                    </div>
-                    <div>
-                      <label className="block text-[9px] font-bold uppercase tracking-widest text-ink-green/70 mb-1">Street Address / Estate *</label>
-                      <input required type="text" value={booking.streetAddress} onChange={e => setBooking({...booking, streetAddress: e.target.value})} placeholder="Building name, Floor, Street" className="w-full bg-transparent border-b border-ink-green/30 pb-1 text-ink-green focus:outline-none focus:border-ink-green text-sm placeholder:text-ink-green/40" />
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-[9px] font-bold uppercase tracking-widest text-ink-green/70 mb-1">State *</label>
+                          <input required type="text" placeholder="MH" value={booking.state} onChange={e => setBooking({...booking, state: e.target.value})} className="w-full bg-transparent border-b border-ink-green/30 pb-1 text-ink-green focus:outline-none focus:border-ink-green text-sm placeholder:text-ink-green/40" />
+                        </div>
+                        <div>
+                          <label className="block text-[9px] font-bold uppercase tracking-widest text-ink-green/70 mb-1">Postal Code *</label>
+                          <input required type="text" maxLength={6} placeholder="400001" value={booking.postalCode} onChange={e => setBooking({...booking, postalCode: e.target.value.replace(/\D/g, '')})} className="w-full bg-transparent border-b border-ink-green/30 pb-1 text-ink-green focus:outline-none focus:border-ink-green text-sm placeholder:text-ink-green/40" />
+                        </div>
+                      </div>
                     </div>
                     <div>
                       <label className="block text-[9px] font-bold uppercase tracking-widest text-ink-green/70 mb-1">Mobile Phone Number *</label>
@@ -513,109 +521,84 @@ export default function Dashboard() {
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-[9px] font-bold uppercase tracking-widest text-ink-green/70 mb-1">Select Master Ink *</label>
-                    <input required type="text" value={booking.inkName} onChange={e => setBooking({...booking, inkName: e.target.value})} placeholder="e.g. Royal Blue" className="w-full bg-transparent border-b border-ink-green/30 pb-1 text-ink-green focus:outline-none focus:border-ink-green text-sm placeholder:text-ink-green/40" />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[9px] font-bold uppercase tracking-widest text-ink-green/70 mb-1">Select Master Ink Brand *</label>
+                      <select
+                        required
+                        value={booking.inkName}
+                        onChange={e => setBooking({...booking, inkName: e.target.value})}
+                        className="w-full bg-transparent border-b border-ink-green/30 pb-1 text-ink-green focus:outline-none focus:border-ink-green text-sm appearance-none cursor-pointer"
+                      >
+                        <option value="" className="bg-[#D5C8AD] text-ink-green">Select an Ink Brand...</option>
+                        {brandPricings?.map((pricing: any) => (
+                          <option key={pricing.id} value={pricing.brand} className="bg-[#D5C8AD] text-ink-green">
+                            {pricing.brand} (₹{Number(pricing.price).toLocaleString()})
+                          </option>
+                        ))}
+                        <option value="other" className="bg-[#D5C8AD] text-ink-green italic">Other / My Brand is Not Listed</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-[9px] font-bold uppercase tracking-widest text-ink-green/70 mb-1">Specific Ink Name / Color *</label>
+                      <input 
+                        required 
+                        type="text" 
+                        value={inkColor} 
+                        onChange={e => setInkColor(e.target.value)} 
+                        placeholder="e.g. Kon-Peki, Royal Blue" 
+                        className="w-full bg-transparent border-b border-ink-green/30 pb-1 text-ink-green focus:outline-none focus:border-ink-green text-sm placeholder:text-ink-green/40" 
+                      />
+                    </div>
                   </div>
+
+                  {isCustomBrand && (
+                    <div className="animate-in fade-in slide-in-from-top-2">
+                      <label className="block text-[9px] font-bold uppercase tracking-widest text-ink-green/70 mb-1">Custom Ink Brand *</label>
+                      <input 
+                        required 
+                        type="text" 
+                        value={customInkBrand} 
+                        onChange={e => setCustomInkBrand(e.target.value)} 
+                        placeholder="e.g. Noodler's" 
+                        className="w-full bg-transparent border-b border-ink-green/30 pb-1 text-ink-green focus:outline-none focus:border-ink-green text-sm placeholder:text-ink-green/40" 
+                      />
+                    </div>
+                  )}
 
                   {/* Color selection moved to The Ink Sommelier on the right */}
                   
-                  <div>
-                    <label className="block text-[9px] font-bold uppercase tracking-widest text-ink-green/70 mb-1">Payment Method *</label>
-                    <select
-                      value={booking.paymentMethod}
-                      onChange={e => setBooking({...booking, paymentMethod: e.target.value})}
-                      className="w-full bg-transparent border-b border-ink-green/30 pb-1 text-ink-green focus:outline-none focus:border-ink-green text-sm appearance-none"
-                    >
-                      <option value="cos" className="bg-[#D3C2A3] text-ink-green">Cash on Service</option>
-                      <option value="upi" className="bg-[#D3C2A3] text-ink-green">UPI</option>
-                    </select>
-                  </div>
 
-                  {/* Dynamic Voucher Code Entry */}
-                  <div className="space-y-2 pt-2 border-t border-ink-green/10">
-                    <label className="block text-[9px] font-bold uppercase tracking-widest text-ink-green/70">Voucher Code</label>
-                    <div className="flex gap-3 items-end">
-                      <input
-                        type="text"
-                        placeholder="e.g. INK20"
-                        value={voucherCode}
-                        onChange={e => {
-                          setVoucherCode(e.target.value.toUpperCase());
-                          setVoucherError('');
-                        }}
-                        className="flex-1 bg-transparent border-b border-ink-green/30 pb-1 text-ink-green focus:outline-none focus:border-ink-green text-sm placeholder:text-ink-green/40 uppercase"
-                      />
-                      <button
-                        type="button"
-                        onClick={async () => {
-                          if (!voucherCode.trim()) {
-                            setVoucherError('Please enter a voucher code.');
-                            return;
-                          }
-                          setIsValidatingVoucher(true);
-                          setVoucherError('');
-                          try {
-                            const email = localStorage.getItem('inkopia_user_email') || '';
-                            const { data } = await axios.post('/api/orders/validate-voucher', {
-                              voucher_code: voucherCode,
-                              customer_email: email
-                            });
-                            if (data.valid) {
-                              setDiscountPercent(data.discount_percent);
-                              setAppliedVoucher(data.code);
-                              toast.success(`Voucher ${data.code} applied! ${data.discount_percent}% Discount`);
-                            } else {
-                              setVoucherError(data.error || 'Invalid voucher code.');
-                              setDiscountPercent(0);
-                              setAppliedVoucher('');
-                            }
-                          } catch (err) {
-                            setVoucherError('Error validating voucher.');
-                          } finally {
-                            setIsValidatingVoucher(false);
-                          }
-                        }}
-                        disabled={isValidatingVoucher}
-                        className="px-4 py-2 border border-ink-green text-ink-green font-sans text-[10px] uppercase tracking-widest hover:bg-ink-green hover:text-[#D5C8AD] transition-colors"
-                      >
-                        {isValidatingVoucher ? '...' : 'Apply'}
-                      </button>
-                    </div>
-                    {voucherError && <p className="text-[9px] text-red-500 mt-1">{voucherError}</p>}
-                    {appliedVoucher && (
-                      <p className="text-[9px] text-emerald-700 mt-1 font-semibold">
-                        ✓ Voucher {appliedVoucher} active! Save {discountPercent}% on Service Fee.
+
+                  {isCustomBrand ? (
+                    <div className="p-4 border border-ink-green/30 bg-ink-green/5 text-center space-y-2 mt-8">
+                      <h4 className="text-[10px] uppercase tracking-widest text-ink-green font-bold">Custom Quote Required</h4>
+                      <p className="text-xs text-ink-green/70 font-sans">
+                        Your instrument's brand is not currently tracked in our standardized tiers. Our manager will review your details and contact you with a bespoke pricing quote before confirming the service.
                       </p>
-                    )}
-                  </div>
-
-                  {/* Custom luxury Pricing Summary showing 18% GST */}
-                  <div className="pt-4 border-t border-ink-green/15 space-y-2">
-                    <div className="flex justify-between items-center text-xs">
-                      <span className="text-[9px] uppercase tracking-widest text-ink-green/50">Base Service Fee</span>
-                      <span className="font-mono text-ink-green/80">₹{(content.servicePrice || 2500).toLocaleString()}</span>
                     </div>
-                    {discountPercent > 0 && (
+                  ) : booking.inkName ? (
+                    <div className="pt-4 border-t border-ink-green/15 space-y-2">
                       <div className="flex justify-between items-center text-xs">
-                        <span className="text-[9px] uppercase tracking-widest text-emerald-600 font-bold">Discount ({appliedVoucher} — {discountPercent}%)</span>
-                        <span className="font-mono text-emerald-600 font-bold">-₹{Math.round(((content.servicePrice || 2500) * discountPercent) / 100).toLocaleString()}</span>
+                        <span className="text-[9px] uppercase tracking-widest text-ink-green/50">Base Service Fee</span>
+                        <span className="font-mono text-ink-green/80">₹{activeBaseAmount.toLocaleString()}</span>
                       </div>
-                    )}
-                    <div className="flex justify-between items-center text-xs">
-                      <span className="text-[9px] uppercase tracking-widest text-ink-green/50">GST (18%)</span>
-                      <span className="font-mono text-ink-green/80">₹{Math.round(((content.servicePrice || 2500) - Math.round(((content.servicePrice || 2500) * discountPercent) / 100)) * 0.18 * 100 / 100).toLocaleString()}</span>
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="text-[9px] uppercase tracking-widest text-ink-green/50">GST (18%)</span>
+                        <span className="font-mono text-ink-green/80">₹{activeGstAmount.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between items-center pt-2 border-t border-ink-green/10">
+                        <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-ink-green">Total Payable</span>
+                        <span className="text-xl font-mono text-ink-green font-bold">₹{activeTotalAmount.toLocaleString()}</span>
+                      </div>
                     </div>
-                    <div className="flex justify-between items-center pt-2 border-t border-ink-green/10">
-                      <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-ink-green">Total Payable</span>
-                      <span className="text-xl font-mono text-ink-green font-bold">₹{Math.round((((content.servicePrice || 2500) - Math.round(((content.servicePrice || 2500) * discountPercent) / 100)) + (((content.servicePrice || 2500) - Math.round(((content.servicePrice || 2500) * discountPercent) / 100)) * 0.18)) * 100 / 100).toLocaleString()}</span>
-                    </div>
-                  </div>
-                  
-                  <button type="submit" className="w-full !mt-10 bg-ink-green text-[#D5C8AD] py-4 text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-ink-green/90 transition-colors shadow-md flex items-center justify-center gap-2">
-                    Confirm Commission <ChevronRight className="w-3 h-3" />
+                  ) : null}
+
+                  <button type="submit" className="w-full mt-8 bg-ink-green text-[#D5C8AD] py-4 text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-ink-green/90 transition-colors shadow-md">
+                    {isCustomBrand ? 'Request Custom Quote' : 'Confirm Commission'}
                   </button>
                 </form>
+                )}
               </div>
             </motion.div>
           </motion.div>

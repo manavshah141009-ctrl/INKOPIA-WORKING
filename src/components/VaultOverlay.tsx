@@ -81,12 +81,14 @@ function PenSlot({ pen, onSelect, index }: { pen: typeof PEN_SILHOUETTES[0]; onS
 
 interface BookingData {
   clientName: string;
-  location: string;
+  streetAddress: string;
+  city: string;
+  state: string;
+  postalCode: string;
   locationType: 'Residence' | 'Office';
   date: string;
   time: string;
   amount: number;
-  paymentMethod?: string;
 }
 
 interface BookingErrors {
@@ -97,36 +99,39 @@ interface BookingErrors {
 
 function BookingForm({ penType, onClose, onConfirmed }: { penType: string; onClose: () => void; onConfirmed: (data: BookingData) => void }) {
   const { content } = useSite();
+  const { brandPricings } = useOrders();
   const [booking, setBooking] = useState<BookingData>(() => ({
     clientName: localStorage.getItem('inkopia_user_name') || '',
-    location: localStorage.getItem('inkopia_user_address') || '',
+    streetAddress: localStorage.getItem('inkopia_user_street') || '',
+    city: localStorage.getItem('inkopia_user_city') || '',
+    state: localStorage.getItem('inkopia_user_state') || '',
+    postalCode: localStorage.getItem('inkopia_user_zip') || '',
     locationType: 'Residence',
     date: '',
     time: '14:00',
     amount: content.servicePrice || 2500,
-    paymentMethod: 'Cash on Service'
   }));
 
-  // Voucher and pricing state
-  const [voucherCode, setVoucherCode] = useState('');
-  const [appliedVoucher, setAppliedVoucher] = useState('');
-  const [discountPercent, setDiscountPercent] = useState(0);
-  const [voucherError, setVoucherError] = useState('');
-  const [isValidatingVoucher, setIsValidatingVoucher] = useState(false);
+  // Pricing state
+  const [selectedInk, setSelectedInk] = useState<string>('');
+  const [penBrand, setPenBrand] = useState('');
+  const [customInkBrand, setCustomInkBrand] = useState('');
+  const [inkColor, setInkColor] = useState('');
 
   const [errors, setErrors] = useState<Partial<Record<keyof BookingData, string>>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const baseAmount = content.servicePrice || 2500;
-  const discountAmount = Math.round((baseAmount * discountPercent) / 100);
-  const priceAfterDiscount = baseAmount - discountAmount;
-  const gstAmount = Math.round(priceAfterDiscount * 0.18 * 100) / 100;
-  const totalAmount = Math.round((priceAfterDiscount + gstAmount) * 100) / 100;
+  const isCustomBrand = selectedInk === 'other';
+  const selectedPricingTier = brandPricings?.find(p => p.brand === selectedInk);
+  const baseAmount = selectedPricingTier ? Number(selectedPricingTier.price) : (content.servicePrice || 2500);
+  const gstAmount = Math.round(baseAmount * 0.18 * 100) / 100;
+  const totalAmount = (isCustomBrand || !selectedInk) ? 0 : Math.round((baseAmount + gstAmount) * 100) / 100;
 
   const validate = (): boolean => {
     const errs: BookingErrors = {};
     if (!booking.clientName.trim()) errs.clientName = 'Please enter your name.';
-    if (!booking.location.trim()) errs.location = 'Please provide a delivery location.';
+    if (!booking.streetAddress.trim()) errs.location = 'Please provide a valid address.';
+    if (!booking.city.trim() || !booking.postalCode.trim()) errs.location = 'City and Postal Code are required.';
     if (!booking.date) errs.date = 'Please select a preferred date.';
     else {
       const selected = new Date(booking.date);
@@ -146,9 +151,11 @@ function BookingForm({ penType, onClose, onConfirmed }: { penType: string; onClo
     setIsSubmitting(false);
     onConfirmed({
       ...booking,
+      location: `${booking.streetAddress}, ${booking.city}, ${booking.state} - ${booking.postalCode}`,
       amount: totalAmount,
-      baseAmount: baseAmount,
-      voucherCode: appliedVoucher || undefined
+      baseAmount: (isCustomBrand || !selectedInk) ? 0 : baseAmount,
+      instrument: `${penType}${penBrand ? ` - ${penBrand}` : ''}`,
+      ink: `${isCustomBrand ? customInkBrand : selectedInk} - ${inkColor}`,
     });
   };
 
@@ -172,6 +179,14 @@ function BookingForm({ penType, onClose, onConfirmed }: { penType: string; onClo
         We'll arrange a private consultation at your convenience.
       </p>
 
+      {content.acceptingOrders === false ? (
+        <div className="text-center space-y-4 p-6 border border-[hsl(var(--gold)/0.2)] bg-[hsl(var(--gold)/0.05)] mb-8">
+          <h3 className="text-xl font-serif text-[hsl(var(--gold))]">Currently Unavailable</h3>
+          <p className="text-sm font-sans text-white/70">
+            We are temporarily not accepting new commission requests at this time. Please check back later.
+          </p>
+        </div>
+      ) : (
       <form className="space-y-8" onSubmit={handleSubmit} noValidate>
         <div>
           <input
@@ -184,16 +199,106 @@ function BookingForm({ penType, onClose, onConfirmed }: { penType: string; onClo
           />
           {errors.clientName && <p className="text-[9px] text-red-400 mt-1">{errors.clientName}</p>}
         </div>
-        <div>
-          <input
-            id="vault-location"
-            type="text"
-            placeholder="Estate / Office Location"
-            value={booking.location}
-            onChange={e => setBooking(b => ({ ...b, location: e.target.value }))}
-            className={`${inputBase} ${errors.location ? 'border-red-500/70' : 'border-[hsl(var(--gold)/0.3)] focus:border-[hsl(var(--gold))]'}`}
-          />
-          {errors.location && <p className="text-[9px] text-red-400 mt-1">{errors.location}</p>}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="md:col-span-2">
+            <input
+              id="vault-street"
+              type="text"
+              placeholder="Street Address / Estate"
+              value={booking.streetAddress}
+              onChange={e => setBooking(b => ({ ...b, streetAddress: e.target.value }))}
+              className={`${inputBase} ${errors.location ? 'border-red-500/70' : 'border-[hsl(var(--gold)/0.3)] focus:border-[hsl(var(--gold))]'}`}
+            />
+          </div>
+          <div>
+            <input
+              id="vault-city"
+              type="text"
+              placeholder="City"
+              value={booking.city}
+              onChange={e => setBooking(b => ({ ...b, city: e.target.value }))}
+              className={`${inputBase} ${errors.location ? 'border-red-500/70' : 'border-[hsl(var(--gold)/0.3)] focus:border-[hsl(var(--gold))]'}`}
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <input
+              id="vault-state"
+              type="text"
+              placeholder="State"
+              value={booking.state}
+              onChange={e => setBooking(b => ({ ...b, state: e.target.value }))}
+              className={`${inputBase} border-[hsl(var(--gold)/0.3)] focus:border-[hsl(var(--gold))]`}
+            />
+            <input
+              id="vault-zip"
+              type="text"
+              placeholder="Pincode"
+              value={booking.postalCode}
+              onChange={e => setBooking(b => ({ ...b, postalCode: e.target.value }))}
+              className={`${inputBase} ${errors.location ? 'border-red-500/70' : 'border-[hsl(var(--gold)/0.3)] focus:border-[hsl(var(--gold))]'}`}
+            />
+          </div>
+          {errors.location && <p className="text-[9px] text-red-400 mt-1 md:col-span-2">{errors.location}</p>}
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="text-[9px] uppercase tracking-widest text-[hsl(var(--gold)/0.6)] mb-2 block">Your Pen Brand & Model</label>
+            <input
+              type="text"
+              placeholder="e.g. Lamy Safari"
+              value={penBrand}
+              onChange={e => setPenBrand(e.target.value)}
+              className={`${inputBase} border-[hsl(var(--gold)/0.3)] focus:border-[hsl(var(--gold))]`}
+              required
+            />
+          </div>
+          <div>
+            <label className="text-[9px] uppercase tracking-widest text-[hsl(var(--gold)/0.6)] mb-2 block">Select Master Ink Brand *</label>
+            <select
+              required
+              value={selectedInk}
+              onChange={e => setSelectedInk(e.target.value)}
+              className={`${inputBase} border-[hsl(var(--gold)/0.3)] focus:border-[hsl(var(--gold))] appearance-none`}
+              style={{ backgroundImage: 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23D4AF37%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right .7em top 50%', backgroundSize: '.65em auto' }}
+            >
+              <option value="" className="bg-[#0A0A0A] text-white">Select an Ink Brand...</option>
+              {brandPricings?.map((pricing: any) => (
+                <option key={pricing.id} value={pricing.brand} className="bg-[#0A0A0A] text-white">
+                  {pricing.brand} (₹{Number(pricing.price).toLocaleString()})
+                </option>
+              ))}
+              <option value="other" className="bg-[#0A0A0A] text-[hsl(var(--gold))] italic">Other / My Brand is Not Listed</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="text-[9px] uppercase tracking-widest text-[hsl(var(--gold)/0.6)] mb-2 block">Specific Ink Name / Color *</label>
+            <input
+              type="text"
+              placeholder="e.g. Kon-Peki, Royal Blue"
+              value={inkColor}
+              onChange={e => setInkColor(e.target.value)}
+              className={`${inputBase} border-[hsl(var(--gold)/0.3)] focus:border-[hsl(var(--gold))]`}
+              required
+            />
+          </div>
+
+          {isCustomBrand && (
+            <div className="animate-in fade-in slide-in-from-top-2">
+              <label className="text-[9px] uppercase tracking-widest text-[hsl(var(--gold)/0.6)] mb-2 block">Custom Ink Brand *</label>
+              <input
+                type="text"
+                placeholder="e.g. Noodler's"
+                value={customInkBrand}
+                onChange={e => setCustomInkBrand(e.target.value)}
+                className={`${inputBase} border-[hsl(var(--gold)/0.3)] focus:border-[hsl(var(--gold))]`}
+                required
+              />
+            </div>
+          )}
         </div>
         <div className="grid grid-cols-2 gap-6">
           <div>
@@ -238,117 +343,46 @@ function BookingForm({ penType, onClose, onConfirmed }: { penType: string; onClo
             ))}
           </div>
         </div>
-        <div>
-          <label className="text-[9px] uppercase tracking-widest text-[hsl(var(--gold)/0.6)] mb-2 block">Payment Method</label>
-          <select
-            value={booking.paymentMethod}
-            onChange={e => setBooking(b => ({ ...b, paymentMethod: e.target.value }))}
-            className={`${inputBase} border-[hsl(var(--gold)/0.3)] focus:border-[hsl(var(--gold))] appearance-none`}
-            style={{ backgroundImage: 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23D4AF37%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right .7em top 50%', backgroundSize: '.65em auto' }}
-          >
-            <option value="Cash on Service" className="bg-[#0A0A0A] text-white">Cash on Service</option>
-            <option value="UPI" className="bg-[#0A0A0A] text-white">UPI</option>
-          </select>
-        </div>
 
-        {/* Dynamic Voucher Code Entry */}
-        <div className="space-y-2 pt-2 border-t border-[hsl(var(--gold)/0.1)]">
-          <label className="text-[9px] uppercase tracking-widest text-[hsl(var(--gold)/0.6)] block">Voucher Code</label>
-          <div className="flex gap-3 items-end">
-            <input
-              type="text"
-              placeholder="e.g. INK20"
-              value={voucherCode}
-              onChange={e => {
-                setVoucherCode(e.target.value.toUpperCase());
-                setVoucherError('');
-              }}
-              className="flex-1 bg-transparent border-b pb-3 pt-1 text-white font-sans text-sm tracking-wide placeholder:text-[#555] focus:outline-none border-[hsl(var(--gold)/0.3)] focus:border-[hsl(var(--gold))] uppercase"
-            />
-            <button
-              type="button"
-              onClick={async () => {
-                if (!voucherCode.trim()) {
-                  setVoucherError('Please enter a voucher code.');
-                  return;
-                }
-                setIsValidatingVoucher(true);
-                setVoucherError('');
-                try {
-                  const email = localStorage.getItem('inkopia_user_email') || '';
-                  const { data } = await axios.post('/api/orders/validate-voucher', {
-                    voucher_code: voucherCode,
-                    customer_email: email
-                  });
-                  if (data.valid) {
-                    setDiscountPercent(data.discount_percent);
-                    setAppliedVoucher(data.code);
-                    toast.success(`Voucher ${data.code} applied! ${data.discount_percent}% Discount`);
-                  } else {
-                    setVoucherError(data.error || 'Invalid voucher code.');
-                    setDiscountPercent(0);
-                    setAppliedVoucher('');
-                  }
-                } catch (err) {
-                  setVoucherError('Error validating voucher.');
-                } finally {
-                  setIsValidatingVoucher(false);
-                }
-              }}
-              disabled={isValidatingVoucher}
-              className="px-4 py-2 border border-[hsl(var(--gold))] text-[hsl(var(--gold))] font-sans text-[10px] uppercase tracking-widest hover:bg-[hsl(var(--gold))] hover:text-black transition-colors"
-            >
-              {isValidatingVoucher ? '...' : 'Apply'}
-            </button>
-          </div>
-          {voucherError && <p className="text-[9px] text-red-400 mt-1">{voucherError}</p>}
-          {appliedVoucher && (
-            <p className="text-[9px] text-emerald-400 mt-1">
-              ✓ Voucher {appliedVoucher} active! Save {discountPercent}% on Service Fee.
+        {isCustomBrand ? (
+          <div className="p-4 border border-[hsl(var(--gold)/0.3)] bg-[hsl(var(--gold)/0.05)] text-center space-y-2 mt-4">
+            <h4 className="text-[10px] uppercase tracking-widest text-[hsl(var(--gold))] font-bold">Custom Quote Required</h4>
+            <p className="text-xs text-white/70 font-sans">
+              As you have selected an unlisted brand, our manager will review your instrument details and contact you with a bespoke pricing quote before confirming the service.
             </p>
-          )}
-        </div>
-
-        {/* Custom luxury Pricing Summary showing 18% GST */}
-        <div className="pt-4 border-t border-[hsl(var(--gold)/0.15)] space-y-2">
-          <div className="flex justify-between items-center text-xs">
-            <span className="text-[9px] uppercase tracking-widest text-[#666]">Base Service Fee</span>
-            <span className="font-mono text-white/80">₹{baseAmount.toLocaleString()}</span>
           </div>
-          {discountPercent > 0 && (
+        ) : selectedInk ? (
+          <div className="pt-4 border-t border-[hsl(var(--gold)/0.15)] space-y-2">
             <div className="flex justify-between items-center text-xs">
-              <span className="text-[9px] uppercase tracking-widest text-emerald-500">Discount ({appliedVoucher} — {discountPercent}%)</span>
-              <span className="font-mono text-emerald-500">-₹{discountAmount.toLocaleString()}</span>
+              <span className="text-[9px] uppercase tracking-widest text-white/50">Base Service Fee</span>
+              <span className="font-mono text-white/80">₹{baseAmount.toLocaleString()}</span>
             </div>
-          )}
-          <div className="flex justify-between items-center text-xs">
-            <span className="text-[9px] uppercase tracking-widest text-[#666]">GST (18%)</span>
-            <span className="font-mono text-white/80">₹{gstAmount.toLocaleString()}</span>
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-[9px] uppercase tracking-widest text-white/50">GST (18%)</span>
+              <span className="font-mono text-white/80">₹{gstAmount.toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between items-center pt-2 border-t border-[hsl(var(--gold)/0.1)]">
+              <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-[hsl(var(--gold))]">Total Payable</span>
+              <span className="text-xl font-mono text-[hsl(var(--gold))] font-bold">₹{totalAmount.toLocaleString()}</span>
+            </div>
           </div>
-          <div className="flex justify-between items-center pt-2 border-t border-[hsl(var(--gold)/0.05)]">
-            <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-[hsl(var(--gold))]">Total Payable</span>
-            <span className="text-xl font-mono text-[hsl(var(--gold))] font-bold">₹{totalAmount.toLocaleString()}</span>
-          </div>
-        </div>
+        ) : null}
 
-        <div className="pt-4">
-          <button
-            id="vault-confirm"
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full bg-[hsl(var(--gold))] text-[#0A0A0A] py-4 font-sans text-xs tracking-[0.3em] uppercase font-semibold transition-all duration-300 hover:shadow-[0_4px_30px_rgba(212,175,55,0.4)] hover:scale-[1.02] flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="w-3 h-3 animate-spin" />
-                Arranging…
-              </>
-            ) : (
-              'Confirm Concierge'
-            )}
-          </button>
-        </div>
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full py-4 mt-8 bg-[hsl(var(--gold))] text-[#0A0A0A] text-[11px] uppercase tracking-[0.3em] font-sans font-bold hover:bg-white hover:text-[#0A0A0A] transition-all duration-300 flex items-center justify-center gap-2"
+        >
+          {isSubmitting ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : isCustomBrand ? (
+            'Request Custom Quote'
+          ) : (
+            'Confirm Concierge'
+          )}
+        </button>
       </form>
+      )}
     </motion.div>
   );
 }
@@ -356,13 +390,8 @@ function BookingForm({ penType, onClose, onConfirmed }: { penType: string; onClo
 function ConfirmationScreen({ penType, booking, onClose }: { penType: string; booking: BookingData; onClose: () => void }) {
   const basePrice = booking.baseAmount || 2500;
   const totalAmount = booking.amount;
-  const appliedVoucher = booking.voucherCode;
   
-  // Calculate reverse breakdown for UI if not stored explicitly
-  const discountPercent = appliedVoucher ? (appliedVoucher === 'INK10' ? 10 : appliedVoucher === 'INK15' ? 15 : 20) : 0;
-  const discountAmount = Math.round((basePrice * discountPercent) / 100);
-  const priceAfterDiscount = basePrice - discountAmount;
-  const gstAmount = Math.round(priceAfterDiscount * 0.18 * 100) / 100;
+  const gstAmount = Math.round(basePrice * 0.18 * 100) / 100;
 
   return (
     <motion.div
@@ -423,12 +452,6 @@ function ConfirmationScreen({ penType, booking, onClose }: { penType: string; bo
               <span className="text-[#666] uppercase tracking-wider text-[9px]">Base Service Fee:</span>
               <span className="text-white/80 font-mono">₹{basePrice.toLocaleString()}</span>
             </div>
-            {discountAmount > 0 && (
-              <div className="flex justify-between border-b border-[#222] pb-2 text-xs">
-                <span className="text-emerald-500 uppercase tracking-wider text-[9px]">Discount ({appliedVoucher}):</span>
-                <span className="text-emerald-500 font-mono">-₹{discountAmount.toLocaleString()}</span>
-              </div>
-            )}
             <div className="flex justify-between border-b border-[#222] pb-2 text-xs">
               <span className="text-[#666] uppercase tracking-wider text-[9px]">GST (18%):</span>
               <span className="text-white/80 font-mono">₹{gstAmount.toLocaleString()}</span>

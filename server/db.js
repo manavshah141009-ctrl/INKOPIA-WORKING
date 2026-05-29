@@ -234,6 +234,16 @@ const initDB = async () => {
         );
       `);
 
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS InkBrandPricing (
+            id VARCHAR(191) PRIMARY KEY,
+            brand VARCHAR(191) UNIQUE NOT NULL,
+            price DECIMAL(10,2) NOT NULL,
+            createdAt DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+            updatedAt DATETIME(3) NOT NULL
+        );
+      `);
+
       console.log('✅ MySQL Tables Initialized');
     } catch (err) {
       console.error('❌ MySQL Initialization Error:', err.message);

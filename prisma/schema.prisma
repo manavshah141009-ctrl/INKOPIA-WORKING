@@ -196,3 +196,11 @@ model ServiceablePincode {
   region  String @db.VarChar(100)
 }
 
+model InkBrandPricing {
+  id        String   @id @default(uuid())
+  brand     String   @unique
+  price     Decimal  @db.Decimal(10, 2)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+

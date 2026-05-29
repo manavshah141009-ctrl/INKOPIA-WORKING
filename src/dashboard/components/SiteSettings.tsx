@@ -425,6 +425,29 @@ export const SiteSettings = () => {
             </div>
             <p className="text-[9px] text-ink-green/40 mt-1">This price will be displayed to users during the commission process.</p>
           </div>
+
+          <div className="space-y-2 max-w-md pt-4">
+            <Label className="text-[10px] uppercase tracking-widest font-bold opacity-60">Global Order Status</Label>
+            <div className="flex items-center justify-between p-4 border border-ink-green/20 rounded-md bg-white/5">
+              <div>
+                <p className="text-sm font-bold text-ink-green">Accepting New Orders</p>
+                <p className="text-[10px] text-ink-green/60 mt-1">When disabled, customers cannot book new services.</p>
+              </div>
+              <button
+                onClick={() => saveAsset('acceptingOrders')}
+                onMouseDown={() => handleAssetChange('acceptingOrders', !localContent.acceptingOrders)}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-ink-green focus:ring-offset-2 ${
+                  localContent.acceptingOrders ? 'bg-gold' : 'bg-ink-green/20'
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    localContent.acceptingOrders ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+          </div>
         </div>
       </section>
     </div>

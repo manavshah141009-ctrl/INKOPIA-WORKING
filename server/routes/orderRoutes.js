@@ -15,44 +15,8 @@ const transporter = nodemailer.createTransport({
   tls: { rejectUnauthorized: false }
 });
 
-// ─── Voucher Code System ─────────────────────────────────────
-const VALID_VOUCHERS = {
-  'INK10': 10,
-  'INK15': 15,
-  'INK20': 20,
-};
-
+// ─── Taxes & Pricing System ─────────────────────────────────────
 const GST_RATE = 0.18; // 18% GST
-
-// Validate a voucher code (check if valid + not already used by this email)
-router.post('/validate-voucher', async (req, res) => {
-  try {
-    const { voucher_code, customer_email } = req.body;
-    if (!voucher_code || !customer_email) {
-      return res.status(400).json({ valid: false, error: 'Voucher code and email are required.' });
-    }
-
-    const code = voucher_code.toUpperCase().trim();
-    if (!VALID_VOUCHERS[code]) {
-      return res.json({ valid: false, error: 'Invalid voucher code.' });
-    }
-
-    // Check if already redeemed by this account
-    const existing = await db.query(
-      'SELECT id FROM voucher_redemptions WHERE voucher_code = ? AND customer_email = ?',
-      [code, customer_email.toLowerCase()]
-    );
-
-    if (existing && existing.length > 0) {
-      return res.json({ valid: false, error: 'This voucher has already been redeemed on your account.' });
-    }
-
-    return res.json({ valid: true, discount_percent: VALID_VOUCHERS[code], code });
-  } catch (err) {
-    console.error('Voucher validation error:', err);
-    res.status(500).json({ valid: false, error: 'Failed to validate voucher.' });
-  }
-});
 
 // ─── GET orders ──────────────────────────────────────────────
 router.get('/', async (req, res) => {
@@ -107,29 +71,11 @@ router.post('/', async (req, res) => {
 
     // ── Price Calculation ──
     const serviceBasePrice = parseFloat(base_amount) || 2500;
-    let discountPercent = 0;
-    let appliedVoucher = null;
-
-    // Validate and apply voucher if provided
-    if (voucher_code) {
-      const code = voucher_code.toUpperCase().trim();
-      if (VALID_VOUCHERS[code]) {
-        // Check one-time-per-account
-        const existing = await db.query(
-          'SELECT id FROM voucher_redemptions WHERE voucher_code = ? AND customer_email = ?',
-          [code, customer_email.toLowerCase()]
-        );
-        if (!existing || existing.length === 0) {
-          discountPercent = VALID_VOUCHERS[code];
-          appliedVoucher = code;
-        }
-      }
-    }
-
-    const discountAmount = (serviceBasePrice * discountPercent) / 100;
-    const priceAfterDiscount = serviceBasePrice - discountAmount;
-    const gstAmount = Math.round(priceAfterDiscount * GST_RATE * 100) / 100;
-    const totalPayable = Math.round((priceAfterDiscount + gstAmount) * 100) / 100;
+    const discountPercent = 0;
+    const appliedVoucher = null;
+    const discountAmount = 0;
+    const gstAmount = Math.round(serviceBasePrice * GST_RATE * 100) / 100;
+    const totalPayable = Math.round((serviceBasePrice + gstAmount) * 100) / 100;
 
     const order_id = `ORD${Math.floor(1000 + Math.random() * 9000)}`;
     const concierge_name = process.env.CONCIERGE_NAME || 'Inkopia Concierge';
@@ -155,14 +101,6 @@ router.post('/', async (req, res) => {
       );
     } catch (err) {
       console.warn('⚠️ Could not insert order into MySQL, falling back to local simulation:', err.message);
-    }
-
-    // Record voucher redemption
-    if (appliedVoucher && result) {
-      await db.query(
-        'INSERT INTO voucher_redemptions (voucher_code, customer_email, order_id) VALUES (?, ?, ?)',
-        [appliedVoucher, customer_email.toLowerCase(), order_id]
-      ).catch(e => console.error('[VOUCHER] Failed to record redemption:', e));
     }
 
     let newOrder = null;
@@ -320,6 +258,17 @@ router.put('/:id/status', async (req, res) => {
   } catch (err) {
     console.error('Error updating order status:', err);
     res.status(500).json({ error: 'Failed to update order status' });
+  }
+});
+
+// ─── DELETE order ────────────────────────────────────────────
+router.delete('/:id', async (req, res) => {
+  try {
+    await db.query('DELETE FROM orders WHERE id = ?', [req.params.id]);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Error deleting order:', err);
+    res.status(500).json({ error: 'Failed to delete order' });
   }
 });
 

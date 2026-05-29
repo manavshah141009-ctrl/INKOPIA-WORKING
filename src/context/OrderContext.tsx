@@ -41,8 +41,10 @@ interface OrderContextType {
   inks: InkData[];
   agents: any[];
   notifications: any[];
+  brandPricings: any[];
   isLoading: boolean;
   addOrder: (order: Omit<BookingData, 'id' | 'createdAt' | 'status'>) => Promise<void>;
+  deleteOrder: (id: string) => Promise<void>;
   updateOrderStatus: (id: string, status: BookingData['status']) => Promise<void>;
   addPen: (pen: any) => Promise<void>;
   updatePen: (id: string, updates: any) => Promise<void>;
@@ -55,6 +57,9 @@ interface OrderContextType {
   deleteAgent: (backendId: string) => Promise<void>;
   addNotification: (notification: any) => Promise<void>;
   deleteNotification: (backendId: string) => Promise<void>;
+  addBrandPricing: (pricing: any) => Promise<void>;
+  updateBrandPricing: (id: string, updates: any) => Promise<void>;
+  deleteBrandPricing: (id: string) => Promise<void>;
 }
 
 const OrderContext = createContext<OrderContextType | undefined>(undefined);
@@ -66,6 +71,7 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [inks, setInks] = useState<InkData[]>([]);
   const [agents, setAgents] = useState<any[]>([]);
   const [notifications, setNotifications] = useState<any[]>([]);
+  const [brandPricings, setBrandPricings] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [schemaId, setSchemaId] = useState<string | null>(null);
   const [vaultSchemaId, setVaultSchemaId] = useState<string | null>(null);
@@ -248,6 +254,15 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           }
         }
 
+        try {
+          const { data: pricingsData } = await axios.get('/api/brand-pricing');
+          if (pricingsData && isMounted) {
+            setBrandPricings(pricingsData);
+          }
+        } catch (err) {
+          console.error('Failed to fetch brand pricings:', err);
+        }
+
         // Fetch vault once
         const isAdmin = localStorage.getItem('inkopia_admin_token') || localStorage.getItem('inkopia_auth_role') === 'admin';
         const userEmail = localStorage.getItem('inkopia_user_email');
@@ -400,6 +415,19 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       ));
     } catch (err) {
       console.error('Failed to update order status on backend:', err);
+    }
+  };
+
+  const deleteOrder = async (id: string) => {
+    const orderToDelete = orders.find(o => o.id === id);
+    if (!orderToDelete || !orderToDelete.backendId) return;
+
+    try {
+      await axios.delete(`/api/orders/${orderToDelete.backendId}`);
+      setOrders(orders.filter(order => order.id !== id));
+    } catch (err) {
+      console.error('Failed to delete order on backend:', err);
+      throw err;
     }
   };
 
@@ -577,11 +605,42 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
+  const addBrandPricing = async (pricing: any) => {
+    try {
+      const { data } = await axios.post('/api/brand-pricing', pricing);
+      setBrandPricings(prev => [...prev, data]);
+    } catch (err) {
+      console.error('Failed to add brand pricing:', err);
+      throw err;
+    }
+  };
+
+  const updateBrandPricing = async (id: string, updates: any) => {
+    try {
+      const { data } = await axios.put(`/api/brand-pricing/${id}`, updates);
+      setBrandPricings(prev => prev.map(p => p.id === id ? data : p));
+    } catch (err) {
+      console.error('Failed to update brand pricing:', err);
+      throw err;
+    }
+  };
+
+  const deleteBrandPricing = async (id: string) => {
+    try {
+      await axios.delete(`/api/brand-pricing/${id}`);
+      setBrandPricings(prev => prev.filter(p => p.id !== id));
+    } catch (err) {
+      console.error('Failed to delete brand pricing:', err);
+      throw err;
+    }
+  };
+
   return (
     <OrderContext.Provider value={{ 
-      orders, pens, users, inks, agents, notifications, isLoading,
-      addOrder, updateOrderStatus, addPen, updatePen, addUser, updateUser, deleteUser,
-      addInk, deleteInk, addAgent, deleteAgent, addNotification, deleteNotification
+      orders, pens, users, inks, agents, notifications, brandPricings, isLoading,
+      addOrder, deleteOrder, updateOrderStatus, addPen, updatePen, addUser, updateUser, deleteUser,
+      addInk, deleteInk, addAgent, deleteAgent, addNotification, deleteNotification,
+      addBrandPricing, updateBrandPricing, deleteBrandPricing
     }}>
       {children}
     </OrderContext.Provider>

@@ -8,10 +8,11 @@ import { ThemeController } from './components/ThemeController'
 import { SiteSettings } from './components/SiteSettings'
 import { BackendEditor } from './components/BackendEditor'
 import { InkManager } from './components/InkManager'
+import { PricingManager } from './components/PricingManager'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { PincodeManager } from './components/PincodeManager'
 import { NotificationManager } from './components/NotificationManager'
-import { LayoutDashboard, Users, Bot, Settings, LogOut, ChevronRight, Palette, FileText, Settings2, Sparkles, Database, Droplets, Megaphone, MapPin as MapPinIcon } from 'lucide-react'
+import { LayoutDashboard, Users, Bot, Settings, LogOut, ChevronRight, Palette, FileText, Settings2, Sparkles, Database, Droplets, Megaphone, MapPin as MapPinIcon, Tag } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 
@@ -124,6 +125,15 @@ export const AdminDashboard = () => {
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton 
+                  onClick={() => setActiveView('pricing')}
+                  className={`h-10 transition-all ${activeView === 'pricing' ? 'bg-ink-green/10 text-ink-green font-bold' : 'text-ink-green/70 hover:bg-ink-green/5 hover:text-ink-green'}`}
+                >
+                  <Tag className="w-4 h-4 mr-2" />
+                  <span className="text-xs uppercase tracking-widest">Brand Pricing</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton 
                   onClick={() => setActiveView('pincodes')}
                   className={`h-10 transition-all ${activeView === 'pincodes' ? 'bg-ink-green/10 text-ink-green font-bold' : 'text-ink-green/70 hover:bg-ink-green/5 hover:text-ink-green'}`}
                 >
@@ -230,6 +240,11 @@ export const AdminDashboard = () => {
             {activeView === 'inks' && (
               <div className="animate-in fade-in slide-in-from-bottom-2 duration-500 flex flex-col gap-4">
                 <InkManager />
+              </div>
+            )}
+            {activeView === 'pricing' && (
+              <div className="animate-in fade-in slide-in-from-bottom-2 duration-500 flex flex-col gap-4">
+                <PricingManager />
               </div>
             )}
             {activeView === 'pincodes' && (

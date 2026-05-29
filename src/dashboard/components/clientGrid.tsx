@@ -135,12 +135,17 @@ export const ClientGrid = () => {
                         (client.email && p.ownerEmail === client.email) || 
                         (client.name && p.ownerName === client.name)
                       ).map((p, idx) => (
-                        <div key={idx} className="bg-black/5 p-1.5 border border-ink-green/5 text-[9px] font-semibold text-ink-green flex justify-between items-center normal-case">
-                          <div className="flex flex-col truncate max-w-[120px]">
+                        <div key={idx} className="bg-black/5 p-1.5 border border-ink-green/5 text-[9px] font-semibold text-ink-green flex gap-2 items-center normal-case">
+                          {p.imageUrl ? (
+                            <img src={p.imageUrl} alt={`${p.brand} ${p.model}`} className="w-8 h-8 object-contain bg-white/40 p-0.5 border border-ink-green/10" />
+                          ) : (
+                            <div className="w-8 h-8 bg-ink-green/5 border border-ink-green/10 flex items-center justify-center text-[7px] text-ink-green/30 uppercase tracking-tighter">No Pic</div>
+                          )}
+                          <div className="flex-1 flex flex-col truncate">
                             <span className="truncate font-serif font-bold">{p.brand} {p.model}</span>
                             {p.mechanism && <span className="text-[8px] text-gold uppercase tracking-wider">{p.mechanism}</span>}
                           </div>
-                          <span className="text-[8px] text-ink-green/60 uppercase font-mono tracking-wider">{p.nib}</span>
+                          <span className="text-[8px] text-ink-green/60 uppercase font-mono tracking-wider whitespace-nowrap">{p.nib}</span>
                         </div>
                       ))}
                     </div>

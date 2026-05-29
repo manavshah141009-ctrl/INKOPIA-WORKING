@@ -74,6 +74,7 @@ const uploadRoutes = require('./routes/uploadRoutes');
 const authRoutes = require('./routes/authRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const pincodeRoutes = require('./routes/pincodeRoutes');
+const brandPricingRoutes = require('./routes/brandPricingRoutes');
 
 app.use('/api/schemas', schemaRoutes);
 app.use('/schemas', schemaRoutes);
@@ -87,6 +88,8 @@ app.use('/api/orders', orderRoutes);
 app.use('/orders', orderRoutes);
 app.use('/api/pincodes', pincodeRoutes);
 app.use('/pincodes', pincodeRoutes);
+app.use('/api/brand-pricing', brandPricingRoutes);
+app.use('/brand-pricing', brandPricingRoutes);
 
 // Basic API Check
 app.get('/api/health', (req, res) => {

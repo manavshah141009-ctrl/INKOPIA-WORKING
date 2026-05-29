@@ -56,8 +56,8 @@ export interface SiteContent {
   showConciergeSection: boolean;
   showWhiteGloveSection: boolean;
   showCoverageSection: boolean;
-  showCommissionSection: boolean;
   showDynamicPages: boolean;
+  acceptingOrders: boolean;
 }
 
 export interface SiteTheme {
@@ -133,6 +133,7 @@ const DEFAULT_CONTENT: SiteContent = {
   showCoverageSection: true,
   showCommissionSection: true,
   showDynamicPages: true,
+  acceptingOrders: true,
 };
 
 const DEFAULT_THEME: SiteTheme = {
