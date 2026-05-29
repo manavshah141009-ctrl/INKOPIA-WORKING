@@ -462,17 +462,19 @@ export default function Dashboard() {
               className="bg-[#D5C8AD] border border-ink-green w-full max-w-lg p-0 relative shadow-2xl flex flex-col overflow-hidden"
             >
               <button onClick={() => setIsBookingService(null)} className="absolute top-6 right-6 text-ink-green/60 hover:text-ink-green transition-colors z-20">✕</button>
-              
-              <div className="flex-1 p-8 pr-12">
-                <p className="text-[10px] tracking-[0.3em] font-bold uppercase text-ink-green/60 mb-2">Commission Request</p>
-                <h3 className="font-serif font-black text-2xl md:text-3xl text-ink-green mb-2 leading-tight">The<br/>Concierge<br/>Ritual</h3>
-                <p className="text-xs text-ink-green/80 font-medium mb-8 leading-relaxed">
+              <div className="flex-1 px-6 py-8 sm:p-10 md:p-12 max-h-[85vh] overflow-y-auto">
+                <p className="text-[9px] tracking-[0.4em] font-extrabold uppercase text-ink-green/50 mb-2 font-sans">Commission Request</p>
+                <h3 className="font-serif font-black text-3xl sm:text-4xl text-ink-green mb-3 leading-tight uppercase tracking-tight">The Concierge Ritual</h3>
+                <p className="text-xs text-ink-green/70 mb-8 leading-relaxed font-sans font-medium tracking-wide">
                   Our master specialist will arrive at your premises to meticulously clean, tune, and refill the selected instrument.
                 </p>
 
-                <div className="p-4 border border-ink-green/20 bg-white/20 mb-8 backdrop-blur-sm">
-                  <p className="text-[9px] font-bold uppercase tracking-widest text-ink-green/60 mb-1">Selected Instrument</p>
-                  <p className="font-serif font-bold text-ink-green">{pens.find(p => p.id === isBookingService)?.brand} {pens.find(p => p.id === isBookingService)?.model}</p>
+                <div className="p-6 border border-ink-green/20 bg-white/40 mb-8 backdrop-blur-sm rounded-none text-center shadow-sm relative overflow-hidden group">
+                  <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
+                  <p className="text-[8px] font-bold uppercase tracking-[0.3em] text-ink-green/50 mb-1">Commissioning Instrument</p>
+                  <p className="font-serif font-black text-lg md:text-xl text-ink-green tracking-wide">
+                    {pens.find(p => p.id === isBookingService)?.brand} {pens.find(p => p.id === isBookingService)?.model}
+                  </p>
                 </div>
 
                 {content.acceptingOrders === false ? (
@@ -483,52 +485,106 @@ export default function Dashboard() {
                     </p>
                   </div>
                 ) : (
-                <form onSubmit={handleBookService} className="space-y-6">
-                  <div className="flex gap-4">
-                    <div className="flex-1">
-                      <label className="block text-[9px] font-bold uppercase tracking-widest text-ink-green/70 mb-1">Date</label>
-                      <input required type="date" value={booking.date} onChange={e => setBooking({...booking, date: e.target.value})} className="w-full bg-transparent border-b border-ink-green/30 pb-1 text-ink-green focus:outline-none focus:border-ink-green text-sm" />
-                    </div>
-                    <div className="flex-1">
-                      <label className="block text-[9px] font-bold uppercase tracking-widest text-ink-green/70 mb-1">Time</label>
-                      <input required type="time" value={booking.time} onChange={e => setBooking({...booking, time: e.target.value})} className="w-full bg-transparent border-b border-ink-green/30 pb-1 text-ink-green focus:outline-none focus:border-ink-green text-sm" />
-                    </div>
-                  </div>
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="md:col-span-2">
-                        <label className="block text-[9px] font-bold uppercase tracking-widest text-ink-green/70 mb-1">Street Address / Estate *</label>
-                        <input required type="text" value={booking.streetAddress} onChange={e => setBooking({...booking, streetAddress: e.target.value})} placeholder="Building name, Floor, Street" className="w-full bg-transparent border-b border-ink-green/30 pb-1 text-ink-green focus:outline-none focus:border-ink-green text-sm placeholder:text-ink-green/40" />
-                      </div>
-                      <div>
-                        <label className="block text-[9px] font-bold uppercase tracking-widest text-ink-green/70 mb-1">City *</label>
-                        <input required type="text" placeholder="Mumbai" value={booking.city} onChange={e => setBooking({...booking, city: e.target.value})} className="w-full bg-transparent border-b border-ink-green/30 pb-1 text-ink-green focus:outline-none focus:border-ink-green text-sm placeholder:text-ink-green/40" />
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-[9px] font-bold uppercase tracking-widest text-ink-green/70 mb-1">State *</label>
-                          <input required type="text" placeholder="MH" value={booking.state} onChange={e => setBooking({...booking, state: e.target.value})} className="w-full bg-transparent border-b border-ink-green/30 pb-1 text-ink-green focus:outline-none focus:border-ink-green text-sm placeholder:text-ink-green/40" />
-                        </div>
-                        <div>
-                          <label className="block text-[9px] font-bold uppercase tracking-widest text-ink-green/70 mb-1">Postal Code *</label>
-                          <input required type="text" maxLength={6} placeholder="400001" value={booking.postalCode} onChange={e => setBooking({...booking, postalCode: e.target.value.replace(/\D/g, '')})} className="w-full bg-transparent border-b border-ink-green/30 pb-1 text-ink-green focus:outline-none focus:border-ink-green text-sm placeholder:text-ink-green/40" />
-                        </div>
-                      </div>
+                <form onSubmit={handleBookService} className="space-y-8">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-[8px] font-extrabold uppercase tracking-[0.25em] text-ink-green/60 mb-1.5 font-sans">Date *</label>
+                      <input 
+                        required 
+                        type="date" 
+                        min={new Date().toISOString().split('T')[0]} 
+                        value={booking.date} 
+                        onChange={e => setBooking({...booking, date: e.target.value})} 
+                        className="w-full bg-transparent border-b-2 border-ink-green/25 py-3 h-[48px] text-ink-green focus:outline-none focus:border-ink-green transition-all duration-300 text-sm" 
+                      />
                     </div>
                     <div>
-                      <label className="block text-[9px] font-bold uppercase tracking-widest text-ink-green/70 mb-1">Mobile Phone Number *</label>
-                      <input required type="tel" maxLength={10} value={booking.clientPhone} onChange={e => setBooking({...booking, clientPhone: e.target.value.replace(/\D/g, '')})} placeholder="10-digit mobile number" className="w-full bg-transparent border-b border-ink-green/30 pb-1 text-ink-green focus:outline-none focus:border-ink-green text-sm placeholder:text-ink-green/40" />
+                      <label className="block text-[8px] font-extrabold uppercase tracking-[0.25em] text-ink-green/60 mb-1.5 font-sans">Time *</label>
+                      <input 
+                        required 
+                        type="time" 
+                        value={booking.time} 
+                        onChange={e => setBooking({...booking, time: e.target.value})} 
+                        className="w-full bg-transparent border-b-2 border-ink-green/25 py-3 h-[48px] text-ink-green focus:outline-none focus:border-ink-green transition-all duration-300 text-sm" 
+                      />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-6">
                     <div>
-                      <label className="block text-[9px] font-bold uppercase tracking-widest text-ink-green/70 mb-1">Select Master Ink Brand *</label>
+                      <label className="block text-[8px] font-extrabold uppercase tracking-[0.25em] text-ink-green/60 mb-1.5 font-sans">Street Address / Estate *</label>
+                      <input 
+                        required 
+                        type="text" 
+                        value={booking.streetAddress} 
+                        onChange={e => setBooking({...booking, streetAddress: e.target.value})} 
+                        placeholder="Building name, Floor, Street" 
+                        className="w-full bg-transparent border-b-2 border-ink-green/25 py-3 h-[48px] text-ink-green focus:outline-none focus:border-ink-green transition-all duration-300 text-sm placeholder:text-ink-green/30" 
+                      />
+                    </div>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-[8px] font-extrabold uppercase tracking-[0.25em] text-ink-green/60 mb-1.5 font-sans">City *</label>
+                        <input 
+                          required 
+                          type="text" 
+                          placeholder="Mumbai" 
+                          value={booking.city} 
+                          onChange={e => setBooking({...booking, city: e.target.value})} 
+                          className="w-full bg-transparent border-b-2 border-ink-green/25 py-3 h-[48px] text-ink-green focus:outline-none focus:border-ink-green transition-all duration-300 text-sm placeholder:text-ink-green/30" 
+                        />
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-[8px] font-extrabold uppercase tracking-[0.25em] text-ink-green/60 mb-1.5 font-sans">State *</label>
+                          <input 
+                            required 
+                            type="text" 
+                            placeholder="MH" 
+                            value={booking.state} 
+                            onChange={e => setBooking({...booking, state: e.target.value})} 
+                            className="w-full bg-transparent border-b-2 border-ink-green/25 py-3 h-[48px] text-ink-green focus:outline-none focus:border-ink-green transition-all duration-300 text-sm placeholder:text-ink-green/30" 
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[8px] font-extrabold uppercase tracking-[0.25em] text-ink-green/60 mb-1.5 font-sans">Postal Code *</label>
+                          <input 
+                            required 
+                            type="text" 
+                            maxLength={6} 
+                            placeholder="400001" 
+                            value={booking.postalCode} 
+                            onChange={e => setBooking({...booking, postalCode: e.target.value.replace(/\D/g, '')})} 
+                            className="w-full bg-transparent border-b-2 border-ink-green/25 py-3 h-[48px] text-ink-green focus:outline-none focus:border-ink-green transition-all duration-300 text-sm placeholder:text-ink-green/30" 
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-[8px] font-extrabold uppercase tracking-[0.25em] text-ink-green/60 mb-1.5 font-sans">Mobile Phone Number *</label>
+                      <input 
+                        required 
+                        type="tel" 
+                        maxLength={10} 
+                        value={booking.clientPhone} 
+                        onChange={e => setBooking({...booking, clientPhone: e.target.value.replace(/\D/g, '')})} 
+                        placeholder="10-digit mobile number" 
+                        className="w-full bg-transparent border-b-2 border-ink-green/25 py-3 h-[48px] text-ink-green focus:outline-none focus:border-ink-green transition-all duration-300 text-sm placeholder:text-ink-green/30" 
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-[8px] font-extrabold uppercase tracking-[0.25em] text-ink-green/60 mb-1.5 font-sans">Select Master Ink Brand *</label>
                       <select
                         required
                         value={booking.inkName}
                         onChange={e => setBooking({...booking, inkName: e.target.value})}
-                        className="w-full bg-transparent border-b border-ink-green/30 pb-1 text-ink-green focus:outline-none focus:border-ink-green text-sm appearance-none cursor-pointer"
+                        className="w-full bg-transparent border-b-2 border-ink-green/25 py-3 h-[48px] text-ink-green focus:outline-none focus:border-ink-green transition-all duration-300 text-sm appearance-none cursor-pointer"
                       >
                         <option value="" className="bg-[#D5C8AD] text-ink-green">Select an Ink Brand...</option>
                         {brandPricings?.map((pricing: any) => (
@@ -540,40 +596,38 @@ export default function Dashboard() {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-[9px] font-bold uppercase tracking-widest text-ink-green/70 mb-1">Specific Ink Name / Color *</label>
+                      <label className="block text-[8px] font-extrabold uppercase tracking-[0.25em] text-ink-green/60 mb-1.5 font-sans">Specific Ink Name / Color *</label>
                       <input 
                         required 
                         type="text" 
                         value={inkColor} 
                         onChange={e => setInkColor(e.target.value)} 
                         placeholder="e.g. Kon-Peki, Royal Blue" 
-                        className="w-full bg-transparent border-b border-ink-green/30 pb-1 text-ink-green focus:outline-none focus:border-ink-green text-sm placeholder:text-ink-green/40" 
+                        className="w-full bg-transparent border-b-2 border-ink-green/25 py-3 h-[48px] text-ink-green focus:outline-none focus:border-ink-green transition-all duration-300 text-sm placeholder:text-ink-green/30" 
                       />
                     </div>
                   </div>
 
                   {isCustomBrand && (
                     <div className="animate-in fade-in slide-in-from-top-2">
-                      <label className="block text-[9px] font-bold uppercase tracking-widest text-ink-green/70 mb-1">Custom Ink Brand *</label>
+                      <label className="block text-[8px] font-extrabold uppercase tracking-[0.25em] text-ink-green/60 mb-1.5 font-sans">Custom Ink Brand *</label>
                       <input 
                         required 
                         type="text" 
                         value={customInkBrand} 
                         onChange={e => setCustomInkBrand(e.target.value)} 
                         placeholder="e.g. Noodler's" 
-                        className="w-full bg-transparent border-b border-ink-green/30 pb-1 text-ink-green focus:outline-none focus:border-ink-green text-sm placeholder:text-ink-green/40" 
+                        className="w-full bg-transparent border-b-2 border-ink-green/25 py-3 h-[48px] text-ink-green focus:outline-none focus:border-ink-green transition-all duration-300 text-sm placeholder:text-ink-green/30" 
                       />
                     </div>
                   )}
 
                   {/* Color selection moved to The Ink Sommelier on the right */}
                   
-
-
                   {isCustomBrand ? (
                     <div className="p-4 border border-ink-green/30 bg-ink-green/5 text-center space-y-2 mt-8">
                       <h4 className="text-[10px] uppercase tracking-widest text-ink-green font-bold">Custom Quote Required</h4>
-                      <p className="text-xs text-ink-green/70 font-sans">
+                      <p className="text-xs text-ink-green/70 font-sans leading-relaxed">
                         Your instrument's brand is not currently tracked in our standardized tiers. Our manager will review your details and contact you with a bespoke pricing quote before confirming the service.
                       </p>
                     </div>
