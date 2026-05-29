@@ -466,7 +466,7 @@ export default function Dashboard() {
                 <p className="text-[9px] tracking-[0.4em] font-extrabold uppercase text-ink-green/50 mb-2 font-sans">Commission Request</p>
                 <h3 className="font-serif font-black text-3xl sm:text-4xl text-ink-green mb-3 leading-tight uppercase tracking-tight">The Concierge Ritual</h3>
                 <p className="text-xs text-ink-green/70 mb-8 leading-relaxed font-sans font-medium tracking-wide">
-                  Our master specialist will arrive at your premises to meticulously clean, tune, and refill the selected instrument.
+                  Our master specialist will arrive at your premises to meticulously clean and refill the selected instrument.
                 </p>
 
                 <div className="p-6 border border-ink-green/20 bg-white/40 mb-8 backdrop-blur-sm rounded-none text-center shadow-sm relative overflow-hidden group">

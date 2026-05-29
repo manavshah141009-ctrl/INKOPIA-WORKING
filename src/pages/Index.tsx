@@ -285,15 +285,9 @@ const Index = () => {
                   <span key={i} className="block md:inline">{part}{i === 0 && part ? '.' : ''}{i === 0 && <br className="hidden md:block" />}</span>
                 ))}
               </h2>
-              <p className="max-w-sm text-center text-sm text-foreground/70 leading-relaxed mb-8 font-sans font-light">
+              <p className="max-w-sm text-center text-sm text-foreground/70 leading-relaxed mb-12 font-sans font-light">
                 {content.commissionText}
               </p>
-              <div className="mb-12 text-center border border-gold/20 p-8 glass-panel max-w-md relative overflow-hidden group">
-                <div className="absolute inset-0 bg-gold/5 -translate-x-full group-hover:translate-x-0 transition-transform duration-1000" />
-                <p className="text-[10px] uppercase tracking-widest text-gold mb-2 font-bold relative z-10">Current Highlight</p>
-                <h4 className="font-serif text-2xl text-primary mb-2 relative z-10">{content.commissionPenBrand}</h4>
-                <p className="italic text-muted-foreground font-serif text-lg relative z-10">{content.commissionPenName}</p>
-              </div>
               <button
                 onClick={() => {
                   navigate(isLoggedIn ? '/dashboard' : '/signup');
