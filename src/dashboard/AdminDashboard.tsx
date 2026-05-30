@@ -13,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { PincodeManager } from './components/PincodeManager'
 import { NotificationManager } from './components/NotificationManager'
 import { BlogManager } from './components/BlogManager'
-import { LayoutDashboard, Users, Bot, Settings, LogOut, ChevronRight, Palette, FileText, Settings2, Sparkles, Database, Droplets, Megaphone, MapPin as MapPinIcon, Tag } from 'lucide-react'
+import { LayoutDashboard, Users, Bot, Settings, LogOut, ChevronRight, Palette, FileText, Settings2, Sparkles, Database, Droplets, Megaphone, MapPin as MapPinIcon, Tag, BookOpen } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 
