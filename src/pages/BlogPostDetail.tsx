@@ -1,17 +1,34 @@
 import { useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
-import { blogPosts, BlogPost } from "@/lib/blogData";
+import { blogPosts } from "@/lib/blogData";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Calendar, Clock, ArrowLeft, ChevronRight, User, BookOpen, ExternalLink } from "lucide-react";
-import { toast } from "sonner";
+import { Calendar, Clock, ArrowLeft, ChevronRight, User, BookOpen } from "lucide-react";
+import { useOrders } from "@/context/OrderContext";
 
 export default function BlogPostDetail() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const isLoggedIn = localStorage.getItem('inkopia_auth') === 'true';
+  const { blogPosts: apiPosts } = useOrders();
 
-  const post = blogPosts.find(p => p.slug === slug);
+  const activePosts = apiPosts && apiPosts.length > 0 ? apiPosts : blogPosts;
+  const post = activePosts.find(p => p.slug === slug);
+
+  const getAuthorName = (p: any) => {
+    if (p.author && typeof p.author === 'object') return p.author.name;
+    return p.author || "Manav Shah";
+  };
+
+  const getAuthorRole = (p: any) => {
+    if (p.author && typeof p.author === 'object') return p.author.role;
+    return p.authorRole || "Lead Fountain Pen Specialist";
+  };
+
+  const formatReadingTime = (time: any) => {
+    if (typeof time === 'string') return time;
+    return `${time || 5} min read`;
+  };
 
   useEffect(() => {
     if (!post) return;
@@ -43,11 +60,11 @@ export default function BlogPostDetail() {
       "@type": "Article",
       "headline": post.title,
       "description": post.metaDescription,
-      "datePublished": new Date(post.publishedDate).toISOString(),
+      "datePublished": post.publishedDate ? new Date(post.publishedDate).toISOString() : new Date().toISOString(),
       "author": {
         "@type": "Person",
-        "name": post.author.name,
-        "jobTitle": post.author.role
+        "name": getAuthorName(post),
+        "jobTitle": getAuthorRole(post)
       },
       "publisher": {
         "@type": "Organization",
@@ -94,7 +111,8 @@ export default function BlogPostDetail() {
     );
   }
 
-  const relatedPosts = blogPosts.filter(p => post.relatedPostSlugs.includes(p.slug));
+  const relatedSlugs = post.relatedPostSlugs || (post.relatedPosts ? post.relatedPosts.split(',').map((s: string) => s.trim()) : []);
+  const relatedPosts = activePosts.filter(p => p.slug !== slug && relatedSlugs.includes(p.slug));
 
   return (
     <div className="relative min-h-screen w-full bg-[#FDFBF7] text-ink-green selection:bg-gold selection:text-black">
@@ -137,14 +155,14 @@ export default function BlogPostDetail() {
                   <User className="w-5 h-5 text-ink-green/60" />
                 </div>
                 <div>
-                  <p className="text-xs font-serif font-bold text-ink-green">{post.author.name}</p>
-                  <p className="text-[9px] uppercase tracking-widest text-[#666] font-bold">{post.author.role}</p>
+                  <p className="text-xs font-serif font-bold text-ink-green">{getAuthorName(post)}</p>
+                  <p className="text-[9px] uppercase tracking-widest text-[#666] font-bold">{getAuthorRole(post)}</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-6 text-[9px] uppercase tracking-widest text-ink-green/60 font-bold font-sans">
                 <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5 text-gold" /> {post.publishedDate}</span>
-                <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-gold" /> {post.readingTime}</span>
+                <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-gold" /> {formatReadingTime(post.readingTime)}</span>
               </div>
             </div>
           </header>
@@ -196,7 +214,7 @@ export default function BlogPostDetail() {
                     <div className="flex items-center gap-3 text-[8px] uppercase tracking-widest text-ink-green/50 font-bold font-sans">
                       <span>{rPost.publishedDate}</span>
                       <span>•</span>
-                      <span>{rPost.readingTime}</span>
+                      <span>{formatReadingTime(rPost.readingTime)}</span>
                     </div>
                     <h4 className="font-serif font-black text-lg text-ink-green group-hover:text-gold transition-colors leading-tight">
                       {rPost.title}

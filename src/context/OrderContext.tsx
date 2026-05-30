@@ -42,6 +42,7 @@ interface OrderContextType {
   agents: any[];
   notifications: any[];
   brandPricings: any[];
+  blogPosts: any[];
   isLoading: boolean;
   addOrder: (order: Omit<BookingData, 'id' | 'createdAt' | 'status'>) => Promise<void>;
   deleteOrder: (id: string) => Promise<void>;
@@ -60,6 +61,9 @@ interface OrderContextType {
   addBrandPricing: (pricing: any) => Promise<void>;
   updateBrandPricing: (id: string, updates: any) => Promise<void>;
   deleteBrandPricing: (id: string) => Promise<void>;
+  addBlogPost: (post: any) => Promise<void>;
+  updateBlogPost: (id: string, updates: any) => Promise<void>;
+  deleteBlogPost: (id: string) => Promise<void>;
 }
 
 const OrderContext = createContext<OrderContextType | undefined>(undefined);
@@ -72,6 +76,7 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [agents, setAgents] = useState<any[]>([]);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [brandPricings, setBrandPricings] = useState<any[]>([]);
+  const [blogPosts, setBlogPosts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [schemaId, setSchemaId] = useState<string | null>(null);
   const [vaultSchemaId, setVaultSchemaId] = useState<string | null>(null);
@@ -261,6 +266,15 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           }
         } catch (err) {
           console.error('Failed to fetch brand pricings:', err);
+        }
+
+        try {
+          const { data: blogData } = await axios.get('/api/blog');
+          if (blogData && isMounted) {
+            setBlogPosts(blogData);
+          }
+        } catch (err) {
+          console.error('Failed to fetch blog posts from backend:', err);
         }
 
         // Fetch vault once
@@ -635,12 +649,43 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
+  const addBlogPost = async (post: any) => {
+    try {
+      const { data } = await axios.post('/api/blog', post);
+      setBlogPosts(prev => [data, ...prev]);
+    } catch (err) {
+      console.error('Failed to add blog post:', err);
+      throw err;
+    }
+  };
+
+  const updateBlogPost = async (id: string, updates: any) => {
+    try {
+      const { data } = await axios.put(`/api/blog/${id}`, updates);
+      setBlogPosts(prev => prev.map(p => p.id === id ? data : p));
+    } catch (err) {
+      console.error('Failed to update blog post:', err);
+      throw err;
+    }
+  };
+
+  const deleteBlogPost = async (id: string) => {
+    try {
+      await axios.delete(`/api/blog/${id}`);
+      setBlogPosts(prev => prev.filter(p => p.id !== id));
+    } catch (err) {
+      console.error('Failed to delete blog post:', err);
+      throw err;
+    }
+  };
+
   return (
     <OrderContext.Provider value={{ 
-      orders, pens, users, inks, agents, notifications, brandPricings, isLoading,
+      orders, pens, users, inks, agents, notifications, brandPricings, blogPosts, isLoading,
       addOrder, deleteOrder, updateOrderStatus, addPen, updatePen, addUser, updateUser, deleteUser,
       addInk, deleteInk, addAgent, deleteAgent, addNotification, deleteNotification,
-      addBrandPricing, updateBrandPricing, deleteBrandPricing
+      addBrandPricing, updateBrandPricing, deleteBrandPricing,
+      addBlogPost, updateBlogPost, deleteBlogPost
     }}>
       {children}
     </OrderContext.Provider>

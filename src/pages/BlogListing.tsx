@@ -1,15 +1,18 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { blogPosts, BlogPost } from "@/lib/blogData";
+import { blogPosts } from "@/lib/blogData";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Search, Calendar, Clock, BookOpen, ChevronRight, ArrowLeft } from "lucide-react";
-import { motion } from "framer-motion";
+import { Search, Calendar, Clock, BookOpen, ChevronRight } from "lucide-react";
+import { useOrders } from "@/context/OrderContext";
 
 export default function BlogListing() {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [searchQuery, setSearchQuery] = useState("");
   const isLoggedIn = localStorage.getItem('inkopia_auth') === 'true';
+  const { blogPosts: apiPosts } = useOrders();
+
+  const activePosts = apiPosts && apiPosts.length > 0 ? apiPosts : blogPosts;
 
   useEffect(() => {
     document.title = "The InKoPia Chronicle — Fountain Pen Care, Cleaning & Ink Insights";
@@ -33,7 +36,19 @@ export default function BlogListing() {
     canonical.setAttribute('href', window.location.href);
   }, []);
 
-  const filteredPosts = blogPosts.filter(post => 
+  const formatReadingTime = (time: any) => {
+    if (typeof time === 'string') return time;
+    return `${time || 5} min read`;
+  };
+
+  const getAuthorName = (post: any) => {
+    if (post.author && typeof post.author === 'object') {
+      return post.author.name;
+    }
+    return post.author || "Manav Shah";
+  };
+
+  const filteredPosts = activePosts.filter(post => 
     post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     post.metaDescription.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -104,7 +119,7 @@ export default function BlogListing() {
                   <div className="space-y-4">
                     <div className="flex items-center gap-4 text-[9px] uppercase tracking-widest text-ink-green/60 font-bold font-sans">
                       <span className="flex items-center gap-1"><Calendar className="w-3 h-3 text-gold" /> {filteredPosts[0].publishedDate}</span>
-                      <span className="flex items-center gap-1"><Clock className="w-3 h-3 text-gold" /> {filteredPosts[0].readingTime}</span>
+                      <span className="flex items-center gap-1"><Clock className="w-3 h-3 text-gold" /> {formatReadingTime(filteredPosts[0].readingTime)}</span>
                     </div>
                     <h2 className="font-serif font-black text-2xl md:text-3xl lg:text-4xl text-ink-green group-hover:text-gold transition-colors leading-tight">
                       {filteredPosts[0].title}
@@ -116,7 +131,7 @@ export default function BlogListing() {
                   <div className="flex justify-between items-center pt-6 border-t border-ink-green/10">
                     <div className="flex flex-col">
                       <span className="text-[9px] uppercase tracking-widest text-[#666] font-bold">Author</span>
-                      <span className="text-xs font-serif font-bold text-ink-green">{filteredPosts[0].author.name}</span>
+                      <span className="text-xs font-serif font-bold text-ink-green">{getAuthorName(filteredPosts[0])}</span>
                     </div>
                     <span className="flex items-center gap-1 text-[10px] uppercase tracking-widest text-ink-green font-extrabold group-hover:gap-2 transition-all">
                       Read Article <ChevronRight className="w-4 h-4 text-gold" />
@@ -167,7 +182,7 @@ export default function BlogListing() {
                   <div className="space-y-4">
                     <div className="flex items-center gap-4 text-[9px] uppercase tracking-widest text-ink-green/50 font-bold font-sans">
                       <span className="flex items-center gap-1"><Calendar className="w-2.5 h-2.5 text-gold" /> {post.publishedDate}</span>
-                      <span className="flex items-center gap-1"><Clock className="w-2.5 h-2.5 text-gold" /> {post.readingTime}</span>
+                      <span className="flex items-center gap-1"><Clock className="w-2.5 h-2.5 text-gold" /> {formatReadingTime(post.readingTime)}</span>
                     </div>
                     <h3 className="font-serif font-black text-xl text-ink-green group-hover:text-gold transition-colors leading-tight">
                       {post.title}
@@ -177,7 +192,7 @@ export default function BlogListing() {
                     </p>
                   </div>
                   <div className="flex justify-between items-center pt-6 border-t border-ink-green/5 mt-8">
-                    <span className="text-[9px] text-[#666] font-extrabold uppercase font-sans">By {post.author.name}</span>
+                    <span className="text-[9px] text-[#666] font-extrabold uppercase font-sans">By {getAuthorName(post)}</span>
                     <span className="text-[9px] uppercase tracking-widest text-ink-green font-extrabold flex items-center gap-1 group-hover:gap-1.5 transition-all">
                       Read <ChevronRight className="w-3.5 h-3.5 text-gold" />
                     </span>

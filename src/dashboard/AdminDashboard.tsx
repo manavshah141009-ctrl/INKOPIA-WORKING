@@ -12,6 +12,7 @@ import { PricingManager } from './components/PricingManager'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { PincodeManager } from './components/PincodeManager'
 import { NotificationManager } from './components/NotificationManager'
+import { BlogManager } from './components/BlogManager'
 import { LayoutDashboard, Users, Bot, Settings, LogOut, ChevronRight, Palette, FileText, Settings2, Sparkles, Database, Droplets, Megaphone, MapPin as MapPinIcon, Tag } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
@@ -67,6 +68,15 @@ export const AdminDashboard = () => {
                 >
                   <FileText className="w-4 h-4 mr-2" />
                   <span className="text-xs uppercase tracking-widest">Content Engine</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton 
+                  onClick={() => setActiveView('blog')}
+                  className={`h-10 transition-all ${activeView === 'blog' ? 'bg-ink-green/10 text-ink-green font-bold' : 'text-ink-green/70 hover:bg-ink-green/5 hover:text-ink-green'}`}
+                >
+                  <BookOpen className="w-4 h-4 mr-2" />
+                  <span className="text-xs uppercase tracking-widest">Chronicle Blog</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
@@ -193,6 +203,11 @@ export const AdminDashboard = () => {
                   <h2 className="text-xl font-serif font-bold text-ink-green">Content Management</h2>
                 </div>
                 <ContentEditor />
+              </div>
+            )}
+            {activeView === 'blog' && (
+              <div className="animate-in fade-in slide-in-from-bottom-2 duration-500 flex flex-col gap-4">
+                <BlogManager />
               </div>
             )}
             {activeView === 'theme' && (
