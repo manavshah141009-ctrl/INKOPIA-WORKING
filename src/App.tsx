@@ -12,6 +12,8 @@ import NotFound from "./pages/NotFound.tsx";
 import DynamicPage from "./pages/DynamicPage.tsx";
 import CompleteProfile from "./pages/CompleteProfile.tsx";
 import MyOrders from "./pages/MyOrders.tsx";
+import BlogListing from "./pages/BlogListing.tsx";
+import BlogPostDetail from "./pages/BlogPostDetail.tsx";
 import { SiteProvider } from "./context/SiteContext";
 import { OrderProvider } from "./context/OrderContext";
 import { Navigate } from "react-router-dom";
@@ -44,6 +46,8 @@ const App = () => (
                   <AdminDashboard />
                 </ProtectedAdminRoute>
               } />
+              <Route path="/blog" element={<BlogListing />} />
+              <Route path="/blog/:slug" element={<BlogPostDetail />} />
               <Route path="/p/:slug" element={<DynamicPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

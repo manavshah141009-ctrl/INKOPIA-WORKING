@@ -56,8 +56,15 @@ const Index = () => {
       <div className="page-frame" />
 
 
-      {/* Login link */}
-      <div className={`fixed ${isMobile ? 'top-6 right-6' : 'top-10 right-10'} z-50`}>
+      {/* Navigation & Login */}
+      <div className={`fixed ${isMobile ? 'top-6 right-6' : 'top-10 right-10'} z-50 flex items-center gap-4`}>
+        <Link 
+          to="/blog" 
+          className={`text-[10px] tracking-[0.3em] font-sans uppercase text-ink-green hover:opacity-70 transition-all ${isMobile ? 'bg-white/40 backdrop-blur-md px-4 py-2 rounded-full border border-ink-green/10 shadow-sm' : ''}`}
+        >
+          Chronicle
+        </Link>
+        <span className="text-ink-green/30 text-[10px]">|</span>
         <Link 
           to={isLoggedIn ? "/dashboard" : "/signup"} 
           className={`text-[10px] tracking-[0.3em] font-sans uppercase text-ink-green hover:opacity-70 transition-all ${isMobile ? 'bg-white/40 backdrop-blur-md px-4 py-2 rounded-full border border-ink-green/10 shadow-sm' : ''}`}
@@ -348,6 +355,8 @@ const Index = () => {
         <div className="max-w-7xl mx-auto px-6 md:px-12 pt-8 border-t border-ink-green/5 flex flex-col md:flex-row justify-between items-center gap-4 text-ink-green/55">
           <p className="text-[10px] uppercase tracking-widest">© {new Date().getFullYear()} Inkopia Experience • Private & Confidential</p>
           <div className="flex gap-6 text-[9px] uppercase tracking-widest font-semibold">
+            <Link to="/blog" className="hover:text-gold transition-colors">Chronicle</Link>
+            <span className="opacity-30">|</span>
             <Link to="/admin-login" className="hover:text-gold transition-colors">Command Center</Link>
             <span className="opacity-30">|</span>
             <span className="text-gold">Zero-Borders Premium</span>
