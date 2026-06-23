@@ -52,6 +52,7 @@ const SignUp = () => {
     phone: '',
   });
 
+  const [acceptTerms, setAcceptTerms] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
   const recaptchaRef = useRef<any>(null);
   const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
@@ -78,8 +79,12 @@ const SignUp = () => {
     }
     if (!form.phone.trim()) newErrors.phone = 'Phone number is required for verification.';
     
+    if (!acceptTerms) {
+      toast.error('You must accept the Terms and Policy to continue.');
+    }
+
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return Object.keys(newErrors).length === 0 && acceptTerms;
   };
 
   const handleDirectSignUp = async () => {
@@ -164,6 +169,10 @@ const SignUp = () => {
   };
 
   const handleGoogleSignIn = async () => {
+    if (!acceptTerms) {
+      toast.error('You must accept the Terms and Policy to continue.');
+      return;
+    }
     setIsSubmitting(true);
     try {
       const result = await signInWithPopup(auth, googleProvider);
@@ -353,7 +362,20 @@ const SignUp = () => {
 
             </div>
 
-            <div className="w-full pt-8 flex flex-col items-center gap-4">
+            <div className="flex items-start gap-3 mt-6 border border-ink-green/20 p-4 bg-ink-green/5 max-w-2xl mx-auto">
+              <input 
+                type="checkbox" 
+                id="acceptTerms" 
+                checked={acceptTerms}
+                onChange={(e) => setAcceptTerms(e.target.checked)}
+                className="mt-1 w-4 h-4 cursor-pointer"
+              />
+              <label htmlFor="acceptTerms" className="text-xs text-ink-green/80 font-sans leading-relaxed cursor-pointer select-none">
+                I accept the <Link to="/terms" target="_blank" className="text-gold hover:underline">Terms of Service and Privacy Policy</Link>. I understand that I am commissioning a premium service.
+              </label>
+            </div>
+
+            <div className="w-full pt-6 flex flex-col items-center gap-4">
 
               {/* Standard Sign Up Button */}
               <button

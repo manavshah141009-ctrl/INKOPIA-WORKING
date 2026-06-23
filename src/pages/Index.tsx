@@ -163,6 +163,22 @@ const Index = () => {
                 </p>
               </div>
 
+              {/* Service Catalogs */}
+              <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 mb-32">
+                <a href="/catalogs/EXI1500+GSt.pdf" target="_blank" rel="noopener noreferrer" className="group flex items-center gap-3 px-8 py-4 border border-[hsl(var(--gold)/0.3)] bg-[hsl(var(--gold)/0.02)] hover:bg-[hsl(var(--gold)/0.05)] transition-all duration-300 w-full md:w-auto justify-center">
+                  <span className="text-[10px] uppercase tracking-[0.3em] text-[hsl(var(--gold))] font-bold">Essential Catalog</span>
+                  <svg className="w-4 h-4 text-[hsl(var(--gold))] group-hover:translate-y-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                </a>
+                <a href="/catalogs/Exhi2000+gst.pdf" target="_blank" rel="noopener noreferrer" className="group flex items-center gap-3 px-8 py-4 border border-[hsl(var(--gold)/0.3)] bg-[hsl(var(--gold)/0.02)] hover:bg-[hsl(var(--gold)/0.05)] transition-all duration-300 w-full md:w-auto justify-center">
+                  <span className="text-[10px] uppercase tracking-[0.3em] text-[hsl(var(--gold))] font-bold">Premium Catalog</span>
+                  <svg className="w-4 h-4 text-[hsl(var(--gold))] group-hover:translate-y-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                </a>
+                <a href="/catalogs/Exhi2500+gst.pdf" target="_blank" rel="noopener noreferrer" className="group flex items-center gap-3 px-8 py-4 border border-[hsl(var(--gold)/0.3)] bg-[hsl(var(--gold)/0.02)] hover:bg-[hsl(var(--gold)/0.05)] transition-all duration-300 w-full md:w-auto justify-center">
+                  <span className="text-[10px] uppercase tracking-[0.3em] text-[hsl(var(--gold))] font-bold">Bespoke Catalog</span>
+                  <svg className="w-4 h-4 text-[hsl(var(--gold))] group-hover:translate-y-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                </a>
+              </div>
+
               {/* Pillar 1 — The Mobile Atelier */}
               <div className="mb-40 md:mb-64 group">
                 <div className="flex flex-col md:flex-row items-baseline gap-6 md:gap-20 mb-10 md:mb-16">
@@ -305,6 +321,19 @@ const Index = () => {
                   ? (content.vaultEntranceButtonText || "Enter Your Private Vault") 
                   : (content.bookServiceButtonText || "Book Your Concierge Session")}
               </button>
+
+              {/* Service Catalogs */}
+              <div className="mt-12 flex flex-col items-center z-10">
+                <p className="text-[10px] uppercase tracking-widest text-foreground/50 mb-4 font-bold">Review our service catalogs</p>
+                <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto px-4">
+                  <a href="/catalogs/EXI1500+GSt.pdf" target="_blank" rel="noopener noreferrer" className="text-[11px] uppercase tracking-wider text-accent hover:text-foreground transition-colors font-bold"><span className="underline">Essential Catalog</span></a>
+                  <span className="hidden md:inline text-foreground/20">|</span>
+                  <a href="/catalogs/Exhi2000+gst.pdf" target="_blank" rel="noopener noreferrer" className="text-[11px] uppercase tracking-wider text-accent hover:text-foreground transition-colors font-bold"><span className="underline">Premium Catalog</span></a>
+                  <span className="hidden md:inline text-foreground/20">|</span>
+                  <a href="/catalogs/Exhi2500+gst.pdf" target="_blank" rel="noopener noreferrer" className="text-[11px] uppercase tracking-wider text-accent hover:text-foreground transition-colors font-bold"><span className="underline">Bespoke Catalog</span></a>
+                </div>
+              </div>
+
             </div>
           </section>
         )}

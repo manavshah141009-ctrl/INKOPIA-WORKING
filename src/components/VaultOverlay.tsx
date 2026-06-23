@@ -127,6 +127,14 @@ function BookingForm({ penType, onClose, onConfirmed }: { penType: string; onClo
   const gstAmount = Math.round(baseAmount * 0.18 * 100) / 100;
   const totalAmount = (isCustomBrand || !selectedInk) ? 0 : Math.round((baseAmount + gstAmount) * 100) / 100;
 
+  const getInkImage = (brand: string) => {
+    if (!brand || brand === 'other') return null;
+    const b = brand.toLowerCase();
+    if (b.includes('montblanc')) return '/inks/montblanc.png';
+    if (b.includes('noodler')) return '/inks/noodlers.png';
+    return '/inks/generic.png';
+  };
+
   const validate = (): boolean => {
     const errs: BookingErrors = {};
     if (!booking.clientName.trim()) errs.clientName = 'Please enter your name.';
@@ -253,23 +261,32 @@ function BookingForm({ penType, onClose, onConfirmed }: { penType: string; onClo
               required
             />
           </div>
-          <div>
+          <div className="relative">
             <label className="text-[9px] uppercase tracking-widest text-[hsl(var(--gold)/0.6)] mb-2 block">Select Master Ink Brand *</label>
-            <select
-              required
-              value={selectedInk}
-              onChange={e => setSelectedInk(e.target.value)}
-              className={`${inputBase} border-[hsl(var(--gold)/0.3)] focus:border-[hsl(var(--gold))] appearance-none`}
-              style={{ backgroundImage: 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23D4AF37%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right .7em top 50%', backgroundSize: '.65em auto' }}
-            >
-              <option value="" className="bg-[#0A0A0A] text-white">Select an Ink Brand...</option>
-              {brandPricings?.map((pricing: any) => (
-                <option key={pricing.id} value={pricing.brand} className="bg-[#0A0A0A] text-white">
-                  {pricing.brand} (₹{Number(pricing.price).toLocaleString()})
-                </option>
-              ))}
-              <option value="other" className="bg-[#0A0A0A] text-[hsl(var(--gold))] italic">Other / My Brand is Not Listed</option>
-            </select>
+            <div className="flex gap-4 items-end">
+              <div className="flex-1">
+                <select
+                  required
+                  value={selectedInk}
+                  onChange={e => setSelectedInk(e.target.value)}
+                  className={`${inputBase} border-[hsl(var(--gold)/0.3)] focus:border-[hsl(var(--gold))] appearance-none`}
+                  style={{ backgroundImage: 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23D4AF37%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right .7em top 50%', backgroundSize: '.65em auto' }}
+                >
+                  <option value="" className="bg-[#0A0A0A] text-white">Select an Ink Brand...</option>
+                  {brandPricings?.map((pricing: any) => (
+                    <option key={pricing.id} value={pricing.brand} className="bg-[#0A0A0A] text-white">
+                      {pricing.brand} (₹{Number(pricing.price).toLocaleString()})
+                    </option>
+                  ))}
+                  <option value="other" className="bg-[#0A0A0A] text-[hsl(var(--gold))] italic">Other / My Brand is Not Listed</option>
+                </select>
+              </div>
+              {getInkImage(selectedInk) && (
+                <div className="w-16 h-16 rounded overflow-hidden bg-[#0A0A0A] border border-[hsl(var(--gold)/0.3)] shadow-[0_0_15px_rgba(212,175,55,0.15)] flex-shrink-0 transition-opacity duration-300">
+                  <img src={getInkImage(selectedInk)!} alt="Ink preview" className="w-full h-full object-cover" />
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -367,6 +384,16 @@ function BookingForm({ penType, onClose, onConfirmed }: { penType: string; onClo
             </div>
           </div>
         ) : null}
+
+        {/* Service Catalogs */}
+        <div className="pt-6 mt-6 border-t border-[hsl(var(--gold)/0.15)] flex flex-col gap-4">
+          <p className="text-[9px] uppercase tracking-widest text-white/50 text-center">Review our service catalogs</p>
+          <div className="flex flex-row justify-center gap-6">
+             <a href="/catalogs/EXI1500+GSt.pdf" target="_blank" rel="noopener noreferrer" className="text-[10px] uppercase tracking-wider text-[hsl(var(--gold))] hover:text-white transition-colors flex items-center gap-1"><span className="underline">Essential (₹1500)</span></a>
+             <a href="/catalogs/Exhi2000+gst.pdf" target="_blank" rel="noopener noreferrer" className="text-[10px] uppercase tracking-wider text-[hsl(var(--gold))] hover:text-white transition-colors flex items-center gap-1"><span className="underline">Premium (₹2000)</span></a>
+             <a href="/catalogs/Exhi2500+gst.pdf" target="_blank" rel="noopener noreferrer" className="text-[10px] uppercase tracking-wider text-[hsl(var(--gold))] hover:text-white transition-colors flex items-center gap-1"><span className="underline">Bespoke (₹2500)</span></a>
+          </div>
+        </div>
 
         <button
           type="submit"

@@ -196,6 +196,14 @@ export default function Dashboard() {
     }
   };
 
+  const getInkImage = (brand: string) => {
+    if (!brand || brand === 'other') return null;
+    const b = brand.toLowerCase();
+    if (b.includes('montblanc')) return '/inks/montblanc.png';
+    if (b.includes('noodler')) return '/inks/noodlers.png';
+    return '/inks/generic.png';
+  };
+
   return (
     <div className="relative min-h-screen w-full font-sans text-ink-green selection:bg-ink-green selection:text-white">
       {/* Decorative page frame matching theme */}
@@ -580,20 +588,29 @@ export default function Dashboard() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-[8px] font-extrabold uppercase tracking-[0.25em] text-ink-green/60 mb-1.5 font-sans">Select Master Ink Brand *</label>
-                      <select
-                        required
-                        value={booking.inkName}
-                        onChange={e => setBooking({...booking, inkName: e.target.value})}
-                        className="w-full bg-transparent border-b-2 border-ink-green/25 py-3 h-[48px] text-ink-green focus:outline-none focus:border-ink-green transition-all duration-300 text-sm appearance-none cursor-pointer"
-                      >
-                        <option value="" className="bg-[#D5C8AD] text-ink-green">Select an Ink Brand...</option>
-                        {brandPricings?.map((pricing: any) => (
-                          <option key={pricing.id} value={pricing.brand} className="bg-[#D5C8AD] text-ink-green">
-                            {pricing.brand} (₹{Number(pricing.price).toLocaleString()})
-                          </option>
-                        ))}
-                        <option value="other" className="bg-[#D5C8AD] text-ink-green italic">Other / My Brand is Not Listed</option>
-                      </select>
+                      <div className="flex gap-4 items-end">
+                        <div className="flex-1">
+                          <select
+                            required
+                            value={booking.inkName}
+                            onChange={e => setBooking({...booking, inkName: e.target.value})}
+                            className="w-full bg-transparent border-b-2 border-ink-green/25 py-3 h-[48px] text-ink-green focus:outline-none focus:border-ink-green transition-all duration-300 text-sm appearance-none cursor-pointer"
+                          >
+                            <option value="" className="bg-[#D5C8AD] text-ink-green">Select an Ink Brand...</option>
+                            {brandPricings?.map((pricing: any) => (
+                              <option key={pricing.id} value={pricing.brand} className="bg-[#D5C8AD] text-ink-green">
+                                {pricing.brand} (₹{Number(pricing.price).toLocaleString()})
+                              </option>
+                            ))}
+                            <option value="other" className="bg-[#D5C8AD] text-ink-green italic">Other / My Brand is Not Listed</option>
+                          </select>
+                        </div>
+                        {getInkImage(booking.inkName) && (
+                          <div className="w-12 h-12 rounded border border-ink-green/20 flex-shrink-0 bg-[#0A0A0A] shadow-md flex items-center justify-center overflow-hidden transition-opacity duration-300">
+                            <img src={getInkImage(booking.inkName)!} alt="Ink preview" className="w-full h-full object-cover" />
+                          </div>
+                        )}
+                      </div>
                     </div>
                     <div>
                       <label className="block text-[8px] font-extrabold uppercase tracking-[0.25em] text-ink-green/60 mb-1.5 font-sans">Specific Ink Name / Color *</label>
@@ -647,6 +664,16 @@ export default function Dashboard() {
                       </div>
                     </div>
                   ) : null}
+
+                  {/* Service Catalogs */}
+                  <div className="pt-6 mt-6 border-t border-ink-green/15 flex flex-col gap-4">
+                    <p className="text-[8px] uppercase tracking-widest text-ink-green/60 text-center font-bold">Review our service catalogs</p>
+                    <div className="flex flex-row justify-center gap-6">
+                       <a href="/catalogs/EXI1500+GSt.pdf" target="_blank" rel="noopener noreferrer" className="text-[9px] uppercase tracking-wider text-ink-green hover:opacity-70 transition-colors font-bold"><span className="underline">Essential (₹1500)</span></a>
+                       <a href="/catalogs/Exhi2000+gst.pdf" target="_blank" rel="noopener noreferrer" className="text-[9px] uppercase tracking-wider text-ink-green hover:opacity-70 transition-colors font-bold"><span className="underline">Premium (₹2000)</span></a>
+                       <a href="/catalogs/Exhi2500+gst.pdf" target="_blank" rel="noopener noreferrer" className="text-[9px] uppercase tracking-wider text-ink-green hover:opacity-70 transition-colors font-bold"><span className="underline">Bespoke (₹2500)</span></a>
+                    </div>
+                  </div>
 
                   <button type="submit" className="w-full mt-8 bg-ink-green text-[#D5C8AD] py-4 text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-ink-green/90 transition-colors shadow-md">
                     {isCustomBrand ? 'Request Custom Quote' : 'Confirm Commission'}
